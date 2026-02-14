@@ -1,0 +1,135 @@
+.sev-high {
+  background: #fde7e9;
+  color: #8e030f;
+  font-weight: 700;
+}
+
+.sev-medium {
+  background: #fff1e0;
+  color: #8a4b00;
+  font-weight: 700;
+}
+
+.sev-low {
+  background: #e6f9ee;
+  color: #056b2f;
+  font-weight: 700;
+}
+
+.snippetBox {
+  font-family: monospace;
+  white-space: pre;
+}
+
+.snippetLine {
+  padding: 2px 6px;
+}
+
+.snippetHighlight {
+  background: #fff3b0;
+  border-left: 4px solid #f4b400;
+}
+
+/* --- NEW UI POLISH --- */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.badge-high {
+  background: #fde7e9;
+  color: #8e030f;
+}
+
+.badge-medium {
+  background: #fff1e0;
+  color: #8a4b00;
+}
+
+.badge-low {
+  background: #e6f9ee;
+  color: #056b2f;
+}
+
+.metaRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.metaChip {
+  background: #f3f3f3;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+}
+/*==========Phase8.1.1 START code change==========*/
+.actionBtn {
+  margin-left: 8px;
+}
+/*==========Phase8.1.1 END code change==========*/
+.selectedTriggersTitle {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.selectedTriggersPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.selectedPill {
+  background: #eef3ff;
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+.selectedPillRemove {
+  background: none;
+  border: none;
+  margin-left: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1;
+}
+/* HS - search input spacing */
+lightning-input[type="search"] {
+  margin-bottom: 8px;
+}
+/* HS - helper text under Run Analysis button */
+.runHelpText {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+.sectionHeader {
+  padding-top: 10px;
+  padding-bottom: 8px;
+  margin-top: 12px;
+  border-bottom: 1px solid #e5e5e5;
+}
+.inlineSpinnerRow {
+  min-height: 22px;
+}
+
+.inlineSpinner {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+/* HS - empty state card */
+.emptyStateCard {
+  border: 1px solid #e5e5e5;
+  background: #fafaf9;
+  border-radius: 6px;
+  padding: 14px;
+  margin-top: 14px;
+}

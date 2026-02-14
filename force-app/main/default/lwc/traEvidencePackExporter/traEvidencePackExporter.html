@@ -1,0 +1,146 @@
+<template>
+  <lightning-card title="TRA Test Console">
+    <div class="slds-p-around_medium">
+      <div class="slds-grid slds-gutters slds-wrap">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
+          <lightning-input
+            label="Deployment Analysis Run Id (DAR Id)"
+            value={runId}
+            onchange={handleRunIdChange}
+            placeholder="Paste Run Id (15 or 18 chars)">
+          </lightning-input>
+          <div class="slds-text-body_small slds-text-color_weak slds-m-top_x-small">
+            Loads automatically when Run Id is valid.
+          </div>
+        </div>
+
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-align-bottom">
+          <div class="slds-m-top_small slds-text-align_right">
+            <lightning-button
+              label="Load"
+              variant="brand"
+              onclick={handleLoad}
+              disabled={isLoading}>
+            </lightning-button>
+
+            <lightning-button
+              class="slds-m-left_small"
+              label="Reset"
+              onclick={handleReset}
+              disabled={isLoading}>
+            </lightning-button>
+          </div>
+        </div>
+      </div>
+
+      <template if:true={isLoading}>
+        <div class="slds-m-top_medium">
+          <lightning-spinner alternative-text="Loading"></lightning-spinner>
+          <div class="slds-text-body_small slds-text-color_weak slds-m-top_small">
+            Loading run data and fetching details for all findings: {detailsLoaded}/{detailsTotal}
+          </div>
+        </div>
+      </template>
+
+      <template if:true={errorMsg}>
+        <div class="slds-m-top_medium slds-text-color_error">
+          {errorMsg}
+        </div>
+      </template>
+
+      <template if:true={hasData}>
+        <!-- Button outputs -->
+        <div class="slds-m-top_medium slds-grid slds-gutters slds-wrap">
+          <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
+            <div class="slds-box slds-theme_default">
+              <div class="slds-grid slds-grid_align-spread slds-m-bottom_x-small">
+                <div class="slds-text-heading_small">Copy Summary output</div>
+                <lightning-button label="Copy" onclick={copySummary} disabled={isLoading}></lightning-button>
+              </div>
+              <lightning-textarea value={summaryText} read-only class="mono" style="min-height:220px;"></lightning-textarea>
+            </div>
+          </div>
+
+          <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
+            <div class="slds-box slds-theme_default">
+              <div class="slds-grid slds-grid_align-spread slds-m-bottom_x-small">
+                <div class="slds-text-heading_small">Copy Release Decision output</div>
+                <lightning-button label="Copy" onclick={copyExecDecision} disabled={isLoading}></lightning-button>
+              </div>
+              <lightning-textarea value={execDecisionText} read-only class="mono" style="min-height:220px;"></lightning-textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="slds-m-top_medium slds-grid slds-gutters slds-wrap">
+          <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
+            <div class="slds-box slds-theme_default">
+              <div class="slds-grid slds-grid_align-spread slds-m-bottom_x-small">
+                <div class="slds-text-heading_small">Export CSV output (preview)</div>
+                <div>
+                  <lightning-button label="Copy" onclick={copyCsv} disabled={isLoading}></lightning-button>
+                  <lightning-button class="slds-m-left_x-small" label="Download" onclick={downloadCsv} disabled={isLoading}></lightning-button>
+                </div>
+              </div>
+              <lightning-textarea value={csvText} read-only class="mono" style="min-height:260px;"></lightning-textarea>
+            </div>
+          </div>
+
+          <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
+            <div class="slds-box slds-theme_default">
+              <div class="slds-grid slds-grid_align-spread slds-m-bottom_x-small">
+                <div class="slds-text-heading_small">Export Release Decision output (preview)</div>
+                <div>
+                  <lightning-button label="Copy" onclick={copyReleaseDecision} disabled={isLoading}></lightning-button>
+                  <lightning-button class="slds-m-left_x-small" label="Download" onclick={downloadReleaseDecision} disabled={isLoading}></lightning-button>
+                </div>
+              </div>
+              <lightning-textarea value={releaseDecisionText} read-only class="mono" style="min-height:260px;"></lightning-textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- All View/Details -->
+        <div class="slds-m-top_medium slds-box slds-theme_default">
+          <div class="slds-text-heading_small slds-m-bottom_small">All View / Details (all findings)</div>
+
+          <template if:true={noFindings}>
+            <div class="slds-text-color_weak">No findings detected for this run.</div>
+          </template>
+
+          <template if:false={noFindings}>
+            <lightning-accordion allow-multiple-sections-open>
+              <template for:each={detailCards} for:item="c">
+                <lightning-accordion-section key={c.itemId} name={c.itemId} label={c.label}>
+                  <div class="slds-text-body_small">
+                    <p><b>Severity:</b> {c.severity}</p>
+                    <p><b>Trigger:</b> {c.triggerName}</p>
+                    <p><b>Rule:</b> {c.ruleLabel}</p>
+                    <p><b>Line:</b> {c.lineNumber}</p>
+
+                    <div class="slds-m-top_small">
+                      <p><b>Message</b></p>
+                      <pre class="mono prewrap">{c.message}</pre>
+                    </div>
+
+                    <div class="slds-m-top_small">
+                      <p><b>Recommendation</b></p>
+                      <pre class="mono prewrap">{c.recommendation}</pre>
+                    </div>
+
+                    <template if:true={c.hasSnippet}>
+                      <div class="slds-m-top_small">
+                        <p><b>Snippet</b></p>
+                        <pre class="mono prewrap">{c.snippetText}</pre>
+                      </div>
+                    </template>
+                  </div>
+                </lightning-accordion-section>
+              </template>
+            </lightning-accordion>
+          </template>
+        </div>
+      </template>
+    </div>
+  </lightning-card>
+</template>
