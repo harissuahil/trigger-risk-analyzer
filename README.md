@@ -1,18 +1,13 @@
-# Salesforce DX Project: Next Steps
+## Trigger Risk Analyzer — Strategic Overview
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+Trigger Risk Analyzer (TRA) helps release owners reduce the likelihood of production incidents caused by Apex trigger changes before deployment. It also exposes potential blast radius (what else could be affected) so Salesforce managers can make safer release decisions.
 
-## How Do You Plan to Deploy Your Changes?
+TRA does not guarantee zero incidents, but it reduces exposure and increases visibility before release.
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
-
-## Configure Your Salesforce DX Project
-
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
-
-## Read All About It
-
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+- **Target buyer:** Salesforce Managers, Tech Leads, and Release Owners.
+- **Core promise:** Before deploying a trigger, understand the business risk and potential impact.
+- **Positioning:** TRA is a business risk reduction tool, not a technical rule engine.
+- **Pricing direction:** Premium niche positioning, with target pricing around **$199/month per org**.
+- **Growth approach:** Start with a few paying customers, validate value, expand gradually, and use AppExchange later as a credibility channel.
+- **Time horizon:** Long-term build with focused, disciplined progress.
+- **Guiding product principle:** Build only features that directly reduce perceived production incident risk.
