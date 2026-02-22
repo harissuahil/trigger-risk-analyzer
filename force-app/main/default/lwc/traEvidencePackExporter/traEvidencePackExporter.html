@@ -4,13 +4,13 @@
       <div class="slds-grid slds-gutters slds-wrap">
         <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
           <lightning-input
-            label="Deployment Analysis Run Id (DAR Id)"
+            label="Deployment Analysis Run ID (DAR ID)"
             value={runId}
             onchange={handleRunIdChange}
-            placeholder="Paste Run Id (15 or 18 chars)">
+            placeholder="Paste Run ID (15 or 18 chars)">
           </lightning-input>
           <div class="slds-text-body_small slds-text-color_weak slds-m-top_x-small">
-            Loads automatically when Run Id is valid.
+            Loads automatically when Run ID is valid.
           </div>
         </div>
 
@@ -54,7 +54,7 @@
           <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
             <div class="slds-box slds-theme_default">
               <div class="slds-grid slds-grid_align-spread slds-m-bottom_x-small">
-                <div class="slds-text-heading_small">Copy Summary output</div>
+                <div class="slds-text-heading_small">Copy Summary</div>
                 <lightning-button label="Copy" onclick={copySummary} disabled={isLoading}></lightning-button>
               </div>
               <lightning-textarea value={summaryText} read-only class="mono" style="min-height:220px;"></lightning-textarea>
@@ -64,7 +64,7 @@
           <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
             <div class="slds-box slds-theme_default">
               <div class="slds-grid slds-grid_align-spread slds-m-bottom_x-small">
-                <div class="slds-text-heading_small">Copy Release Decision output</div>
+                <div class="slds-text-heading_small">Copy Release Decision</div>
                 <lightning-button label="Copy" onclick={copyExecDecision} disabled={isLoading}></lightning-button>
               </div>
               <lightning-textarea value={execDecisionText} read-only class="mono" style="min-height:220px;"></lightning-textarea>
@@ -76,7 +76,7 @@
           <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
             <div class="slds-box slds-theme_default">
               <div class="slds-grid slds-grid_align-spread slds-m-bottom_x-small">
-                <div class="slds-text-heading_small">Export CSV output (preview)</div>
+                <div class="slds-text-heading_small">Export CSV (preview)</div>
                 <div>
                   <lightning-button label="Copy" onclick={copyCsv} disabled={isLoading}></lightning-button>
                   <lightning-button class="slds-m-left_x-small" label="Download" onclick={downloadCsv} disabled={isLoading}></lightning-button>

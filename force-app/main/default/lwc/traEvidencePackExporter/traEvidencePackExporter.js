@@ -60,7 +60,7 @@ export default class TraEvidencePackExporter extends LightningElement {
   handleRunIdChange(e) {
     this.runId = (e.target.value || '').trim();
 
-    // Auto-load when Run Id looks valid (15 or 18 chars)
+    // Auto-load when Run ID looks valid (15 or 18 chars)
     clearTimeout(this._debounce);
     this._debounce = setTimeout(() => {
       if (this.isLikelySalesforceId(this.runId)) {
@@ -94,7 +94,7 @@ export default class TraEvidencePackExporter extends LightningElement {
   async loadAll(runId) {
     this.errorMsg = '';
     if (!this.isLikelySalesforceId(runId)) {
-      this.errorMsg = 'Please paste a valid Run Id (15 or 18 characters).';
+      this.errorMsg = 'Please paste a valid Run ID (15 or 18 characters).';
       return;
     }
 
@@ -361,7 +361,7 @@ export default class TraEvidencePackExporter extends LightningElement {
     out += `Build: ${TRA_BUILD_LABEL}\n`;
     out += '======================================\n\n';
 
-    out += `Run Id: ${runId}\n`;
+    out += `Run ID: ${runId}\n`;
     out += `Release Label: ${release}\n`;
     out += `Generated At: ${generated}\n\n`;
 
@@ -473,7 +473,7 @@ export default class TraEvidencePackExporter extends LightningElement {
       `TRA Build: ${TRA_BUILD_LABEL}`,
       `Release Gate Policy: ${this.gatePolicyProfile || 'N/A'}`,
       `Release Gate Version: ${this.gateVersion || 'N/A'}`,
-      `Run Id: ${runId}`,
+      `Run ID: ${runId}`,
       `Release Label: ${release}`,
       `Generated At: ${now.toLocaleString()}`,
       `Filters: Severity=${sev}; Category=${cat}${q ? `; Search="${q}"` : ''}`,
