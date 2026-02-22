@@ -712,7 +712,7 @@ get triggerOptions() {
      `TRA Build: ${TRA_BUILD_LABEL}`, //HS
      `Release Gate Policy: ${this.gatePolicyProfile || 'N/A'}`, //HS
      `Release Gate Version: ${this.gateVersion || 'N/A'}`, //HS
-     `Run Id: ${runId}`,
+     `Run ID: ${runId}`,
      `Release Label: ${release}`,
      `Generated At: ${now.toLocaleString()}`,
      `Filters: Severity=${sev}; Category=${cat}${q ? `; Search="${q}"` : ''}`,
@@ -810,7 +810,7 @@ get triggerOptions() {
 
 
     let out = '';
-    out += 'Trigger Risk Analyzer – Release Decision\n';
+    out += 'Trigger Risk Analyzer - Release Decision\n';
     out += `Build: ${TRA_BUILD_LABEL}\n`; //HS
     out += '======================================\n\n';
 
