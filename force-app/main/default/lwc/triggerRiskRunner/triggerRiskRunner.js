@@ -132,6 +132,10 @@ get triggerOptions() {
     return this.runId && this.filteredItems && this.filteredItems.length > 0;
   }
 
+  get hasAnyFindings() { 
+    return (this.findingsCount || 0) > 0; 
+  } 
+
   get hasRows() {
     return (this.filteredItems || []).length > 0; //Phase5.6.2
   }
@@ -182,7 +186,7 @@ get triggerOptions() {
 
   get releaseGateDecisionLabel() {
     const d = this.releaseDecision;
-    if (d === 'APPROVED_WITH_CONDITIONS') return 'APPROVED (WITH CONDITIONS)';
+    if (d === 'APPROVED_WITH_CONDITIONS') return 'APPROVED WITH CONDITIONS';
     return d || 'N/A';
   }
 
@@ -683,9 +687,9 @@ get triggerOptions() {
     // execLines.push(`- Architect Impacts: ${impacts.length ? impacts.join(', ') : 'N/A'}`);
 
     // NEW (Excel-safe, still manager-friendly)
-        execLines.push(`Overall Deployment Risk: ${this.overallRisk || this.computeOverallRisk()}`);
-        execLines.push(`Release Recommendation: ${this.releaseRecommendation || 'N/A'}`);
-        execLines.push(`Architect Impacts: ${impacts.length ? impacts.join(', ') : 'N/A'}`);
+      execLines.push(`Overall Risk: ${this.overallRisk || this.computeOverallRisk()}`);
+      execLines.push(`Release Recommendation: ${this.releaseGateDecisionLabel}`);
+      execLines.push(`Architect Impacts: ${impacts.length ? impacts.join(', ') : 'N/A'}`);
     //==========Phase6.0.3 END code change=========
 
       execLines.push(' ');
@@ -792,7 +796,7 @@ get triggerOptions() {
     const generated = now ? now.toLocaleString() : '';
 
     const overallRisk = this.overallRisk || this.computeOverallRisk();
-    const rec = this.releaseRecommendation || 'N/A';
+    const rec = this.releaseGateDecisionLabel || 'N/A';
 
     // Executive signal
     const impacts = Array.isArray(this.architectImpacts) ? this.architectImpacts : [];
@@ -820,7 +824,7 @@ get triggerOptions() {
 
     out += 'EXECUTIVE SIGNAL\n';
     out += '---------------\n';
-    out += `Overall Deployment Risk: ${overallRisk}\n`;
+    out += `Overall Risk: ${overallRisk}\n`;
     out += `Release Recommendation: ${rec}\n`;
     out += `Architect Impacts: ${impacts.length ? impacts.join(', ') : 'N/A'}\n\n`;
 
@@ -835,7 +839,7 @@ get triggerOptions() {
 
     out += '\nRELEASE GATE\n';
     out += '------------\n';
-    out += `Release Decision: ${decision}\n`;
+    out += `Gate Outcome: ${this.releaseGateDecisionLabel}\n`;
     out += `Policy: ${policy}\n`;
     out += `Version: ${version}\n\n`;
 
@@ -1049,7 +1053,7 @@ buildReleaseDecisionExecutiveText() {
   const policy = this.gatePolicyProfile || 'N/A';
   const version = this.gateVersion || 'N/A';
 
-  const rec = this.releaseRecommendation || 'N/A';
+  const rec = this.releaseGateDecisionLabel || 'N/A';
   const risk = this.overallRisk || this.computeOverallRisk();
 
   const impacts = Array.isArray(this.architectImpacts) ? this.architectImpacts : [];
@@ -1062,9 +1066,9 @@ buildReleaseDecisionExecutiveText() {
   out += 'Release Decision (Executive)\n';
   out += `Build: ${TRA_BUILD_LABEL}\n`; //HS
   out += '===========================\n\n';
-  out += `Release Decision: ${decision}\n`;
-  out += `Risk Level: ${risk}\n`;
-  out += `Recommendation: ${rec}\n`;
+  out += `Gate Outcome: ${this.releaseGateDecisionLabel}\n`;
+  out += `Overall Risk: ${risk}\n`;
+  out += `Release Recommendation: ${rec}\n`;
   out += `Policy: ${policy} (${version})\n\n`;
 
   if (impacts.length) {

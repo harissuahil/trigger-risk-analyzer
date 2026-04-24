@@ -194,10 +194,10 @@
                 <!-- ========================= -->
                 <!-- Phase6.0-ExecutiveSignal   -->
                 <!-- ========================= -->
-                <template if:true={releaseRecommendation}>
+                <template if:true={hasReleaseGate}>
                     <p class="slds-m-top_x-small">
                         <b>Release Recommendation:</b>
-                        <span class={recommendationBadgeClass}>{releaseRecommendation}</span>
+                        <span class={releaseGateBadgeClass}>{releaseGateDecisionLabel}</span>
                     </p>
                 </template>
 
@@ -225,7 +225,7 @@
                 <!-- Phase6.0-ExecutiveSignal   -->
                 <!-- ========================= -->
 
-              <p class="slds-m-top_x-small"><b>Total Findings:</b> {findingsCount}</p>
+              <p class="slds-m-top_x-small"><b>Findings:</b> {findingsCount}</p>
               <p class="slds-m-top_x-small"><b>Last Updated:</b>
                     <lightning-formatted-date-time
                         value={lastUpdated}
@@ -297,7 +297,7 @@
           </div>
 
           <div class="slds-m-top_small">
-            <p><b>Gate Outcome:</b> {releaseRecommendation}</p>
+            <p><b>Gate Outcome:</b> {releaseGateDecisionLabel}</p>
           </div>
 
           <template if:true={hasGateRationale}>
@@ -332,7 +332,7 @@
         <template if:true={isRunComplete}>
           <!-- Section: Detailed Findings -->
           <div class="sectionHeader slds-m-top_medium">
-            <h2 class="slds-text-heading_small">Detailed Findings</h2>
+            <h2 class="slds-text-heading_small">Findings</h2>
             <p class="slds-text-color_weak slds-text-body_small">
               Filter and review individual findings
             </p>
@@ -386,6 +386,16 @@
                 hide-checkbox-column
               >
               </lightning-datatable>
+            </div>
+          </template>
+          <template if:false={showTable}><!--HS-->
+            <div class="slds-m-top_medium slds-text-color_weak">
+              <template if:false={hasAnyFindings}>
+                No findings detected. This trigger passed all active rules.
+              </template>
+              <template if:true={hasAnyFindings}>
+                No findings match the current filters.
+              </template>
             </div>
           </template>
         </template>

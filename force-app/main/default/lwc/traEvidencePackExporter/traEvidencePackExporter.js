@@ -266,7 +266,7 @@ export default class TraEvidencePackExporter extends LightningElement {
       assessment = 'Medium-severity risks were identified. Review recommended before deployment.';
     }
 
-    const rec = this.releaseRecommendation ? `\nRelease Recommendation: ${this.releaseRecommendation}\n` : '\n';
+    const rec = this.releaseDecision ? `\nRelease Recommendation: ${this.decisionToLabel(this.releaseDecision)}\n` : '\n';
     const impacts = this.architectImpacts ? `Architect Impacts: ${this.architectImpacts}\n` : '';
     const top =
       (this.topRisks || []).length
@@ -297,7 +297,7 @@ export default class TraEvidencePackExporter extends LightningElement {
     const policy = this.gatePolicyProfile || 'N/A';
     const version = this.gateVersion || 'N/A';
 
-    const rec = this.releaseRecommendation || 'N/A';
+    const rec = this.decisionToLabel(this.releaseDecision) || 'N/A';
     const risk = this.overallRisk || this.computeOverallRisk();
 
     const impacts = Array.isArray(this.architectImpacts) ? this.architectImpacts : [];
@@ -310,9 +310,9 @@ export default class TraEvidencePackExporter extends LightningElement {
     out += 'Release Decision (Executive)\n';
     out += `Build: ${TRA_BUILD_LABEL}\n`;
     out += '===========================\n\n';
-    out += `Release Decision: ${decision}\n`;
-    out += `Risk Level: ${risk}\n`;
-    out += `Recommendation: ${rec}\n`;
+    out += `Gate Outcome: ${this.decisionToLabel(this.releaseDecision)}\n`;
+    out += `Overall Risk: ${risk}\n`;
+    out += `Release Recommendation: ${rec}\n`;
     out += `Policy: ${policy} (${version})\n\n`;
 
     if (impacts.length) {
@@ -344,7 +344,7 @@ export default class TraEvidencePackExporter extends LightningElement {
     const generated = now ? now.toLocaleString() : '';
 
     const overallRisk = this.overallRisk || this.computeOverallRisk();
-    const rec = this.releaseRecommendation || 'N/A';
+    const rec = this.decisionToLabel(this.releaseDecision) || 'N/A';
 
     const impacts = Array.isArray(this.architectImpacts) ? this.architectImpacts : [];
     const risks = Array.isArray(this.topRisks) ? this.topRisks : [];
@@ -367,7 +367,7 @@ export default class TraEvidencePackExporter extends LightningElement {
 
     out += 'EXECUTIVE SIGNAL\n';
     out += '---------------\n';
-    out += `Overall Deployment Risk: ${overallRisk}\n`;
+    out += `Overall Risk: ${overallRisk}\n`;
     out += `Release Recommendation: ${rec}\n`;
     out += `Architect Impacts: ${impacts.length ? impacts.join(', ') : 'N/A'}\n\n`;
 
@@ -382,7 +382,7 @@ export default class TraEvidencePackExporter extends LightningElement {
 
     out += '\nRELEASE GATE\n';
     out += '------------\n';
-    out += `Release Decision: ${decision}\n`;
+    out += `Gate Outcome: ${this.decisionToLabel(this.releaseDecision)}\n`;
     out += `Policy: ${policy}\n`;
     out += `Version: ${version}\n\n`;
 
@@ -449,8 +449,8 @@ export default class TraEvidencePackExporter extends LightningElement {
 
     const execLines = [];
     execLines.push('EXECUTIVE SIGNAL:');
-    execLines.push(`Overall Deployment Risk: ${this.overallRisk || this.computeOverallRisk()}`);
-    execLines.push(`Release Recommendation: ${this.releaseRecommendation || 'N/A'}`);
+    execLines.push(`Overall Risk: ${this.overallRisk || this.computeOverallRisk()}`);
+    execLines.push(`Release Recommendation: ${this.decisionToLabel(this.releaseDecision) || 'N/A'}`);
     execLines.push(`Architect Impacts: ${impacts.length ? impacts.join(', ') : 'N/A'}`);
     execLines.push(' ');
     execLines.push('Top Risks:');
@@ -628,6 +628,13 @@ export default class TraEvidencePackExporter extends LightningElement {
     if (med > 0) return 'Medium';
     return 'Low';
   }
+  decisionToLabel(decision) { //HS
+    const d = (decision || '').toUpperCase(); //HS
+    if (d === 'APPROVED_WITH_CONDITIONS') return 'APPROVED WITH CONDITIONS'; //HS
+    if (d === 'APPROVED') return 'APPROVED'; //HS
+    if (d === 'BLOCKED') return 'BLOCKED'; //HS
+    return decision || 'N/A'; //HS
+  } //HS
 
   // ----------------------------
   // Copy + Download actions
