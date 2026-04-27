@@ -715,26 +715,38 @@ private class DeploymentAnalysisControllerTest {
     // ============================================================
     
     @isTest
-    static void getRunStatus_phase7StructuredFields_areNullDueToUnqueriedSOQL() {
+    static void getRunStatus_phase7StructuredFields_shouldMapFromRecord() {
+        // Fields now exist and are in the SOQL — they map directly.
+        // This test replaces the previous null-contract test which documented
+        // the broken state where these fields were not queried.
         Deployment_Analysis_Run__c run = new Deployment_Analysis_Run__c(
-            Status__c = 'Done',
-            High_Count__c = 1
+            Status__c                 = 'Done',
+            Release_Decision__c       = 'BLOCKED',
+            Policy_Profile__c         = 'Standard',
+            Gate_Version__c           = '7.0.1',
+            Release_Recommendation__c = 'NOT RECOMMENDED',
+            Architect_Impacts__c      = 'Bulk/Limit Risk, Transaction Safety Risk',
+            Release_Rationale__c      = 'SOQL inside loops can exceed governor limits under bulk load.'
         );
         insert run;
         
         DeploymentAnalysisController.RunStatusResponse resp =
             DeploymentAnalysisController.getRunStatus(run.Id);
         
-        // These are null because the fields are not in the getRunStatus SOQL.
-        // If this test breaks in the future, it means the SOQL was updated
-        // to include Release Gate fields — which is the right fix, and these
-        // assertions should then be changed to assert the actual values.
-        System.assertEquals(null, resp.releaseDecision,
-                            'releaseDecision is null because Release_Decision__c is not in the SOQL');
-        System.assertEquals(null, resp.policyProfile,
-                            'policyProfile is null because Policy_Profile__c is not in the SOQL');
-        System.assertEquals(null, resp.gateVersion,
-                            'gateVersion is null because Gate_Version__c is not in the SOQL');
+        System.assertEquals('BLOCKED', resp.releaseDecision,
+                            'releaseDecision should map directly from Release_Decision__c');
+        System.assertEquals('Standard', resp.policyProfile,
+                            'policyProfile should map directly from Policy_Profile__c');
+        System.assertEquals('7.0.1', resp.gateVersion,
+                            'gateVersion should map directly from Gate_Version__c');
+        System.assertEquals('NOT RECOMMENDED', resp.releaseRecommendation,
+                            'releaseRecommendation should map directly from Release_Recommendation__c');
+        System.assertEquals('Bulk/Limit Risk, Transaction Safety Risk', resp.architectImpacts,
+                            'architectImpacts should map directly from Architect_Impacts__c');
+        System.assertEquals(
+            'SOQL inside loops can exceed governor limits under bulk load.',
+            resp.releaseRationale,
+            'releaseRationale should map directly from Release_Rationale__c');
     }
     
 }

@@ -66,25 +66,21 @@ public with sharing class DeploymentAnalysisController {
     //HS
     @AuraEnabled
     public static RunStatusResponse getRunStatus(Id runId) {
-        //HS
+        
         Deployment_Analysis_Run__c r = [
-            //HS
             SELECT Id, Status__c, Total_Triggers__c, Processed_Triggers__c,
-                   //HS
-                   High_Count__c, Medium_Count__c, Low_Count__c,
-                   //HS
-                   Error_Message__c, Last_Updated__c,
-                   // Phase6.0-ExecutiveSignal
-                   Overall_Risk__c, Summary__c, Completed_At__c
-            //HS
+            High_Count__c, Medium_Count__c, Low_Count__c,
+            Error_Message__c, Last_Updated__c,
+            Overall_Risk__c, Summary__c, Completed_At__c,
+            Release_Decision__c, Release_Recommendation__c,
+            Policy_Profile__c, Gate_Version__c,
+            Architect_Impacts__c, Release_Rationale__c,
+            Required_Fixes__c, Top_Risks__c
             FROM Deployment_Analysis_Run__c
-            //HS
             WHERE Id = :runId
-            //HS
             LIMIT 1
-            //HS
         ];
-        //HS
+        
         RunStatusResponse resp = new RunStatusResponse();
         //HS
         resp.runId = r.Id; //HS
@@ -99,16 +95,16 @@ public with sharing class DeploymentAnalysisController {
         //==========Phase7.0.1 START code change=========
         Map<String, Schema.SObjectField> fMap = r.getSObjectType().getDescribe().fields.getMap();
         
-        resp.releaseDecision = safeGetString(r, fMap, 'Release_Decision__c');
-        resp.releaseRecommendation = safeGetString(r, fMap, 'Release_Recommendation__c');
-        resp.policyProfile = safeGetString(r, fMap, 'Policy_Profile__c');
-        resp.gateVersion = safeGetString(r, fMap, 'Gate_Version__c');
-        resp.architectImpacts = safeGetString(r, fMap, 'Architect_Impacts__c');
-        resp.releaseRationale = safeGetString(r, fMap, 'Release_Rationale__c');
-        resp.requiredFixes = safeGetString(r, fMap, 'Required_Fixes__c');
+        resp.releaseDecision = r.Release_Decision__c;
+        resp.releaseRecommendation = r.Release_Recommendation__c;
+        resp.policyProfile = r.Policy_Profile__c;
+        resp.gateVersion = r.Gate_Version__c;
+        resp.architectImpacts = r.Architect_Impacts__c;
+        resp.releaseRationale = r.Release_Rationale__c;
+        resp.requiredFixes = r.Required_Fixes__c;
         //==========Phase7.0.1 START code change=========
         // Top_Risks__c is stored as Long Text (String) -> convert to List<String>
-        String risksRaw = safeGetString(r, fMap, 'Top_Risks__c');
+        String risksRaw = r.Top_Risks__c;
         if (!String.isBlank(risksRaw)) {
             resp.topRisks = risksRaw.split('\n');
         } else {

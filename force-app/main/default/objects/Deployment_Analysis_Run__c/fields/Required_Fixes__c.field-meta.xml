@@ -3,7 +3,6 @@
     <fullName>Required_Fixes__c</fullName>
     <label>Required Fixes</label>
     <length>5000</length>
-    <required>false</required>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
     <type>LongTextArea</type>
