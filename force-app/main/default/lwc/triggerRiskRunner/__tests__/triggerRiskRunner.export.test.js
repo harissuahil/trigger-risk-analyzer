@@ -364,7 +364,7 @@ describe("c-trigger-risk-runner — export buttons", () => {
     // honor the mimeType parameter, this assertion will need to
     // change to 'application/octet-stream;charset=utf-8;' (with
     // trailing semicolon) to match the value that exportCsv passes.
-    expect(mimeType).toBe("application/octet-stream;charset=utf-8");
+    expect(mimeType).toBe("application/octet-stream;charset=utf-8;");
   });
 
   // ─────────────────────────────────────────────────────────────────
@@ -486,13 +486,9 @@ describe("c-trigger-risk-runner — export buttons", () => {
     );
 
     // MIME type from the data URI.
-    // See Test 2 for explanation of the component bug — downloadTextFile
-    // ignores the mimeType parameter and always uses application/octet-stream.
-    // exportReleaseDecision passes 'text/plain;charset=utf-8;' but the
-    // component drops it on the floor. We assert what the component
-    // actually does. Filename extension (.txt) and content are still
-    // correct, so end users get the right file behaviorally.
-    expect(mimeType).toBe("application/octet-stream;charset=utf-8");
+    // exportReleaseDecision passes 'text/plain;charset=utf-8;' to downloadTextFile.
+    // The captured data URI preserves the trailing semicolon from the passed MIME type.
+    expect(mimeType).toBe("text/plain;charset=utf-8;");
   });
 
   // ─────────────────────────────────────────────────────────────────
