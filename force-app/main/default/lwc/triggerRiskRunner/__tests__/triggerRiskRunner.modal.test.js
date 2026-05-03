@@ -120,14 +120,12 @@ function singleFindingRunStatus() {
 // that exactly ONE rendered snippet line should carry snippetHighlight.
 //
 // Field shape follows DeploymentAnalysisController.ItemDetailDTO.
-// Includes ruleKeys (plural) — the real DTO field. The modal now reads
+// Includes ruleKeys (plural) — the real DTO field. The modal reads
 // this via the detailRuleKeys getter (this.detail.ruleKeys ||
 // this.detail.ruleKey), matching the Phase 8 filteredItems haystack
 // fix pattern.
-// We intentionally omit category because getItemDetail does not currently
-// return Category__c — the modal HTML still references {detail.category}
-// but production data does not populate it. (Cleanup-pass item: either
-// add category to the DTO or remove the chip from the modal HTML.)
+// Includes category because getItemDetail now returns Category__c,
+// allowing the modal category chip to render from real Apex data.
 function detailWithSnippet() {
   return {
     itemId: "a01000000000001AAA",
@@ -135,6 +133,7 @@ function detailWithSnippet() {
     severity: "High",
     ruleLabel: "SOQL in Loop",
     ruleKeys: "SOQL_IN_LOOP",
+    category: "BulkRisk",
     lineNumber: 7,
     message: "SOQL inside a loop can hit query limits under bulk load.",
     recommendation: "Move SOQL outside the loop and bulkify the query.",
@@ -293,6 +292,7 @@ describe("c-trigger-risk-runner — finding detail modal", () => {
     // filteredItems haystack pattern. If the getter or template binding
     // regresses, this assertion fails immediately with a clear signal.
     expect(modalText).toContain("SOQL_IN_LOOP");
+    expect(modalText).toContain("BulkRisk");
   });
 
   // ─────────────────────────────────────────────────────────────────
