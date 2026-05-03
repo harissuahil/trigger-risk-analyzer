@@ -339,7 +339,7 @@ export default class TriggerRiskRunner extends LightningElement {
       const hay = [
         r.triggerName,
         r.ruleLabel,
-        r.ruleKey,
+        r.ruleKeys || r.ruleKey,
         r.category,
         r.messageShort,
         r.severity
