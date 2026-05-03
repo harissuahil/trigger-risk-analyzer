@@ -281,8 +281,8 @@ describe("c-trigger-risk-runner — finding detail modal", () => {
       "Move SOQL outside the loop and bulkify the query."
     );
     // ruleLabel chip — safe to assert because ruleLabel is in the real
-    // ItemDetailDTO. (We avoid asserting on the category chip — known
-    // field-shape mismatch flagged for the cleanup pass.)
+    // ruleLabel chip — safe to assert because ruleLabel is in the real
+    // ItemDetailDTO.
     expect(modalText).toContain("SOQL in Loop");
     // ruleKeys chip — keystone assertion for the Phase 9 modal chip fix.
     // The modal HTML used to read {detail.ruleKey} (singular) which never
