@@ -457,7 +457,6 @@ export default class TriggerRiskRunner extends LightningElement {
     this.gateRationaleRaw = "";
     this.gateRequiredFixesRaw = "";
     //==========BUG FIX END code change=========
-    console.log("TRA gateRequiredFixesRaw:", this.gateRequiredFixesRaw);
 
     try {
       const triggerNames = Array.from(this.selected);
@@ -484,18 +483,6 @@ export default class TriggerRiskRunner extends LightningElement {
 
     try {
       const s = await getRunStatus({ runId: this.runId });
-      //==========Phase7.0.2 DEBUG START=========
-      console.log(
-        "TRA gate fields:",
-        JSON.stringify({
-          releaseDecision: s.releaseDecision,
-          policyProfile: s.policyProfile,
-          gateVersion: s.gateVersion,
-          releaseRationale: s.releaseRationale,
-          requiredFixes: s.requiredFixes
-        })
-      );
-      //==========Phase7.0.2 DEBUG END=========
 
       this.status = s.status;
       this.totalTriggers = s.totalTriggers || 0;
@@ -608,17 +595,12 @@ export default class TriggerRiskRunner extends LightningElement {
           ? s.requiredFixes
           : this.gateRequiredFixesRaw || "";
       //==========BUG FIX END code change=========
-      console.log(
-        "TRA gateRequiredFixesRaw:",
-        JSON.stringify(this.gateRequiredFixesRaw)
-      );
 
       this.findingsCount =
         (this.highCount || 0) + (this.mediumCount || 0) + (this.lowCount || 0);
 
       if (this.status === "Done" || this.status === "Failed") {
         const rows = await getRunItems({ runId: this.runId });
-        console.log("getRunItems first row:", JSON.stringify((rows || [])[0])); //Phase5.4.4
         //==========Phase5.4.4 START code change=========
         const enriched = (rows || [])
           .map((r) => ({
