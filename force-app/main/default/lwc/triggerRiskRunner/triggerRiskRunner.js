@@ -284,7 +284,11 @@ export default class TriggerRiskRunner extends LightningElement {
     if (sev === "Medium") return "badge badge-medium";
     return "badge badge-low";
   }
-
+  // fix: ItemDetailDTO sends ruleKeys (plural); fallback for legacy
+  // matches Phase 8 filteredItems haystack fix pattern
+  get detailRuleKeys() {
+    return this.detail ? this.detail.ruleKeys || this.detail.ruleKey : null;
+  }
   // =========================
   // Phase6.0-ExecutiveSignal
   // =========================

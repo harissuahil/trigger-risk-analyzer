@@ -120,21 +120,21 @@ function singleFindingRunStatus() {
 // that exactly ONE rendered snippet line should carry snippetHighlight.
 //
 // Field shape follows DeploymentAnalysisController.ItemDetailDTO.
+// Includes ruleKeys (plural) — the real DTO field. The modal now reads
+// this via the detailRuleKeys getter (this.detail.ruleKeys ||
+// this.detail.ruleKey), matching the Phase 8 filteredItems haystack
+// fix pattern.
 // We intentionally omit category because getItemDetail does not currently
-// return Category__c — the modal HTML references {detail.category} but
-// production data does not populate it. (Cleanup-pass item: either add
-// category to the DTO or remove the chip from the modal HTML.)
-// We also omit ruleKey/ruleKeys because the modal rule chip has a known
-// field-name mismatch — the HTML reads {detail.ruleKey} but the DTO
-// sends ruleKeys. Same class of bug as the Phase 8 search haystack fix;
-// to be resolved in a separate pass via a detailRuleKeys getter (LWC
-// HTML cannot express ruleKeys || ruleKey directly).
+// return Category__c — the modal HTML still references {detail.category}
+// but production data does not populate it. (Cleanup-pass item: either
+// add category to the DTO or remove the chip from the modal HTML.)
 function detailWithSnippet() {
   return {
     itemId: "a01000000000001AAA",
     triggerName: "TRA_SoqlInLoop_Bad",
     severity: "High",
     ruleLabel: "SOQL in Loop",
+    ruleKeys: "SOQL_IN_LOOP",
     lineNumber: 7,
     message: "SOQL inside a loop can hit query limits under bulk load.",
     recommendation: "Move SOQL outside the loop and bulkify the query.",
@@ -282,10 +282,17 @@ describe("c-trigger-risk-runner — finding detail modal", () => {
       "Move SOQL outside the loop and bulkify the query."
     );
     // ruleLabel chip — safe to assert because ruleLabel is in the real
-    // ItemDetailDTO. (We avoid asserting on the rule chip and category
-    // chip — both have known field-shape mismatches flagged for the
-    // cleanup pass.)
+    // ItemDetailDTO. (We avoid asserting on the category chip — known
+    // field-shape mismatch flagged for the cleanup pass.)
     expect(modalText).toContain("SOQL in Loop");
+    // ruleKeys chip — keystone assertion for the Phase 9 modal chip fix.
+    // The modal HTML used to read {detail.ruleKey} (singular) which never
+    // populated against real Apex data (ItemDetailDTO sends ruleKeys,
+    // plural). The fix introduced a detailRuleKeys getter with the
+    // standard `ruleKeys || ruleKey` fallback, matching the Phase 8
+    // filteredItems haystack pattern. If the getter or template binding
+    // regresses, this assertion fails immediately with a clear signal.
+    expect(modalText).toContain("SOQL_IN_LOOP");
   });
 
   // ─────────────────────────────────────────────────────────────────
