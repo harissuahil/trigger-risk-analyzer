@@ -621,13 +621,7 @@ export default class TriggerRiskRunner extends LightningElement {
 
       const execLines = [];
       execLines.push("EXECUTIVE SIGNAL:");
-      //==========Phase6.0.3 START code change=========
-      // OLD (Excel can treat leading "-" as a formula => #NAME?)
-      // execLines.push(`- Overall Deployment Risk: ${this.overallRisk || this.computeOverallRisk()}`);
-      // execLines.push(`- Release Recommendation: ${this.releaseRecommendation || 'N/A'}`);
-      // execLines.push(`- Architect Impacts: ${impacts.length ? impacts.join(', ') : 'N/A'}`);
 
-      // NEW (Excel-safe, still manager-friendly)
       execLines.push(
         `Overall Risk: ${this.overallRisk || this.computeOverallRisk()}`
       );
@@ -637,7 +631,6 @@ export default class TriggerRiskRunner extends LightningElement {
       execLines.push(
         `Architect Impacts: ${impacts.length ? impacts.join(", ") : "N/A"}`
       );
-      //==========Phase6.0.3 END code change=========
 
       execLines.push(" ");
       execLines.push("Top Risks:");
