@@ -615,4 +615,118 @@ private class DeploymentAnalysisJobTest {
       'Summary__c must contain RELEASE GATE — proves full happy path completed'
     );
   }
+
+  // ============================================================
+  // Mock that returns a non-2xx Tooling API response.
+  //
+  // SOURCE — ToolingApiClient.queryUntyped:
+  //   if (res.getStatusCode() < 200 || res.getStatusCode() >= 300) {
+  //       throw new CalloutException(
+  //           'Tooling API call failed: ' + res.getStatus() + ' | ' + res.getBody()
+  //       );
+  //   }
+  //
+  // Forces TriggerFetchService.fetchByNames to throw, which propagates
+  // into DeploymentAnalysisJob.execute()'s catch block.
+  // ============================================================
+  private class ToolingErrorMock implements HttpCalloutMock {
+    public HttpResponse respond(HttpRequest req) {
+      HttpResponse res = new HttpResponse();
+      res.setStatusCode(500);
+      res.setStatus('Internal Server Error');
+      res.setBody('mock tooling failure');
+      return res;
+    }
+  }
+
+  // ============================================================
+  // Scenario 8: catch-block path — Tooling failure surfaces as Failed
+  //
+  // SOURCE — DeploymentAnalysisJob.execute() catch (Exception e):
+  //   runRec.Status__c = 'Failed';
+  //   runRec.Total_Triggers__c = totalSelected;
+  //   runRec.Processed_Triggers__c = triggersAnalyzed;
+  //   runRec.High_Count__c = highCount;
+  //   runRec.Medium_Count__c = mediumCount;
+  //   runRec.Low_Count__c = lowCount;
+  //   runRec.Error_Message__c = e.getMessage();
+  //   runRec.Last_Updated__c = System.now();
+  //   update runRec;
+  //   throw e;
+  //
+  // Why this matters: failed runs must surface Status__c='Failed'
+  // and Error_Message__c so the LWC can display the error to the
+  // user. Scenarios 1–7 only exercise the happy path; this is the
+  // first test that drives the catch block.
+  //
+  // How we trigger the exception: ToolingErrorMock returns 500, which
+  // causes ToolingApiClient.queryUntyped to throw CalloutException.
+  // This propagates out of TriggerFetchService.fetchByNames into the
+  // job's try block.
+  //
+  // Apex queueable test behavior: when execute() re-throws, the
+  // exception surfaces through Test.stopTest(). We wrap it so the
+  // test method itself does not fail on the propagation.
+  // ============================================================
+  @isTest
+  static void job_calloutFailure_setsStatusFailedAndErrorMessage() {
+    Test.setMock(HttpCalloutMock.class, new ToolingErrorMock());
+
+    Id runId;
+    Boolean threw = false;
+    String thrownMsg = null;
+
+    Test.startTest();
+    runId = DeploymentAnalysisService.startRunForTriggers(
+      'Test-FAIL',
+      new List<String>{ 'TRA_Test_Failure' }
+    );
+    try {
+      Test.stopTest();
+    } catch (Exception ex) {
+      threw = true;
+      thrownMsg = ex.getMessage();
+    }
+
+    // Catch block re-throws — proves the catch path executed end-to-end.
+    System.assert(
+      threw,
+      'Job must re-throw the underlying CalloutException after the catch block runs'
+    );
+    System.assert(
+      thrownMsg != null && thrownMsg.contains('Tooling API call failed'),
+      'Thrown exception must carry the Tooling API failure message; actual: ' +
+      thrownMsg
+    );
+
+    // DAR state — what the LWC actually sees.
+    Deployment_Analysis_Run__c dar = getDAR(runId);
+    System.assertEquals(
+      'Failed',
+      dar.Status__c,
+      'Status__c must be Failed when the catch block runs — the LWC reads this to show the error'
+    );
+    System.assertNotEquals(
+      null,
+      dar.Error_Message__c,
+      'Error_Message__c must be populated so the LWC can display the cause'
+    );
+    System.assert(
+      dar.Error_Message__c.contains('Tooling API call failed'),
+      'Error_Message__c must contain the Tooling failure message; actual: ' +
+      dar.Error_Message__c
+    );
+    // SOURCE: totalSelected is set before the callout failure in the try block.
+    System.assertEquals(
+      1,
+      Integer.valueOf(String.valueOf(dar.Total_Triggers__c)),
+      'Total_Triggers__c must reflect the size of the requested name list'
+    );
+    // SOURCE: triggersAnalyzed never increments — failure occurs during fetchByNames.
+    System.assertEquals(
+      0,
+      Integer.valueOf(String.valueOf(dar.Processed_Triggers__c)),
+      'Processed_Triggers__c must be 0 — failure occurred before any trigger was analyzed'
+    );
+  }
 }
