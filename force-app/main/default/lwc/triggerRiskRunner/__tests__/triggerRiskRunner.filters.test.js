@@ -343,7 +343,7 @@ describe("c-trigger-risk-runner — filters and filtered export", () => {
   // ─────────────────────────────────────────────────────────────────
   // Test 3: Search filter matches across the multi-field scope
   //
-  // SOURCE (after Phase 8 fix): filteredItems getter haystack:
+  // SOURCE: filteredItems getter haystack:
   //   const hay = [r.triggerName, r.ruleLabel, r.ruleKeys || r.ruleKey,
   //                r.category, r.messageShort, r.severity]
   //     .filter(Boolean).join(" ").toLowerCase();
@@ -357,9 +357,7 @@ describe("c-trigger-risk-runner — filters and filtered export", () => {
   //
   // The MIXED_DML assertion is the keystone: it proves the haystack
   // reads ruleKeys (the actual ItemRowDTO field name) and not the
-  // misnamed ruleKey. The component originally used r.ruleKey which
-  // silently failed against real Apex data — caught and fixed during
-  // this slice.
+  // misnamed ruleKey fallback alone. Real Apex data uses ruleKeys.
   //
   // The trigger-name assertion covers the most common search path
   // users actually take ("find the trigger I'm worried about").
