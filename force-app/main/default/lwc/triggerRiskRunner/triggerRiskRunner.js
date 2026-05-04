@@ -473,19 +473,16 @@ export default class TriggerRiskRunner extends LightningElement {
               .filter(Boolean)
           : [];
       }
-      //==========Phase7.0.2 END code change=========
+      //==========Phase7.0.2 END code change===========
       //==========BUG 4 FIX  START code change=========
       this.architectImpacts = this.uniqueLines(this.architectImpacts || []);
-      //==========BUG 4 FIX END code change=========
-      //==========BUG 4 START code change=========
-      //this.topRisks = s.topRisks || this.topRisks || [];
-
+      //==========BUG 4 FIX END code change============
+      //==========BUG 4 START code change==============
       this.topRisks = this.uniqueLines(s.topRisks || this.topRisks || []); //HS
-      //==========BUG 4 END code change=========
-
+      //==========BUG 4 END code change================
       this.executiveNote = s.executiveNote || this.executiveNote;
-      //==========Phase6.0.3 END code change=========
-      //==========Phase7.0.2 NOTE START=========
+      //==========Phase6.0.3 END code change===========
+      //==========Phase7.0.2 NOTE START================
       // this.releaseRecommendation = s.releaseRecommendation;
       // this.architectImpacts = s.architectImpacts;
       // this.topRisks = s.topRisks || [];
