@@ -20,19 +20,19 @@ import getRunItems from "@salesforce/apex/DeploymentAnalysisController.getRunIte
 import getItemDetail from "@salesforce/apex/DeploymentAnalysisController.getItemDetail";
 
 //TRA build label (shown in exports)
-const TRA_BUILD_LABEL = "GOLD Phase 7 Validated"; //HS
+const TRA_BUILD_LABEL = "GOLD Phase 7 Validated";
 
 export default class TriggerRiskRunner extends LightningElement {
   @track triggers = [];
-  //HS - trigger list search (separate from findings search)
+  // Trigger list search (separate from findings search)
   triggerSearchText = "";
-  //HS - Used to render checkboxes as controlled inputs (keeps UI in sync with this.selected)
-  //HS - controlled checkbox options with search filtering
+  // Used to render checkboxes as controlled inputs (keeps UI in sync with this.selected)
+  // Controlled checkbox options with search filtering
   get triggerOptions() {
     const selectedSet = this.selected || new Set();
     const search = (this.triggerSearchText || "").toLowerCase();
 
-    return (this.triggers || []) //HS
+    return (this.triggers || [])
       .filter((name) => name.toLowerCase().includes(search))
       .map((name) => ({
         name,
@@ -93,14 +93,14 @@ export default class TriggerRiskRunner extends LightningElement {
       fieldName: "category",
       type: "text",
       initialWidth: 180
-    }, //phase5.4.2
+    },
     {
       label: "Line",
       fieldName: "lineNumber",
       type: "number",
       initialWidth: 90,
       cellAttributes: { alignment: "left" }
-    }, //Phase5.5.1
+    },
     { label: "Message", fieldName: "messageShort", type: "text" },
     {
       label: "Details",
@@ -154,7 +154,7 @@ export default class TriggerRiskRunner extends LightningElement {
   }
 
   get disableExport() {
-    //HS Enable export when run is complete even if 0 findings (manager/audit artifact)
+    // Enable export when run is complete even if 0 findings (manager/audit artifact)
     const canExport = !!this.runId && this.isRunComplete;
     return this.isLoading || !canExport;
   }
@@ -162,7 +162,7 @@ export default class TriggerRiskRunner extends LightningElement {
   get isPolling() {
     return this.pollTimer != null;
   }
-  //HS - run completion helper (used for enabling exports even when 0 findings)
+  // Run completion helper (used for enabling exports even when 0 findings)
   get isRunComplete() {
     return this.status === "Done" || this.status === "Failed";
   }
@@ -304,7 +304,7 @@ export default class TriggerRiskRunner extends LightningElement {
   get hasSelectedTriggers() {
     return this.selected && this.selected.size > 0;
   }
-  //HS - disable Run button when no triggers selected
+  // Disable Run button when no triggers selected
   get isRunDisabled() {
     return !this.hasSelectedTriggers;
   }
@@ -326,7 +326,7 @@ export default class TriggerRiskRunner extends LightningElement {
 
     this.selected = new Set(this.selected);
   }
-  //HS - handle trigger search input
+  // Handle trigger search input
   handleTriggerSearch(e) {
     this.triggerSearchText = e.target.value || "";
   }
@@ -561,8 +561,8 @@ export default class TriggerRiskRunner extends LightningElement {
 
   exportCsv() {
     try {
-      const rows = this.filteredItems || []; //HS
-      //HS Do not return on 0 rows, still export a clean report artifact
+      const rows = this.filteredItems || [];
+      // Do not return on 0 rows, still export a clean report artifact
       // Header / metadata (manager-friendly)
       const now = new Date();
       const ymd = now.toISOString().slice(0, 10);
@@ -608,9 +608,9 @@ export default class TriggerRiskRunner extends LightningElement {
 
       const headerLines = [
         "Trigger Risk Analyzer Export",
-        `TRA Build: ${TRA_BUILD_LABEL}`, //HS
-        `Release Gate Policy: ${this.gatePolicyProfile || "N/A"}`, //HS
-        `Release Gate Version: ${this.gateVersion || "N/A"}`, //HS
+        `TRA Build: ${TRA_BUILD_LABEL}`,
+        `Release Gate Policy: ${this.gatePolicyProfile || "N/A"}`,
+        `Release Gate Version: ${this.gateVersion || "N/A"}`,
         `Run ID: ${runId}`,
         `Release Label: ${release}`,
         `Generated At: ${now.toLocaleString()}`,
@@ -633,9 +633,9 @@ export default class TriggerRiskRunner extends LightningElement {
       const lines = [];
       headerLines.forEach((l) => lines.push(this.csvEscape(l)));
       lines.push(headers.join(","));
-      //HS If no rows, add a friendly note (keeps report useful for “clean trigger” proof)
+      // If no rows, add a friendly note (keeps report useful for “clean trigger” proof)
       if (!rows.length) {
-        lines.push(this.csvEscape("No findings detected for current filters.")); //HS
+        lines.push(this.csvEscape("No findings detected for current filters."));
       }
 
       rows.forEach((r) => {
@@ -713,7 +713,7 @@ export default class TriggerRiskRunner extends LightningElement {
 
     let out = "";
     out += "Trigger Risk Analyzer - Release Decision\n";
-    out += `Build: ${TRA_BUILD_LABEL}\n`; //HS
+    out += `Build: ${TRA_BUILD_LABEL}\n`;
     out += "======================================\n\n";
 
     out += `Run Id: ${runId}\n`;
@@ -751,9 +751,9 @@ export default class TriggerRiskRunner extends LightningElement {
     }
 
     if (fixLines.length) {
-      out += "\nRequired Fixes (to unblock):\n"; //HS
+      out += "\nRequired Fixes (to unblock):\n";
       fixLines.forEach((l, i) => {
-        out += `${i + 1}) ${l}\n`; //HS
+        out += `${i + 1}) ${l}\n`;
       });
     }
 
@@ -801,13 +801,13 @@ export default class TriggerRiskRunner extends LightningElement {
     );
   }
 
-  //HS Dedupe strings while keeping order (first wins)
+  // Dedupe strings while keeping order (first wins)
   uniqueLines(lines) {
     const out = [];
     const seen = new Set();
     (lines || []).forEach((l) => {
       const s = (l == null ? "" : String(l)).trim();
-      if (!s) return; //HS
+      if (!s) return;
       const key = s.toLowerCase();
       if (seen.has(key)) return;
       seen.add(key);
@@ -963,7 +963,7 @@ export default class TriggerRiskRunner extends LightningElement {
 
     let out = "";
     out += "Release Decision (Executive)\n";
-    out += `Build: ${TRA_BUILD_LABEL}\n`; //HS
+    out += `Build: ${TRA_BUILD_LABEL}\n`;
     out += "===========================\n\n";
     out += `Gate Outcome: ${this.releaseGateDecisionLabel}\n`;
     out += `Overall Risk: ${risk}\n`;
