@@ -482,10 +482,6 @@ export default class TriggerRiskRunner extends LightningElement {
       //==========BUG 4 END code change================
       this.executiveNote = s.executiveNote || this.executiveNote;
       //==========Phase6.0.3 END code change===========
-      //==========Phase7.0.2 NOTE START================
-      // this.releaseRecommendation = s.releaseRecommendation;
-      // this.architectImpacts = s.architectImpacts;
-      // this.topRisks = s.topRisks || [];
       this.executiveSummary = s.executiveSummary;
       //==========Phase7.0.2 START code change=========
       // Release Gate: parse from executiveSummary text (since gate fields are embedded there)
@@ -507,9 +503,7 @@ export default class TriggerRiskRunner extends LightningElement {
         // do not block UI
       }
       //==========Phase7.0.2 END code change=========
-
       this.completedAt = s.completedAt;
-      //==========Phase7.0.2 NOTE END=========
       // =========================
       // Phase6.0-ExecutiveSignal
       // =========================
