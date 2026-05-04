@@ -50,6 +50,7 @@ public with sharing class DeploymentAnalysisController {
     public Integer lowCount;
     @AuraEnabled
     public String errorMessage;
+    @AuraEnabled
     public Datetime lastUpdated;
     @AuraEnabled
     public String overallRisk;
