@@ -308,14 +308,6 @@ public with sharing class ReleaseGateEngine {
       out.requiredFixes = trimmed;
     }
 
-    /* if (out.rationale.size() > 3) {
-                List<String> trimmed = new List<String>();
-                for (Integer i = 0; i < 3; i++) {
-                    trimmed.add(out.rationale[i]);
-                }
-                out.rationale = trimmed;
-            } */
-
     return out;
   }
 
