@@ -209,7 +209,6 @@ export default class TriggerRiskRunner extends LightningElement {
     if (!raw) return [];
 
     //==========Phase8.0.2 START code change=========
-    //return raw.split('\n').map((x) => x.trim()).filter(Boolean);
     // Rationale should not include fix lines or headings; also strip "1) " so UI bullets look clean
     return this.cleanGateLines(raw.split("\n"), { removeFixLikeLines: true });
     //==========Phase8.0.2 END code change=========
@@ -220,7 +219,6 @@ export default class TriggerRiskRunner extends LightningElement {
     if (!raw) return [];
 
     //==========Phase8.0.2 START code change=========
-    //return raw.split('\n').map((x) => x.trim()).filter(Boolean);
     // Fixes must keep "Collect/Add/Move" lines; strip numbering so UI bullets don't double-number
     return this.cleanGateLines(raw.split("\n"), { removeFixLikeLines: false });
     //==========Phase8.0.2 END code change=========
