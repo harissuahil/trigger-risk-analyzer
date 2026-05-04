@@ -33,7 +33,6 @@ public with sharing class TriggerRiskEngine {
     public Integer lineNumber; // earliest matched line
   }
 
-  // ====== PHASE3 ======
   // Context Models (multi-trigger awareness)
   public class TriggerUniverse {
     public Map<String, String> triggerNameToBody; // trigger name -> body
@@ -47,7 +46,6 @@ public with sharing class TriggerRiskEngine {
     public String body;
     public TriggerUniverse universe;
   }
-  // ====== PHASE3 ======
 
   // =====================
   // Main Analyzer (existing)
@@ -91,15 +89,14 @@ public with sharing class TriggerRiskEngine {
 
     // SOQL in loop
     Integer soqlPos = findSoqlInLoopPosition(body);
-    Trigger_Risk_Rule__mdt soqlRule = ruleByKey.get('SOQL_IN_LOOP'); //HS
+    Trigger_Risk_Rule__mdt soqlRule = ruleByKey.get('SOQL_IN_LOOP');
     if (
       soqlPos != null &&
       soqlRule != null &&
       soqlRule.Is_Enabled__c &&
       soqlRule.Detection_Mode__c == 'ENGINE'
     ) {
-      //HS
-      Trigger_Risk_Rule__mdt r = soqlRule; //HS
+      Trigger_Risk_Rule__mdt r = soqlRule;
 
       Finding f = new Finding();
       f.ruleKey = 'SOQL_IN_LOOP';
@@ -115,17 +112,16 @@ public with sharing class TriggerRiskEngine {
       findings.add(f);
       addedKeys.add(f.ruleKey);
     }
-    //==========BUG FIX #7 - Engine-driven DML in loop (avoid regex false positives)==========
+    // Engine-driven DML in loop (avoid regex false positives)
     Integer dmlLoopPos = findDmlInLoopPosition(body);
-    Trigger_Risk_Rule__mdt dmlLoopRule = ruleByKey.get('DML_IN_LOOP'); //HS
+    Trigger_Risk_Rule__mdt dmlLoopRule = ruleByKey.get('DML_IN_LOOP');
     if (
       dmlLoopPos != null &&
       dmlLoopRule != null &&
       dmlLoopRule.Is_Enabled__c &&
       dmlLoopRule.Detection_Mode__c == 'ENGINE'
     ) {
-      //HS
-      Trigger_Risk_Rule__mdt r = dmlLoopRule; //HS
+      Trigger_Risk_Rule__mdt r = dmlLoopRule;
 
       Finding f = new Finding();
       f.ruleKey = 'DML_IN_LOOP';
@@ -141,19 +137,17 @@ public with sharing class TriggerRiskEngine {
       findings.add(f);
       addedKeys.add(f.ruleKey); // prevents regex rule from also firing
     }
-    //==========BUG FIX #7 END==========
 
     // Recursion risk
-    Trigger_Risk_Rule__mdt recRule = ruleByKey.get('RECURSION_RISK'); //HS
-    Finding rec = null; //HS
+    Trigger_Risk_Rule__mdt recRule = ruleByKey.get('RECURSION_RISK');
+    Finding rec = null;
     if (
       recRule != null &&
       recRule.Is_Enabled__c &&
       recRule.Detection_Mode__c == 'ENGINE'
     ) {
-      //HS
-      rec = detectRecursionRisk(body, ruleByKey); //HS
-    } //HS
+      rec = detectRecursionRisk(body, ruleByKey);
+    }
 
     if (rec != null && !addedKeys.contains(rec.ruleKey)) {
       findings.add(rec);
@@ -161,57 +155,51 @@ public with sharing class TriggerRiskEngine {
     }
 
     // Missing trigger handler
-    Trigger_Risk_Rule__mdt mhRule = ruleByKey.get('TRIGGER_HANDLER_MISSING'); //HS
-    Finding mh = null; //HS
+    Trigger_Risk_Rule__mdt mhRule = ruleByKey.get('TRIGGER_HANDLER_MISSING');
+    Finding mh = null;
     if (
       mhRule != null &&
       mhRule.Is_Enabled__c &&
       mhRule.Detection_Mode__c == 'ENGINE'
     ) {
-      //HS
-      mh = detectMissingHandlerPattern(body, ruleByKey); //HS
-    } //HS
+      mh = detectMissingHandlerPattern(body, ruleByKey);
+    }
 
     if (mh != null && !addedKeys.contains(mh.ruleKey)) {
       findings.add(mh);
       addedKeys.add(mh.ruleKey);
     }
-    //==========BUG FIX #9 - Engine-driven ENQUEUE_IN_LOOP========== //HS
-    Trigger_Risk_Rule__mdt enqRule = ruleByKey.get('ENQUEUE_IN_LOOP'); //HS
-    Finding enq = null; //HS
+    // Engine-driven ENQUEUE_IN_LOOP
+    Trigger_Risk_Rule__mdt enqRule = ruleByKey.get('ENQUEUE_IN_LOOP');
+    Finding enq = null;
     if (
       enqRule != null &&
       enqRule.Is_Enabled__c &&
       enqRule.Detection_Mode__c == 'ENGINE'
     ) {
-      //HS
-      enq = detectEnqueueInLoop(body, ruleByKey); //HS
-    } //HS
+      enq = detectEnqueueInLoop(body, ruleByKey);
+    }
 
     if (enq != null && !addedKeys.contains(enq.ruleKey)) {
-      //HS
-      findings.add(enq); //HS
-      addedKeys.add(enq.ruleKey); //HS
-    } //HS
-    //==========BUG FIX #9 END========== //HS
-    //==========HS EMAIL_IN_TRIGGER - Engine-driven detection (ignore comments/strings)========== //HS
-    Trigger_Risk_Rule__mdt emailRule = ruleByKey.get('EMAIL_IN_TRIGGER'); //HS
-    Finding emailFinding = null; //HS
+      findings.add(enq);
+      addedKeys.add(enq.ruleKey);
+    }
+
+    // EMAIL_IN_TRIGGER - Engine-driven detection (ignore comments/strings)
+    Trigger_Risk_Rule__mdt emailRule = ruleByKey.get('EMAIL_IN_TRIGGER');
+    Finding emailFinding = null;
     if (
       emailRule != null &&
       emailRule.Is_Enabled__c &&
       emailRule.Detection_Mode__c == 'ENGINE'
     ) {
-      //HS
-      emailFinding = detectEmailInTrigger(body, ruleByKey); //HS
-    } //HS
+      emailFinding = detectEmailInTrigger(body, ruleByKey);
+    }
     if (emailFinding != null && !addedKeys.contains(emailFinding.ruleKey)) {
-      //HS
-      findings.add(emailFinding); //HS
-      addedKeys.add(emailFinding.ruleKey); //HS
-    } //HS
-    //==========HS EMAIL_IN_TRIGGER END========== //HS
-    //==========BUG FIX #11 - Engine-driven DML_ON_TRIGGER_OLD========== //HS
+      findings.add(emailFinding);
+      addedKeys.add(emailFinding.ruleKey);
+    }
+    //Engine-driven DML_ON_TRIGGER_OLD
     Trigger_Risk_Rule__mdt dmlOldRule = ruleByKey.get('DML_ON_TRIGGER_OLD');
     Finding dmlOld = null;
     if (
@@ -219,14 +207,13 @@ public with sharing class TriggerRiskEngine {
       dmlOldRule.Is_Enabled__c &&
       dmlOldRule.Detection_Mode__c == 'ENGINE'
     ) {
-      dmlOld = detectDmlOnTriggerOld(body, ruleByKey); //HS
+      dmlOld = detectDmlOnTriggerOld(body, ruleByKey);
     }
 
     if (dmlOld != null && !addedKeys.contains(dmlOld.ruleKey)) {
       findings.add(dmlOld);
       addedKeys.add(dmlOld.ruleKey);
-    } //HS
-    //==========BUG FIX #11 END========== //HS
+    }
 
     // =====================
     // Regex-driven checks
@@ -239,8 +226,8 @@ public with sharing class TriggerRiskEngine {
       if (
         String.isBlank(key) ||
         addedKeys.contains(key) ||
-        !r.Is_Enabled__c || //HS
-        r.Detection_Mode__c == 'ENGINE' || //HS
+        !r.Is_Enabled__c ||
+        r.Detection_Mode__c == 'ENGINE' ||
         String.isBlank(r.Pattern__c)
       ) {
         continue;
@@ -253,22 +240,7 @@ public with sharing class TriggerRiskEngine {
         continue;
       }
 
-      // Matcher m = p.matcher(body);
-      //HS Use masked text for a few regex rules to avoid matching comments/strings
-      /**  String scanText = body;
-            if (key == 'TRIGGER_NEW_INDEX'|| key == 'DYNAMIC_SOQL'|| key == 'HARDCODED_ID') { 
-                scanText = maskCommentsAndStringsPreserveLength(body); 
-            } ================================================================================***/
-      /*===================================================================================
-            String scanText = body;
-            if (key == 'TRIGGER_NEW_INDEX' || key == 'DYNAMIC_SOQL') {
-                scanText = maskCommentsAndStringsPreserveLength(body);
-            } else if (key == 'HARDCODED_ID') { 
-                scanText = maskCommentsPreserveLength(body); 
-            }
-
-            Matcher m = p.matcher(scanText); 
-			====================================================================================***/
+      // Use masked text for a few regex rules to avoid matching comments/strings
       String scanText = maskCommentsAndStringsPreserveLength(body);
       if (key == 'HARDCODED_ID') {
         scanText = maskCommentsPreserveLength(body);
@@ -277,29 +249,25 @@ public with sharing class TriggerRiskEngine {
 
       if (!m.find())
         continue;
-      Integer firstPos = m.start(); //HS
-      Integer matchPos = firstPos; //HS
-      //HS: Special highlight logic for callouts
+      Integer firstPos = m.start();
+      Integer matchPos = firstPos;
+      // Special highlight logic for callouts
       if (key == 'CALLOUT_IN_TRIGGER') {
-        //HS
-        //HS: 1) Prefer the actual execution call (.send()
-        Matcher sendM = Pattern.compile('\\.send\\s*\\(').matcher(scanText); //HS
+        // 1) Prefer the actual execution call (.send()
+        Matcher sendM = Pattern.compile('\\.send\\s*\\(').matcher(scanText);
         if (sendM.find()) {
-          //HS
-          matchPos = sendM.start(); //HS
+          matchPos = sendM.start();
         } else {
-          //HS
-          //HS: 2) Next, prefer PageReference.getContent / getContentAsPDF
+          // 2) Next, prefer PageReference.getContent / getContentAsPDF
           Matcher contentM = Pattern.compile(
               '\\bPageReference\\.getContent\\b|\\bgetContentAsPDF\\b'
             )
-            .matcher(scanText); //HS
+            .matcher(scanText);
           if (contentM.find()) {
-            //HS
-            matchPos = contentM.start(); //HS
-          } //HS
-        } //HS
-      } //HS
+            matchPos = contentM.start();
+          }
+        }
+      }
 
       Finding f = new Finding();
       f.ruleKey = key;
@@ -309,8 +277,8 @@ public with sharing class TriggerRiskEngine {
       f.message = r.Message__c;
       /* f.matchPos  = m.start();
        f.lineNumber = computeLineNumber(body, m.start());*/
-      f.matchPos = matchPos; //HS
-      f.lineNumber = computeLineNumber(body, matchPos); //HS
+      f.matchPos = matchPos;
+      f.lineNumber = computeLineNumber(body, matchPos);
       findings.add(f);
       addedKeys.add(key);
     }
@@ -319,7 +287,6 @@ public with sharing class TriggerRiskEngine {
     return findings;
   }
 
-  // ====== PHASE3 ======
   // Main Analyzer (context-aware overload)
   public static List<Finding> analyzeFindings(TriggerContext ctx) {
     if (ctx == null)
@@ -337,14 +304,14 @@ public with sharing class TriggerRiskEngine {
       }
     }
 
-    // Phase 3.1: Cross-trigger recursion cycle detection
+    // Cross-trigger recursion cycle detection
     Finding cross = detectCrossTriggerRecursionCycle(ctx);
     if (cross != null && !existing.contains(cross.ruleKey)) {
       findings.add(cross);
       existing.add(cross.ruleKey);
     }
 
-    // Phase 3.2: Trigger order-of-execution risks
+    // Trigger order-of-execution risks
     List<Finding> orderFindings = detectOrderOfExecutionRisks(ctx);
     if (orderFindings != null && !orderFindings.isEmpty()) {
       for (Finding ordFinding : orderFindings) {
@@ -355,20 +322,16 @@ public with sharing class TriggerRiskEngine {
       }
     }
 
-    //==========Phase3.3 START code change=========
-    // Phase 3.3: Bulkification confidence scoring (one informational finding per trigger)
+    // Bulkification confidence scoring (one informational finding per trigger)
     Finding bulkScore = buildBulkConfidenceFinding(ctx, findings);
     if (bulkScore != null && !existing.contains(bulkScore.ruleKey)) {
       findings.add(bulkScore);
       existing.add(bulkScore.ruleKey);
     }
-    //==========Phase3.3 END code change=========
 
     findings.sort(new FindingSorter());
     return findings;
   }
-
-  // ====== PHASE3 ======
 
   // =====================
   // Sorter
@@ -447,130 +410,106 @@ public with sharing class TriggerRiskEngine {
 
   private static Integer findSoqlInLoopPosition(String body) {
     if (String.isBlank(body))
-      return null; //HS
+      return null;
 
-    String scan = maskCommentsAndStringsPreserveLength(body); //HS
+    String scan = maskCommentsAndStringsPreserveLength(body);
 
     for (BlockSpan b : findLoopBlocks(scan)) {
-      //HS
-      Integer rel = findSoqlPosition(scan.substring(b.startPos, b.endPos)); //HS
+      Integer rel = findSoqlPosition(scan.substring(b.startPos, b.endPos));
       if (rel != null)
-        return b.startPos + rel; //HS
+        return b.startPos + rel;
     }
     return null;
   }
 
-  //==========BUG FIX #7 - Engine-driven DML in loop finder==========
-  /***  private static Integer findDmlInLoopPosition(String body) {
-        if (String.isBlank(body)) return null;
-        
-        for (BlockSpan b : findLoopBlocks(body)) {
-            String segment = body.substring(b.startPos, b.endPos);
-            
-            Integer rel = findDmlPosition(segment);
-            if (rel != null) return b.startPos + rel;
-        }
-        return null;
-    } ***/
-  //==========BUG FIX #8 - DML in loop supports no-brace loops==========
   private static Integer findDmlInLoopPosition(String body) {
-    //HS
     if (String.isBlank(body))
-      return null; //HS
+      return null;
 
     // Use masked scan so loops in comments/strings do not interfere, but positions remain aligned
-    String scan = maskCommentsAndStringsPreserveLength(body); //HS
+    String scan = maskCommentsAndStringsPreserveLength(body);
 
     // ---------- for/while loops ----------
-    Matcher m = Pattern.compile('(?m)^\\s*(for|while)\\b').matcher(scan); //HS
+    Matcher m = Pattern.compile('(?m)^\\s*(for|while)\\b').matcher(scan);
     while (m.find()) {
-      //HS
-      Integer loopHeaderPos = m.start(); //HS
-      Integer headerEnd = findLoopHeaderEndPos(scan, m.start(), m.group(0)); //HS
+      Integer loopHeaderPos = m.start();
+      Integer headerEnd = findLoopHeaderEndPos(scan, m.start(), m.group(0));
       if (headerEnd == null)
-        continue; //HS
+        continue;
 
       // Skip whitespace after the full header
-      Integer j = headerEnd; //HS
+      Integer j = headerEnd;
       while (j < scan.length()) {
-        //HS
-        String ch = scan.substring(j, j + 1); //HS
+        String ch = scan.substring(j, j + 1);
         if (ch != ' ' && ch != '\t' && ch != '\r' && ch != '\n')
-          break; //HS
-        j++; //HS
-      } //HS
+          break;
+        j++;
+      }
 
       // Braced loop
       if (j < scan.length() && scan.substring(j, j + 1) == '{') {
-        //HS
-        Integer open = j; //HS
-        Integer close = findMatchingBrace(scan, open); //HS
+        Integer open = j;
+        Integer close = findMatchingBrace(scan, open);
         if (close != null) {
-          //HS
-          String loopSegment = scan.substring(open, close + 1); //HS
-          Integer rel = findDmlPosition(loopSegment); //HS
+          String loopSegment = scan.substring(open, close + 1);
+          Integer rel = findDmlPosition(loopSegment);
           if (rel != null)
-            return loopHeaderPos; //HS
-        } //HS
-        continue; //HS
-      } //HS
+            return loopHeaderPos;
+        }
+        continue;
+      }
 
       // No-brace loop
-      Integer stmtEnd = findStatementEndPos(scan, headerEnd); //HS
+      Integer stmtEnd = findStatementEndPos(scan, headerEnd);
       if (stmtEnd == null)
-        stmtEnd = Math.min(scan.length(), headerEnd + 400); //HS
+        stmtEnd = Math.min(scan.length(), headerEnd + 400);
 
-      String afterHeader = scan.substring(headerEnd, stmtEnd); //HS
-      Integer rel2 = findDmlPosition(afterHeader); //HS
+      String afterHeader = scan.substring(headerEnd, stmtEnd);
+      Integer rel2 = findDmlPosition(afterHeader);
       if (rel2 != null)
-        return loopHeaderPos; //HS
-    } //HS
+        return loopHeaderPos;
+    }
     // ---------- do { ... } while (...) ----------
-    Matcher d = Pattern.compile('(?m)^\\s*do\\b').matcher(scan); //HS
+    Matcher d = Pattern.compile('(?m)^\\s*do\\b').matcher(scan);
     while (d.find()) {
-      //HS
-      Integer doPos = d.start(); //HS
-      Integer doEnd = d.end(); //HS
+      Integer doPos = d.start();
+      Integer doEnd = d.end();
 
       // Skip whitespace after "do"
-      Integer j = doEnd; //HS
+      Integer j = doEnd;
       while (j < scan.length()) {
-        //HS
-        String ch = scan.substring(j, j + 1); //HS
+        String ch = scan.substring(j, j + 1);
         if (ch != ' ' && ch != '\t' && ch != '\r' && ch != '\n')
-          break; //HS
-        j++; //HS
-      } //HS
+          break;
+        j++;
+      }
 
       // Braced do
       if (j < scan.length() && scan.substring(j, j + 1) == '{') {
-        //HS
-        Integer open = j; //HS
-        Integer close = findMatchingBrace(scan, open); //HS
+        Integer open = j;
+        Integer close = findMatchingBrace(scan, open);
         if (close != null) {
-          //HS
-          String loopSegment = scan.substring(open, close + 1); //HS
-          Integer rel = findDmlPosition(loopSegment); //HS
+          String loopSegment = scan.substring(open, close + 1);
+          Integer rel = findDmlPosition(loopSegment);
           if (rel != null)
-            return doPos; //HS
-        } //HS
-        continue; //HS
-      } //HS
+            return doPos;
+        }
+        continue;
+      }
 
       // No-brace do
-      Integer stmtEnd = findStatementEndPos(scan, doEnd); //HS
+      Integer stmtEnd = findStatementEndPos(scan, doEnd);
       if (stmtEnd == null)
-        stmtEnd = Math.min(scan.length(), doEnd + 400); //HS
+        stmtEnd = Math.min(scan.length(), doEnd + 400);
 
-      String stmt = scan.substring(doEnd, stmtEnd); //HS
-      Integer rel2 = findDmlPosition(stmt); //HS
+      String stmt = scan.substring(doEnd, stmtEnd);
+      Integer rel2 = findDmlPosition(stmt);
       if (rel2 != null)
-        return doPos; //HS
-    } //HS
+        return doPos;
+    }
 
-    return null; //HS
-  } //HS
-  //==========BUG FIX #8 END========== //HS
+    return null;
+  }
 
   //Returns relative position of DML keyword inside a string segment, ignoring comments and string literals
   private static Integer findDmlPosition(String segment) {
@@ -626,7 +565,7 @@ public with sharing class TriggerRiskEngine {
         inString = true;
         continue;
       }
-      //HS Left-boundary guard: prevent matching DML keywords inside identifiers like Trigger.isUpdate
+      //Left-boundary guard: prevent matching DML keywords inside identifiers like Trigger.isUpdate
       if (i > 0) {
         String prev = segment.substring(i - 1, i).toLowerCase();
         if (
@@ -678,32 +617,28 @@ public with sharing class TriggerRiskEngine {
       next <= '9') &&
       next != '_';
   }
-  //==========BUG FIX #7 END==========
 
   private static List<BlockSpan> findLoopBlocks(String body) {
     List<BlockSpan> blocks = new List<BlockSpan>();
-    Matcher m = Pattern.compile('(?m)^\\s*(for|while)\\b').matcher(body); //HS
+    Matcher m = Pattern.compile('(?m)^\\s*(for|while)\\b').matcher(body);
 
     while (m.find()) {
-      //HS
-      Integer headerEnd = findLoopHeaderEndPos(body, m.start(), m.group(0)); //HS
+      Integer headerEnd = findLoopHeaderEndPos(body, m.start(), m.group(0));
       if (headerEnd == null)
-        continue; //HS
+        continue;
 
       // Find the next non-whitespace char after the loop header
-      Integer j = headerEnd; //HS
+      Integer j = headerEnd;
       while (j < body.length()) {
-        //HS
-        String ch = body.substring(j, j + 1); //HS
+        String ch = body.substring(j, j + 1);
         if (ch != ' ' && ch != '\t' && ch != '\r' && ch != '\n')
-          break; //HS
-        j++; //HS
-      } //HS
+          break;
+        j++;
+      }
 
       // Case A: Braced loop: for/while(...) { ... }
       if (j < body.length() && body.substring(j, j + 1) == '{') {
-        //HS
-        Integer open = j; //HS
+        Integer open = j;
         Integer close = findMatchingBrace(body, open);
         if (close != null) {
           BlockSpan b = new BlockSpan();
@@ -711,60 +646,54 @@ public with sharing class TriggerRiskEngine {
           b.endPos = close + 1;
           blocks.add(b);
         }
-        continue; //HS
+        continue;
       }
 
       // Case B: Single-statement loop: for/while(...) doSomething();
-      Integer stmtEnd = findStatementEndPos(body, headerEnd); //HS
+      Integer stmtEnd = findStatementEndPos(body, headerEnd);
       if (stmtEnd != null && stmtEnd > headerEnd) {
-        //HS
-        BlockSpan b2 = new BlockSpan(); //HS
-        b2.startPos = headerEnd; //HS
-        b2.endPos = stmtEnd; //HS
-        blocks.add(b2); //HS
-      } //HS
+        BlockSpan b2 = new BlockSpan();
+        b2.startPos = headerEnd;
+        b2.endPos = stmtEnd;
+        blocks.add(b2);
+      }
     }
     // Case C: do { ... } while (...);
-    Matcher d = Pattern.compile('(?m)^\\s*do\\b').matcher(body); //HS
+    Matcher d = Pattern.compile('(?m)^\\s*do\\b').matcher(body);
     while (d.find()) {
-      //HS
-      Integer doEnd = d.end(); //HS
+      Integer doEnd = d.end();
 
       // Skip whitespace after "do"
-      Integer j = doEnd; //HS
+      Integer j = doEnd;
       while (j < body.length()) {
-        //HS
-        String ch = body.substring(j, j + 1); //HS
+        String ch = body.substring(j, j + 1);
         if (ch != ' ' && ch != '\t' && ch != '\r' && ch != '\n')
-          break; //HS
-        j++; //HS
-      } //HS
+          break;
+        j++;
+      }
 
       // Braced do: do { ... } while (...)
       if (j < body.length() && body.substring(j, j + 1) == '{') {
-        //HS
-        Integer open = j; //HS
-        Integer close = findMatchingBrace(body, open); //HS
+        Integer open = j;
+        Integer close = findMatchingBrace(body, open);
         if (close != null) {
-          //HS
-          BlockSpan b3 = new BlockSpan(); //HS
-          b3.startPos = open; //HS
-          b3.endPos = close + 1; //HS
-          blocks.add(b3); //HS
-        } //HS
-        continue; //HS
-      } //HS
+          BlockSpan b3 = new BlockSpan();
+          b3.startPos = open;
+          b3.endPos = close + 1;
+          blocks.add(b3);
+        }
+        continue;
+      }
 
       // No-brace do: do singleStatement; while (...);
-      Integer stmtEnd = findStatementEndPos(body, doEnd); //HS
+      Integer stmtEnd = findStatementEndPos(body, doEnd);
       if (stmtEnd != null && stmtEnd > doEnd) {
-        //HS
-        BlockSpan b4 = new BlockSpan(); //HS
-        b4.startPos = doEnd; //HS
-        b4.endPos = stmtEnd; //HS
-        blocks.add(b4); //HS
-      } //HS
-    } //HS
+        BlockSpan b4 = new BlockSpan();
+        b4.startPos = doEnd;
+        b4.endPos = stmtEnd;
+        blocks.add(b4);
+      }
+    }
     return blocks;
   }
 
@@ -778,510 +707,457 @@ public with sharing class TriggerRiskEngine {
     }
     return null;
   }
-  //HS Finds best-effort end of the next Apex statement after a loop header (supports no-brace loops)
+  //Finds best-effort end of the next Apex statement after a loop header (supports no-brace loops)
   private static Integer findStatementEndPos(String body, Integer startPos) {
-    //HS
     if (String.isBlank(body) || startPos == null)
-      return null; //HS
+      return null;
 
-    Integer n = body.length(); //HS
-    Boolean inLineComment = false; //HS
-    Boolean inBlockComment = false; //HS
-    Boolean inString = false; //HS
+    Integer n = body.length();
+    Boolean inLineComment = false;
+    Boolean inBlockComment = false;
+    Boolean inString = false;
 
     for (Integer i = startPos; i < n; i++) {
-      //HS
       if (i - startPos > 600)
-        return i; //HS BUG FIX# 8
-      String ch = body.substring(i, i + 1); //HS
+        return i;
+      String ch = body.substring(i, i + 1);
 
       if (inLineComment) {
-        //HS
         if (ch == '\n')
-          inLineComment = false; //HS
-        continue; //HS
-      } //HS
+          inLineComment = false;
+        continue;
+      }
       if (inBlockComment) {
-        //HS
         if (i + 1 < n && body.substring(i, i + 2) == '*/') {
-          //HS
-          inBlockComment = false; //HS
-          i++; //HS
-        } //HS
-        continue; //HS
-      } //HS
+          inBlockComment = false;
+          i++;
+        }
+        continue;
+      }
       if (inString) {
-        //HS
         if (ch == '\\') {
-          //HS
           if (i + 1 < n)
-            i++; //HS
-          continue; //HS
-        } //HS
+            i++;
+          continue;
+        }
         if (ch == '\'')
-          inString = false; //HS
-        continue; //HS
-      } //HS
+          inString = false;
+        continue;
+      }
 
       if (i + 1 < n) {
-        //HS
-        String two = body.substring(i, i + 2); //HS
+        String two = body.substring(i, i + 2);
         if (two == '//') {
           inLineComment = true;
           i++;
           continue;
-        } //HS
+        }
         if (two == '/*') {
           inBlockComment = true;
           i++;
           continue;
-        } //HS
-      } //HS
+        }
+      }
 
       if (ch == '\'') {
         inString = true;
         continue;
-      } //HS
+      }
 
-      // End of statement //HS
+      // End of statement
       if (ch == ';')
-        return i + 1; //HS
-      //===============================BUG FIX #8 START=========================
-      // Safety: stop at newline if statement is split weirdly (still ok) //HS
-      //   if (ch == '\n') return i; //HS BUG FIX #8
-      //HS Do NOT stop at newline; allow multi-line statements. Hard stop handled by 600-char limit.
+        return i + 1;
       if (ch == '\n') {
         continue;
-      } //HS
-      //===============================BUG FIX #8 END=========================
-    } //HS
+      }
+    }
 
-    return null; //HS
-  } //HS
-  //==========BUG FIX #9 - Engine-driven ENQUEUE_IN_LOOP finder========== //HS
+    return null;
+  }
+  // Engine-driven ENQUEUE_IN_LOOP finder
   private static Finding detectEnqueueInLoop(
     String body,
     Map<String, Trigger_Risk_Rule__mdt> ruleByKey
   ) {
-    //HS
     if (String.isBlank(body))
-      return null; //HS
+      return null;
 
-    Trigger_Risk_Rule__mdt r = ruleByKey.get('ENQUEUE_IN_LOOP'); //HS
+    Trigger_Risk_Rule__mdt r = ruleByKey.get('ENQUEUE_IN_LOOP');
     if (r == null || !r.Is_Enabled__c)
-      return null; //HS
+      return null;
 
-    Integer pos = findEnqueueInLoopPosition(body); //HS
+    Integer pos = findEnqueueInLoopPosition(body);
     if (pos == null)
-      return null; //HS
+      return null;
 
-    Finding f = new Finding(); //HS
-    f.ruleKey = String.isBlank(r.Rule_Key__c) ? r.DeveloperName : r.Rule_Key__c; //HS
-    f.ruleLabel = r.Label; //HS
-    f.severity = String.isBlank(r.Severity__c) ? 'Low' : r.Severity__c; //HS
-    f.category = r.Category__c; //HS
-    f.message = r.Message__c; //HS
-    f.matchPos = pos; //HS
-    f.lineNumber = computeLineNumber(body, pos); //HS
-    return f; //HS
-  } //HS
+    Finding f = new Finding();
+    f.ruleKey = String.isBlank(r.Rule_Key__c) ? r.DeveloperName : r.Rule_Key__c;
+    f.ruleLabel = r.Label;
+    f.severity = String.isBlank(r.Severity__c) ? 'Low' : r.Severity__c;
+    f.category = r.Category__c;
+    f.message = r.Message__c;
+    f.matchPos = pos;
+    f.lineNumber = computeLineNumber(body, pos);
+    return f;
+  }
 
   private static Integer findEnqueueInLoopPosition(String body) {
-    //HS
     if (String.isBlank(body))
-      return null; //HS
+      return null;
 
-    // Scan on masked text so comment-only and string-only patterns do not false-positive //HS
-    String scan = maskCommentsAndStringsPreserveLength(body); //HS
+    // Scan on masked text so comment-only and string-only patterns do not false-positive
+    String scan = maskCommentsAndStringsPreserveLength(body);
 
-    // ---------- for/while loops ---------- //HS
-    Matcher m = Pattern.compile('(?m)^\\s*(for|while)\\b').matcher(scan); //HS
+    // ---------- for/while loops ----------
+    Matcher m = Pattern.compile('(?m)^\\s*(for|while)\\b').matcher(scan);
     while (m.find()) {
-      //HS
-      Integer loopHeaderPos = m.start(); //HS
-      Integer headerEnd = findLoopHeaderEndPos(scan, m.start(), m.group(0)); //HS
+      Integer loopHeaderPos = m.start();
+      Integer headerEnd = findLoopHeaderEndPos(scan, m.start(), m.group(0));
       if (headerEnd == null)
-        continue; //HS
+        continue;
 
-      // Skip whitespace after the full header //HS
-      Integer j = headerEnd; //HS
+      // Skip whitespace after the full header
+      Integer j = headerEnd;
       while (j < scan.length()) {
-        //HS
-        String ch = scan.substring(j, j + 1); //HS
+        String ch = scan.substring(j, j + 1);
         if (ch != ' ' && ch != '\t' && ch != '\r' && ch != '\n')
-          break; //HS
-        j++; //HS
-      } //HS
+          break;
+        j++;
+      }
 
-      // Braced loop: for/while (...) { ... } //HS
+      // Braced loop: for/while (...) { ... }
       if (j < scan.length() && scan.substring(j, j + 1) == '{') {
-        //HS
-        Integer open = j; //HS
-        Integer close = findMatchingBrace(scan, open); //HS
+        Integer open = j;
+        Integer close = findMatchingBrace(scan, open);
         if (close != null) {
-          //HS
-          String loopSegment = scan.substring(open, close + 1); //HS
+          String loopSegment = scan.substring(open, close + 1);
           if (containsEnqueue(loopSegment))
-            return loopHeaderPos; //HS
-        } //HS
-        continue; //HS
-      } //HS
+            return loopHeaderPos;
+        }
+        continue;
+      }
 
-      // No-brace loop: for/while (...) singleStatement; //HS
-      Integer stmtEnd = findStatementEndPos(scan, headerEnd); //HS
+      // No-brace loop: for/while (...) singleStatement;
+      Integer stmtEnd = findStatementEndPos(scan, headerEnd);
       if (stmtEnd == null)
-        stmtEnd = Math.min(scan.length(), headerEnd + 400); //HS
+        stmtEnd = Math.min(scan.length(), headerEnd + 400);
 
-      String afterHeader = scan.substring(headerEnd, stmtEnd); //HS
+      String afterHeader = scan.substring(headerEnd, stmtEnd);
       if (containsEnqueue(afterHeader))
-        return loopHeaderPos; //HS
-    } //HS
+        return loopHeaderPos;
+    }
 
-    // ---------- do { ... } while (...) ---------- //HS
-    Matcher d = Pattern.compile('(?m)^\\s*do\\b').matcher(scan); //HS
+    // ---------- do { ... } while (...) ----------
+    Matcher d = Pattern.compile('(?m)^\\s*do\\b').matcher(scan);
     while (d.find()) {
-      //HS
-      Integer doPos = d.start(); //HS
-      Integer j = d.end(); //HS
+      Integer doPos = d.start();
+      Integer j = d.end();
 
-      // Skip whitespace after "do" //HS
+      // Skip whitespace after "do"
       while (j < scan.length()) {
-        //HS
-        String ch = scan.substring(j, j + 1); //HS
+        String ch = scan.substring(j, j + 1);
         if (ch != ' ' && ch != '\t' && ch != '\r' && ch != '\n')
-          break; //HS
-        j++; //HS
-      } //HS
+          break;
+        j++;
+      }
 
-      // Braced do: do { ... } while (...); //HS
+      // Braced do: do { ... } while (...);
       if (j < scan.length() && scan.substring(j, j + 1) == '{') {
-        //HS
-        Integer open = j; //HS
-        Integer close = findMatchingBrace(scan, open); //HS
+        Integer open = j;
+        Integer close = findMatchingBrace(scan, open);
         if (close != null) {
-          //HS
-          String loopSegment = scan.substring(open, close + 1); //HS
+          String loopSegment = scan.substring(open, close + 1);
           if (containsEnqueue(loopSegment))
-            return doPos; //HS
-        } //HS
-        continue; //HS
-      } //HS
+            return doPos;
+        }
+        continue;
+      }
 
-      // No-brace do: do singleStatement; while (...); //HS
-      Integer stmtEnd = findStatementEndPos(scan, d.end()); //HS
+      // No-brace do: do singleStatement; while (...);
+      Integer stmtEnd = findStatementEndPos(scan, d.end());
       if (stmtEnd == null)
-        stmtEnd = Math.min(scan.length(), d.end() + 400); //HS
+        stmtEnd = Math.min(scan.length(), d.end() + 400);
 
-      String loopStmt = scan.substring(d.end(), stmtEnd); //HS
+      String loopStmt = scan.substring(d.end(), stmtEnd);
       if (containsEnqueue(loopStmt))
-        return doPos; //HS
-    } //HS
+        return doPos;
+    }
 
-    return null; //HS
-  } //HS
+    return null;
+  }
 
   private static Boolean containsEnqueue(String segment) {
-    //HS
     if (String.isBlank(segment))
-      return false; //HS
+      return false;
     Matcher q = Pattern.compile('(?i)\\bSystem\\s*\\.\\s*enqueueJob\\s*\\(')
-      .matcher(segment); //HS
-    return q.find(); //HS
-  } //HS
+      .matcher(segment);
+    return q.find();
+  }
 
   private static Integer findLoopHeaderEndPos(
     String scan,
     Integer keywordStart,
     String matchedPrefix
   ) {
-    //HS
     if (String.isBlank(scan) || keywordStart == null)
-      return null; //HS
+      return null;
 
-    // Find the first '(' after the keyword (handles for/while with nested parentheses) //HS
-    Integer open = scan.indexOf('(', keywordStart); //HS
+    // Find the first '(' after the keyword (handles for/while with nested parentheses)
+    Integer open = scan.indexOf('(', keywordStart);
     if (open == -1)
-      return null; //HS
+      return null;
 
-    Integer depth = 0; //HS
+    Integer depth = 0;
     for (Integer i = open; i < scan.length(); i++) {
-      //HS
-      String ch = scan.substring(i, i + 1); //HS
+      String ch = scan.substring(i, i + 1);
       if (ch == '(')
-        depth++; //HS
+        depth++;
       if (ch == ')') {
-        //HS
-        depth--; //HS
+        depth--;
         if (depth == 0)
-          return i + 1; //HS
-      } //HS
-    } //HS
-    return null; //HS
-  } //HS
-  //==========BUG FIX #9 END========== //HS
-  //==========HS EMAIL_IN_TRIGGER Helpers========== //HS
+          return i + 1;
+      }
+    }
+    return null;
+  }
+  //==========EMAIL_IN_TRIGGER Helpers==========
   private static Finding detectEmailInTrigger(
     String body,
     Map<String, Trigger_Risk_Rule__mdt> ruleByKey
   ) {
-    //HS
     if (String.isBlank(body))
-      return null; //HS
+      return null;
 
-    Integer pos = findEmailSendPosition(body); //HS
+    Integer pos = findEmailSendPosition(body);
     if (pos == null)
-      return null; //HS
+      return null;
 
     Trigger_Risk_Rule__mdt r = ruleByKey != null
       ? ruleByKey.get('EMAIL_IN_TRIGGER')
-      : null; //HS
+      : null;
 
-    Finding f = new Finding(); //HS
-    f.ruleKey = 'EMAIL_IN_TRIGGER'; //HS
-    f.ruleLabel = r != null ? r.Label : 'Email in Trigger'; //HS
-    f.severity = r != null ? r.Severity__c : 'Medium'; //HS
-    f.category = r != null ? r.Category__c : 'Maintainability'; //HS
+    Finding f = new Finding();
+    f.ruleKey = 'EMAIL_IN_TRIGGER';
+    f.ruleLabel = r != null ? r.Label : 'Email in Trigger';
+    f.severity = r != null ? r.Severity__c : 'Medium';
+    f.category = r != null ? r.Category__c : 'Maintainability';
     f.message = r != null
       ? r.Message__c
-      : 'Email send detected inside a trigger can hit limits and reduce reliability under bulk load.'; //HS
-    f.matchPos = pos; //HS
-    f.lineNumber = computeLineNumber(body, pos); //HS
+      : 'Email send detected inside a trigger can hit limits and reduce reliability under bulk load.';
+    f.matchPos = pos;
+    f.lineNumber = computeLineNumber(body, pos);
 
-    return f; //HS
-  } //HS
+    return f;
+  }
 
   private static Integer findEmailSendPosition(String segment) {
-    //HS
     if (String.isBlank(segment))
-      return null; //HS
+      return null;
 
-    Integer n = segment.length(); //HS
-    Boolean inLineComment = false; //HS
-    Boolean inBlockComment = false; //HS
-    Boolean inString = false; //HS
+    Integer n = segment.length();
+    Boolean inLineComment = false;
+    Boolean inBlockComment = false;
+    Boolean inString = false;
 
     for (Integer i = 0; i < n; i++) {
-      //HS
-      String ch = segment.substring(i, i + 1); //HS
+      String ch = segment.substring(i, i + 1);
 
       if (inLineComment) {
-        //HS
         if (ch == '\n')
-          inLineComment = false; //HS
-        continue; //HS
-      } //HS
+          inLineComment = false;
+        continue;
+      }
       if (inBlockComment) {
-        //HS
         if (i + 1 < n && segment.substring(i, i + 2) == '*/') {
-          //HS
-          inBlockComment = false; //HS
-          i++; //HS
-        } //HS
-        continue; //HS
-      } //HS
+          inBlockComment = false;
+          i++;
+        }
+        continue;
+      }
       if (inString) {
-        //HS
         if (ch == '\\') {
-          //HS
           if (i + 1 < n)
-            i++; //HS
-          continue; //HS
-        } //HS
+            i++;
+          continue;
+        }
         if (ch == '\'')
-          inString = false; //HS
-        continue; //HS
-      } //HS
+          inString = false;
+        continue;
+      }
 
       if (i + 1 < n) {
-        //HS
-        String two = segment.substring(i, i + 2); //HS
+        String two = segment.substring(i, i + 2);
         if (two == '//') {
           inLineComment = true;
           i++;
           continue;
-        } //HS
+        }
         if (two == '/*') {
           inBlockComment = true;
           i++;
           continue;
-        } //HS
-      } //HS
+        }
+      }
 
       if (ch == '\'') {
         inString = true;
         continue;
-      } //HS
+      }
 
-      String tail = segment.substring(i).toLowerCase(); //HS
+      String tail = segment.substring(i).toLowerCase();
 
       if (startsWithWord(tail, 'messaging.sendemail')) {
-        //HS
-        return i; //HS
-      } //HS
-    } //HS
+        return i;
+      }
+    }
 
-    return null; //HS
-  } //HS
-  //==========HS EMAIL_IN_TRIGGER Helpers END========== //HS
-  //==========BUG FIX #11 - Engine-driven DML_ON_TRIGGER_OLD finder========== //HS
+    return null;
+  }
+  // EMAIL_IN_TRIGGER Helpers END
+  // Engine-driven DML_ON_TRIGGER_OLD finder
   private static Finding detectDmlOnTriggerOld(
     String body,
     Map<String, Trigger_Risk_Rule__mdt> ruleByKey
   ) {
-    //HS
     if (String.isBlank(body))
-      return null; //HS
+      return null;
 
-    Trigger_Risk_Rule__mdt r = ruleByKey.get('DML_ON_TRIGGER_OLD'); //HS
+    Trigger_Risk_Rule__mdt r = ruleByKey.get('DML_ON_TRIGGER_OLD');
     if (r == null || !r.Is_Enabled__c)
-      return null; //HS
+      return null;
 
-    Integer pos = findDmlOnTriggerOldPosition(body); //HS
+    Integer pos = findDmlOnTriggerOldPosition(body);
     if (pos == null)
-      return null; //HS
+      return null;
 
-    Finding f = new Finding(); //HS
-    f.ruleKey = String.isBlank(r.Rule_Key__c) ? r.DeveloperName : r.Rule_Key__c; //HS
-    f.ruleLabel = r.Label; //HS
-    f.severity = String.isBlank(r.Severity__c) ? 'Low' : r.Severity__c; //HS
-    f.category = r.Category__c; //HS
-    f.message = r.Message__c; //HS
-    f.matchPos = pos; //HS
-    f.lineNumber = computeLineNumber(body, pos); //HS
-    return f; //HS
-  } //HS
+    Finding f = new Finding();
+    f.ruleKey = String.isBlank(r.Rule_Key__c) ? r.DeveloperName : r.Rule_Key__c;
+    f.ruleLabel = r.Label;
+    f.severity = String.isBlank(r.Severity__c) ? 'Low' : r.Severity__c;
+    f.category = r.Category__c;
+    f.message = r.Message__c;
+    f.matchPos = pos;
+    f.lineNumber = computeLineNumber(body, pos);
+    return f;
+  }
 
   private static Integer findDmlOnTriggerOldPosition(String segment) {
-    //HS
     if (String.isBlank(segment))
-      return null; //HS
+      return null;
 
-    Integer n = segment.length(); //HS
-    Boolean inLineComment = false; //HS
-    Boolean inBlockComment = false; //HS
-    Boolean inString = false; //HS
+    Integer n = segment.length();
+    Boolean inLineComment = false;
+    Boolean inBlockComment = false;
+    Boolean inString = false;
 
     for (Integer i = 0; i < n; i++) {
-      //HS
-      String ch = segment.substring(i, i + 1); //HS
+      String ch = segment.substring(i, i + 1);
 
       if (inLineComment) {
-        //HS
         if (ch == '\n')
-          inLineComment = false; //HS
-        continue; //HS
-      } //HS
+          inLineComment = false;
+        continue;
+      }
       if (inBlockComment) {
-        //HS
         if (i + 1 < n && segment.substring(i, i + 2) == '*/') {
-          //HS
-          inBlockComment = false; //HS
-          i++; //HS
-        } //HS
-        continue; //HS
-      } //HS
+          inBlockComment = false;
+          i++;
+        }
+        continue;
+      }
       if (inString) {
-        //HS
         if (ch == '\\') {
-          //HS
           if (i + 1 < n)
-            i++; //HS
-          continue; //HS
-        } //HS
+            i++;
+          continue;
+        }
         if (ch == '\'')
-          inString = false; //HS
-        continue; //HS
-      } //HS
+          inString = false;
+        continue;
+      }
 
       if (i + 1 < n) {
-        //HS
-        String two = segment.substring(i, i + 2); //HS
+        String two = segment.substring(i, i + 2);
         if (two == '//') {
           inLineComment = true;
           i++;
           continue;
-        } //HS
+        }
         if (two == '/*') {
           inBlockComment = true;
           i++;
           continue;
-        } //HS
-      } //HS
+        }
+      }
 
       if (ch == '\'') {
         inString = true;
         continue;
-      } //HS
+      }
 
-      String tail = segment.substring(i).toLowerCase(); //HS
+      String tail = segment.substring(i).toLowerCase();
 
-      // Direct DML forms: update/delete/undelete <expr> //HS
+      // Direct DML forms: update/delete/undelete <expr>
       if (
         startsWithWord(tail, 'update') ||
         startsWithWord(tail, 'delete') ||
         startsWithWord(tail, 'undelete')
       ) {
-        //HS
         Integer wordLen = startsWithWord(tail, 'update')
           ? 6
-          : (startsWithWord(tail, 'delete') ? 6 : 8); //HS
-        Integer j = i + wordLen; //HS
+          : (startsWithWord(tail, 'delete') ? 6 : 8);
+        Integer j = i + wordLen;
 
         while (j < n) {
-          //HS
-          String cj = segment.substring(j, j + 1); //HS
+          String cj = segment.substring(j, j + 1);
           if (cj != ' ' && cj != '\t' && cj != '\r' && cj != '\n')
-            break; //HS
-          j++; //HS
-        } //HS
+            break;
+          j++;
+        }
 
-        String after = segment.substring(j).toLowerCase(); //HS
+        String after = segment.substring(j).toLowerCase();
         if (
           after.startsWith('trigger.old') || after.startsWith('trigger.oldmap')
         )
-          return i; //HS
-      } //HS
+          return i;
+      }
 
-      // Database.* forms: Database.update(<expr>, ...) //HS
+      // Database.* forms: Database.update(<expr>, ...)
       if (
         startsWithWord(tail, 'database.update') ||
         startsWithWord(tail, 'database.delete') ||
         startsWithWord(tail, 'database.undelete')
       ) {
-        //HS
-        Integer j = i; //HS
+        Integer j = i;
         while (j < n && segment.substring(j, j + 1) != '(')
-          j++; //HS
+          j++;
         if (j >= n)
-          continue; //HS
-        j++; //HS
+          continue;
+        j++;
 
         while (j < n) {
-          //HS
-          String cj = segment.substring(j, j + 1); //HS
+          String cj = segment.substring(j, j + 1);
           if (cj != ' ' && cj != '\t' && cj != '\r' && cj != '\n')
-            break; //HS
-          j++; //HS
-        } //HS
+            break;
+          j++;
+        }
 
-        String after = segment.substring(j).toLowerCase(); //HS
+        String after = segment.substring(j).toLowerCase();
         if (
           after.startsWith('trigger.old') || after.startsWith('trigger.oldmap')
         )
-          return i; //HS
-      } //HS
-    } //HS
+          return i;
+      }
+    }
 
-    return null; //HS
-  } //HS
-  //==========BUG FIX #11 END========== //HS
+    return null;
+  }
 
   private static Integer findSoqlPosition(String text) {
     Matcher m = Pattern.compile(
-        // BUG FIX START #5 - SOQL_IN_LOOP detects multi-line SOQL
+        // SOQL_IN_LOOP detects multi-line SOQL
         // '(?i)(\\[\\s*SELECT.*?FROM.*?\\])|(Database\\.(query|getQueryLocator))'
         '(?is)(\\[\\s*SELECT[\\s\\S]*?FROM[\\s\\S]*?\\])|(Database\\.(query|getQueryLocator))'
-        // BUG FIX END #5 - SOQL_IN_LOOP detects multi-line SOQL
       )
       .matcher(text);
     return m.find() ? m.start() : null;
@@ -1295,23 +1171,15 @@ public with sharing class TriggerRiskEngine {
     Map<String, Trigger_Risk_Rule__mdt> ruleByKey
   ) {
     if (!containsActualDmlStatement(body)) {
-      //Phase3.2
       return null;
     }
-    //==========Phase3.4 START code change=========
-    /*
-        return buildRecursionFinding(ruleByKey, body, 0, body.contains('static'));
-        */
-    //==========BUG FIX #7 - Fully suppress Recursion Risk when a recursion guard exists==========
+
     //return buildRecursionFinding(ruleByKey, body, 0, looksLikeRecursionGuard(body));
     Boolean hasGuard = looksLikeRecursionGuard(body);
     if (hasGuard) {
       return null;
     }
     return buildRecursionFinding(ruleByKey, body, 0, false);
-    //==========BUG FIX #7 END==========
-
-    //==========Phase3.4 END code change=========
   }
 
   private static Finding buildRecursionFinding(
@@ -1360,29 +1228,26 @@ public with sharing class TriggerRiskEngine {
       : 'Trigger contains logic directly. Use a handler class.';
     f.matchPos = 0;
     f.lineNumber = 1;
-    //==========Phase3.4 START code change=========
     Integer lineCount = countEffectiveLines(body);
 
     // Downgrade severity for very small/simple triggers
     if (f.severity == 'Medium' && lineCount <= 12) {
       f.severity = 'Low';
     }
-    //==========Phase3.4 END code change=========
 
     return f;
   }
 
-  // ====== PHASE3 ======
-  // Phase 3.1: cross-trigger recursion cycle detection (best-effort, explainable)
+  // Cross-trigger recursion cycle detection (best-effort, explainable)
   private static Finding detectCrossTriggerRecursionCycle(TriggerContext ctx) {
     if (ctx == null || ctx.universe == null)
       return null;
     if (String.isBlank(ctx.objectApiName) || String.isBlank(ctx.triggerName))
       return null;
 
-    // Only attempt this check if THIS trigger contains REAL DML statements (Phase 3.2.1 noise reduction)
+    // Only attempt this check if THIS trigger contains REAL DML statements
     if (!containsActualDmlStatement(ctx.body))
-      return null; //Phase3.2
+      return null;
 
     // Compute referenced objects from the body using simple, explainable heuristics.
     Set<String> referenced = extractReferencedObjectApiNames(ctx.body);
@@ -1416,9 +1281,9 @@ public with sharing class TriggerRiskEngine {
         if (String.isBlank(otBody))
           continue;
 
-        // Only proceed if OTHER trigger contains REAL DML statements (Phase 3.2.1 noise reduction)
+        // Only proceed if OTHER trigger contains REAL DML statements
         if (!containsActualDmlStatement(otBody))
-          continue; //Phase3.2
+          continue;
 
         Set<String> otRefs = extractReferencedObjectApiNames(otBody);
 
@@ -1428,7 +1293,6 @@ public with sharing class TriggerRiskEngine {
           Boolean otherHasGuard = looksLikeRecursionGuard(otBody);
           Boolean hasGuard = thisHasGuard || otherHasGuard;
 
-          //==========Phase3.2 START code change=========
           String confidence = 'Medium';
           try {
             // High confidence when both sides have DML + strong references to the other object
@@ -1487,7 +1351,6 @@ public with sharing class TriggerRiskEngine {
             '.';
 
           return f;
-          //==========Phase3.2 END code change=========
         }
       }
     }
@@ -1495,220 +1358,184 @@ public with sharing class TriggerRiskEngine {
     return null;
   }
 
-  //==========Phase3.2 START code change=========
-  // Old method kept for reference (caused false positives because it matches "before update"/"after update")
-  /*
-private static Boolean containsDmlKeyword(String body) {
-if (String.isBlank(body)) return false;
-return Pattern.compile(
-'(?i)\\b(insert|update|upsert|delete|undelete)\\b|\\bDatabase\\.(insert|update|upsert|delete|undelete)\\b'
-).matcher(body).find();
-}
-*/
-
   // New: only detect REAL DML statements (avoids matching trigger event keywords like "after update")
   private static Boolean containsActualDmlStatement(String body) {
     if (String.isBlank(body))
       return false;
 
     // Only scan inside the executable block (after the first '{') so we don't match header words.
-    Integer brace = body.indexOf('{'); //HS
+    Integer brace = body.indexOf('{');
     String scan = (brace >= 0 &&
       brace + 1 < body.length())
       ? body.substring(brace + 1)
-      : body; //HS
+      : body;
 
     // Use the engine scanner that already ignores comments and strings.
-    Integer pos = findDmlPosition(scan); //HS
-    return (pos != null); //HS
+    Integer pos = findDmlPosition(scan);
+    return (pos != null);
   }
-  //==========Phase3.2 END code change=========
-  //==========BUG FIX #7 - Helper: detect real Trigger.new mutation in AFTER context==========
+
+  //Helper: detect real Trigger.new mutation in AFTER context
   private static Integer findAfterTriggerNewMutationPos(
     String bodyRaw,
     String bodyLower,
     Boolean isBefore,
     Boolean isAfter
   ) {
-    //HS
     if (!isAfter)
-      return -1; //HS
+      return -1;
     if (String.isBlank(bodyRaw))
-      return -1; //HS
+      return -1;
 
-    //HS Mask comments + strings so traps do not match.
+    //Mask comments + strings so traps do not match.
     String maskedLower = maskCommentsAndStringsPreserveLength(bodyRaw)
-      .toLowerCase(); //HS
+      .toLowerCase();
 
-    //HS If trigger supports BOTH before and after, only flag AFTER mutation when an explicit Trigger.isAfter guard exists.
-    Boolean isAfterOnly = isAfter && !isBefore; //HS
-    Integer afterGuardPos = maskedLower.indexOf('trigger.isafter'); //HS
+    //If trigger supports BOTH before and after, only flag AFTER mutation when an explicit Trigger.isAfter guard exists.
+    Boolean isAfterOnly = isAfter && !isBefore;
+    Integer afterGuardPos = maskedLower.indexOf('trigger.isafter');
     if (!isAfterOnly && afterGuardPos < 0)
-      return -1; //HS
+      return -1;
 
-    Integer offset = 0; //HS
-    String scan = maskedLower; //HS
+    Integer offset = 0;
+    String scan = maskedLower;
 
     if (afterGuardPos >= 0) {
-      //HS
-      offset = afterGuardPos; //HS
-      scan = maskedLower.substring(afterGuardPos); //HS
-    } //HS
+      offset = afterGuardPos;
+      scan = maskedLower.substring(afterGuardPos);
+    }
 
     // Direct DML on Trigger.new (true mutation pattern)
     Matcher dmlOnNew = Pattern.compile(
         '(?i)\\b(update|delete|undelete)\\s+trigger\\.new\\b'
       )
-      .matcher(scan); //HS
+      .matcher(scan);
     if (dmlOnNew.find())
-      return offset + dmlOnNew.start(); //HS
+      return offset + dmlOnNew.start();
 
     // Indexed mutation: Trigger.new[i].Field = ... OR Trigger.new[i] = ...
     Matcher indexed = Pattern.compile(
         '(?i)trigger\\.new\\s*\\[[^\\]]*\\]\\s*(?:\\.[a-z0-9_]+\\s*=|=)'
       )
-      .matcher(scan); //HS
+      .matcher(scan);
     if (indexed.find())
-      return offset + indexed.start(); //HS
+      return offset + indexed.start();
 
     // Loop variable mutation: for (Obj r : Trigger.new) { r.Field = ... }
-    Matcher loopMatcher = Pattern.compile( //HS
-        '(?i)for\\s*\\(\\s*[a-z0-9_\\.]+\\s+([a-z0-9_]+)\\s*:\\s*trigger\\.new\\s*\\)' //HS
+    Matcher loopMatcher = Pattern.compile(
+        '(?i)for\\s*\\(\\s*[a-z0-9_\\.]+\\s+([a-z0-9_]+)\\s*:\\s*trigger\\.new\\s*\\)'
       )
-      .matcher(scan); //HS
+      .matcher(scan);
 
     while (loopMatcher.find()) {
-      //HS
-      String varName = loopMatcher.group(1); //HS
-      Integer scanFrom = loopMatcher.end(); //HS
-      String rest = scan.substring(scanFrom); //HS
+      String varName = loopMatcher.group(1);
+      Integer scanFrom = loopMatcher.end();
+      String rest = scan.substring(scanFrom);
 
       Matcher assign = Pattern.compile(
           '(?i)\\b' + varName + '\\s*\\.[a-z0-9_]+\\s*='
         )
-        .matcher(rest); //HS
+        .matcher(rest);
       if (assign.find())
-        return offset + scanFrom + assign.start(); //HS
-    } //HS
+        return offset + scanFrom + assign.start();
+    }
 
-    return -1; //HS
-  } //HS
+    return -1;
+  }
 
-  //==========BUG FIX #7 END==========
-
-  /* private static Boolean looksLikeRecursionGuard(String body) {
-        if (String.isBlank(body)) return false;
-        
-        //HS Mask comments + strings so traps do not match.
-        String scan = maskCommentsAndStringsPreserveLength(body); //HS
-        
-        // Best-effort patterns: static boolean flag, static set/map used as guard, or common guard words
-        if (Pattern.compile('(?i)\\bstatic\\s+Boolean\\b').matcher(scan).find()) return true;
-        if (Pattern.compile('(?i)\\bstatic\\s+(Set|Map)\\s*<\\s*Id\\b').matcher(scan).find()) return true;
-        
-        //HS Support common guard naming patterns
-        if (Pattern.compile('(?i)\\b(alreadyProcessed|isExecuting|hasRun|recursionGuard|inProgress|alreadyRan|alreadyRun|hasAlreadyRun)\\b').matcher(scan).find()) return true; //HS
-        
-        return false;
-    }*/
   private static Boolean looksLikeRecursionGuard(String body) {
     if (String.isBlank(body))
       return false;
 
-    //HS Mask comments + strings so traps do not match.
-    String scan = maskCommentsAndStringsPreserveLength(body); //HS
-    String lower = scan.toLowerCase(); //HS
+    // Mask comments + strings so traps do not match.
+    String scan = maskCommentsAndStringsPreserveLength(body);
+    String lower = scan.toLowerCase();
 
-    //HS 1) Strong detection: static Boolean guard that is BOTH checked and set
-    //HS Example patterns:
-    //HS   if (hasRun) return;
-    //HS   if (!hasRun) { hasRun = true; ... }
+    // 1) Strong detection: static Boolean guard that is BOTH checked and set
+    //Example patterns:
     Matcher boolDecl = Pattern.compile(
         '(?i)\\bstatic\\s+Boolean\\s+([A-Za-z_][A-Za-z0-9_]*)\\b'
       )
-      .matcher(scan); //HS
+      .matcher(scan);
     while (boolDecl.find()) {
-      //HS
-      String varName = boolDecl.group(1); //HS
+      String varName = boolDecl.group(1);
       if (String.isBlank(varName))
-        continue; //HS
+        continue;
 
-      String v = varName.toLowerCase(); //HS
+      String v = varName.toLowerCase();
 
-      //HS Must see a conditional check using this variable
+      //Must see a conditional check using this variable
       Boolean hasCheck =
         Pattern.compile('(?i)\\bif\\s*\\(\\s*!?\\s*' + v + '\\s*\\)')
           .matcher(lower)
-          .find() || //HS
+          .find() ||
         Pattern.compile(
             '(?i)\\bif\\s*\\(\\s*' + v + '\\s*==\\s*(true|false)\\s*\\)'
           )
           .matcher(lower)
-          .find(); //HS
+          .find();
 
-      //HS Must see the variable being set (true or false)
+      //Must see the variable being set (true or false)
       Boolean hasSet = Pattern.compile(
           '(?i)\\b' + v + '\\s*=\\s*(true|false)\\b'
         )
         .matcher(lower)
-        .find(); //HS
+        .find();
 
       if (hasCheck && hasSet)
-        return true; //HS
-    } //HS
+        return true;
+    }
 
-    //HS 2) Strong detection: static Set<Id> guard (contains + add)
+    // 2) Strong detection: static Set<Id> guard (contains + add)
     Matcher setDecl = Pattern.compile(
         '(?i)\\bstatic\\s+Set\\s*<\\s*Id\\s*>\\s+([A-Za-z_][A-Za-z0-9_]*)\\b'
       )
-      .matcher(scan); //HS
+      .matcher(scan);
     while (setDecl.find()) {
-      //HS
-      String varName = setDecl.group(1); //HS
+      String varName = setDecl.group(1);
       if (String.isBlank(varName))
-        continue; //HS
-      String v = varName.toLowerCase(); //HS
+        continue;
+      String v = varName.toLowerCase();
 
       Boolean hasContains = Pattern.compile(
           '(?i)\\b' + v + '\\s*\\.\\s*contains\\s*\\('
         )
         .matcher(lower)
-        .find(); //HS
+        .find();
       Boolean hasAdd = Pattern.compile('(?i)\\b' + v + '\\s*\\.\\s*add\\s*\\(')
         .matcher(lower)
-        .find(); //HS
+        .find();
 
       if (hasContains && hasAdd)
-        return true; //HS
-    } //HS
+        return true;
+    }
 
-    //HS 3) Strong detection: static Map<Id, ...> guard (containsKey/get + put)
+    // 3) Strong detection: static Map<Id, ...> guard (containsKey/get + put)
     Matcher mapDecl = Pattern.compile(
         '(?i)\\bstatic\\s+Map\\s*<\\s*Id\\s*,\\s*[A-Za-z_][A-Za-z0-9_\\.]*\\s*>\\s+([A-Za-z_][A-Za-z0-9_]*)\\b'
       )
-      .matcher(scan); //HS
+      .matcher(scan);
     while (mapDecl.find()) {
-      //HS
-      String varName = mapDecl.group(1); //HS
+      String varName = mapDecl.group(1);
       if (String.isBlank(varName))
-        continue; //HS
-      String v = varName.toLowerCase(); //HS
+        continue;
+      String v = varName.toLowerCase();
 
       Boolean hasKeyRead = Pattern.compile(
           '(?i)\\b' + v + '\\s*\\.\\s*(containskey|get)\\s*\\('
         )
         .matcher(lower)
-        .find(); //HS
+        .find();
       Boolean hasPut = Pattern.compile('(?i)\\b' + v + '\\s*\\.\\s*put\\s*\\(')
         .matcher(lower)
-        .find(); //HS
+        .find();
 
       if (hasKeyRead && hasPut)
-        return true; //HS
-    } //HS
+        return true;
+    }
 
-    //HS 4) Guard helper utility calls (common patterns)
-    //HS This catches patterns like RecursionGuard.runOnce(...), Guard.enter(...), etc.
+    // 4) Guard helper utility calls (common patterns)
+    //This catches patterns like RecursionGuard.runOnce(...), Guard.enter(...), etc.
     if (
       Pattern.compile(
           '(?i)\\b(recursionguard|guard)\\s*\\.\\s*(runonce|enter|check|checkandset|acquire|lock)\\s*\\('
@@ -1716,7 +1543,7 @@ return Pattern.compile(
         .matcher(scan)
         .find()
     )
-      return true; //HS
+      return true;
 
     return false;
   }
@@ -1772,12 +1599,6 @@ return Pattern.compile(
     return out;
   }
 
-  //==========Phase3.2 START code change=========
-  /**
-   * Returns true if the trigger body has a strong, explicit reference
-   * to the given sObject API name.
-   * Used to increase confidence for cross-trigger recursion detection.
-   */
   private static Boolean hasStrongObjectReference(
     String body,
     String objApiName
@@ -1806,18 +1627,7 @@ return Pattern.compile(
 
     return false;
   }
-  //==========Phase3.2 END code change=========
 
-  //==========Phase3.2 START code change=========
-  /**
-   * Finds the best position in the trigger body to highlight for a
-   * cross-trigger recursion finding.
-   * Preference order:
-   *   1) SOQL: FROM <Object>
-   *   2) new <Object>(
-   *   3) Generic usage: <Object>
-   *   4) First occurrence of object name
-   */
   private static Integer findBestHighlightPos(String body, String objApiName) {
     if (String.isBlank(body) || String.isBlank(objApiName))
       return null;
@@ -1847,7 +1657,6 @@ return Pattern.compile(
 
     return null;
   }
-  //==========Phase3.2 END code change=========
 
   private static Boolean isPlausibleSObjectName(String token) {
     if (String.isBlank(token))
@@ -1895,9 +1704,8 @@ return Pattern.compile(
 
     return false;
   }
-  // ====== PHASE3 ======
-  // ==========Phase3.2 START code change=========
-  // Phase 3.2: Order-of-execution risk detection
+
+  // Order-of-execution risk detection
   private static List<Finding> detectOrderOfExecutionRisks(TriggerContext ctx) {
     List<Finding> out = new List<Finding>();
     if (ctx == null || ctx.universe == null)
@@ -1927,7 +1735,7 @@ return Pattern.compile(
         'which can cause unpredictable behavior.';
       out.add(f);
     }
-    //==========BUG FIX #12 - Accurate BEFORE/AFTER detection (header only)========== //HS
+    //Accurate BEFORE/AFTER detection (header only)
     // Detect trigger timing
     //Boolean isBefore = body.contains('before');
     //Boolean isAfter  = body.contains('after');
@@ -1945,7 +1753,6 @@ return Pattern.compile(
 
     Boolean isBefore = events.contains('before');
     Boolean isAfter = events.contains('after');
-    //==========BUG FIX #12 END========== //HS
 
     // 2) DML inside BEFORE trigger
     if (isBefore && containsActualDmlStatement(ctx.body)) {
@@ -1963,7 +1770,6 @@ return Pattern.compile(
     }
 
     // 3) Modifying Trigger.new in AFTER trigger
-    //==========BUG FIX #7 - Fix false positive: Trigger.new Modified in AFTER Trigger==========
     //if (isAfter && body.contains('trigger.new') && body.contains('=')) {
     Integer afterMutPos = findAfterTriggerNewMutationPos(
       ctx.body,
@@ -1972,14 +1778,13 @@ return Pattern.compile(
       isAfter
     );
     if (afterMutPos >= 0) {
-      //==========BUG FIX #7 END==========
       Finding f = new Finding();
       f.ruleKey = 'AFTER_TRIGGER_MUTATION';
       f.ruleLabel = 'Trigger.new Modified in AFTER Trigger';
       f.category = 'OrderOfExecution';
       f.severity = 'Medium';
       //f.matchPos = body.indexOf('trigger.new');
-      f.matchPos = afterMutPos; //BUG FIX #7
+      f.matchPos = afterMutPos;
       f.lineNumber = computeLineNumber(ctx.body, f.matchPos);
       f.message =
         'Trigger.new appears to be modified in an AFTER trigger. ' +
@@ -1989,8 +1794,7 @@ return Pattern.compile(
 
     return out;
   }
-  //==========Phase3.2 END code change=========
-  //==========Phase3.3 START code change=========
+
   private class BulkScoreResult {
     Integer score;
     String level; // High / Medium / Low
@@ -2020,21 +1824,10 @@ return Pattern.compile(
       ? 'Trigger'
       : ctx.triggerName;
 
-    //==========Phase4.0.1 START code change=========
-    /*
-        f.message =
-            'Bulkification confidence for ' + tName + ': ' +
-            String.valueOf(r.score) + '/100 (' + r.level + '). ' +
-            (String.isBlank(r.deductions)
-                ? 'No major bulk risks detected.'
-                : ('Deductions: ' + r.deductions));
-        */
-    //==========BUG FIX START===============================>
     //String msg = 'Bulk safety concerns detected.';
     String msg = (r.level == 'High')
       ? 'Bulk-safe patterns detected.'
       : 'Bulk safety concerns detected.';
-    //==========BUG FIX END===============================>
 
     if (!String.isBlank(r.deductions)) {
       msg += '\n\nPrimary considerations:';
@@ -2057,16 +1850,13 @@ return Pattern.compile(
     } else {
       msg += '\n\nNo high-impact bulk processing risks were identified.';
     }
-    //==========BUG FIX START===============================>
     //msg += '\n\nThis trigger is functional but may require refactoring before deployment to high-volume environments.';
     if (r.level != 'High' || !String.isBlank(r.deductions)) {
       msg += '\n\nThis trigger is functional but may require refactoring before deployment to high-volume environments.';
     } else {
       msg += '\n\nThis trigger looks ready for higher-volume environments based on detected patterns.';
     }
-    //==========BUG FIX END===============================>
     f.message = msg;
-    //==========Phase4.0.1 END code change=========
 
     return f;
   }
@@ -2079,8 +1869,7 @@ return Pattern.compile(
     Integer score = 100;
 
     List<String> ded = new List<String>();
-    //==========Phase3.4.3 START code change=========
-    // Phase 3.4.3: build rule-key set so we can avoid double-penalizing similar risks
+    // Build rule-key set so we can avoid double-penalizing similar risks
     Set<String> keysPresent = new Set<String>();
     if (findings != null) {
       for (Finding fx : findings) {
@@ -2090,7 +1879,7 @@ return Pattern.compile(
       }
     }
 
-    // Phase 3.4.3: scoring-only dedupe rules (do NOT remove findings from the UI)
+    // Scoring-only dedupe rules (do NOT remove findings from the UI)
     Set<String> skipForScoring = new Set<String>();
     if (keysPresent.contains('DML_IN_LOOP')) {
       skipForScoring.add('SINGLE_RECORD_DML');
@@ -2098,26 +1887,9 @@ return Pattern.compile(
     if (keysPresent.contains('CROSS_TRIGGER_RECURSION_CYCLE')) {
       skipForScoring.add('RECURSION_RISK');
     }
-    //==========Phase3.4.3 END code change=========
 
     // Deduct based on existing findings (ruleKey-based)
     if (findings != null) {
-      //==========Phase3.4 START code change=========
-      /*
-        for (Finding f : findings) {
-        if (f == null || String.isBlank(f.ruleKey)) continue;
-        
-        // Skip self
-        if (f.ruleKey == 'BULK_CONFIDENCE_SCORE') continue;
-        
-        Integer d = bulkDeductionForRuleKey(f.ruleKey, f.severity);
-        if (d > 0) {
-        score -= d;
-        ded.add(f.ruleKey + '(-' + String.valueOf(d) + ')');
-        }
-        }
-        */
-
       for (Finding f : findings) {
         if (f == null || String.isBlank(f.ruleKey))
           continue;
@@ -2126,7 +1898,7 @@ return Pattern.compile(
         if (f.ruleKey == 'BULK_CONFIDENCE_SCORE')
           continue;
 
-        // Phase 3.4.3: skip redundant deductions (scoring only)
+        // Skip redundant deductions (scoring only)
         if (skipForScoring.contains(f.ruleKey))
           continue;
 
@@ -2136,21 +1908,11 @@ return Pattern.compile(
           ded.add(f.ruleKey + '(-' + String.valueOf(d) + ')');
         }
       }
-      //==========Phase3.4 END code change=========
     }
 
     // Small additional heuristic deductions based on body patterns (safe + explainable)
     String body = (ctx.body == null) ? '' : ctx.body;
 
-    // If no obvious bulk pattern (no lists/sets/maps) and trigger does work, small deduction
-    // (kept small to avoid noise)
-    //====================== BUG FIX START=============================>
-    /*Boolean usesCollections =
-            Pattern.compile('(?i)\\b(List|Set|Map)\\s*<').matcher(body).find();
-        if (!usesCollections && Pattern.compile('(?i)\\b(SELECT\\b|update\\b|insert\\b|delete\\b|upsert\\b)').matcher(body).find()) {
-            score -= 5;
-            ded.add('NO_COLLECTIONS_PATTERN(-5)');
-        }*/
     Boolean usesCollections = Pattern.compile('(?i)\\b(List|Set|Map)\\s*<')
       .matcher(body)
       .find();
@@ -2168,7 +1930,6 @@ return Pattern.compile(
       score -= 5;
       ded.add('NO_COLLECTIONS_PATTERN(-5)');
     }
-    //====================== BUG FIX END=============================>
     // Clamp score
     if (score < 0)
       score = 0;
@@ -2186,11 +1947,9 @@ return Pattern.compile(
     String ruleKey,
     String severity
   ) {
-    //==========Phase3.4 START code change=========
-    // Phase 3.4: soften penalties when guards exist
+    // Soften penalties when guards exist
     // If severity is Medium (guard detected), reduce deduction
     Boolean guarded = (severity == 'Medium');
-    //==========Phase3.4 END code change=========
 
     // SOQL / DML risks
     if (ruleKey == 'SOQL_IN_LOOP')
@@ -2206,17 +1965,11 @@ return Pattern.compile(
 
     // Recursion risks
     if (ruleKey == 'RECURSION_RISK') {
-      //==========Phase3.4 START code change=========
       return guarded ? 5 : 15;
-      //==========Phase3.4 END code change=========
-      // return 15;
     }
 
     if (ruleKey == 'CROSS_TRIGGER_RECURSION_CYCLE') {
-      //==========Phase3.4 START code change=========
       return guarded ? 10 : 20;
-      //==========Phase3.4 END code change=========
-      // return 20;
     }
 
     // Order-of-execution risks
@@ -2233,7 +1986,6 @@ return Pattern.compile(
 
     return 0;
   }
-  //==========Phase3.4 START code change=========
   /*** Counts non-empty, non-comment lines to estimate trigger complexity.*/
   private static Integer countEffectiveLines(String body) {
     if (String.isBlank(body))
@@ -2254,95 +2006,82 @@ return Pattern.compile(
     }
     return count;
   }
-  //==========Phase3.4 END code change=========
 
-  //==========Phase3.3 END code change=========
   private static String maskCommentsAndStringsPreserveLength(String input) {
-    //HS
     if (String.isBlank(input))
-      return input; //HS
+      return input;
 
-    Integer n = input.length(); //HS
-    List<String> out = new List<String>(); //HS
+    Integer n = input.length();
+    List<String> out = new List<String>();
 
-    Boolean inLineComment = false; //HS
-    Boolean inBlockComment = false; //HS
-    Boolean inString = false; //HS
+    Boolean inLineComment = false;
+    Boolean inBlockComment = false;
+    Boolean inString = false;
 
     for (Integer i = 0; i < n; i++) {
-      //HS
-      String ch = input.substring(i, i + 1); //HS
+      String ch = input.substring(i, i + 1);
 
       if (inLineComment) {
-        //HS
-        out.add(ch == '\n' ? '\n' : ' '); //HS
+        out.add(ch == '\n' ? '\n' : ' ');
         if (ch == '\n')
-          inLineComment = false; //HS
-        continue; //HS
-      } //HS
+          inLineComment = false;
+        continue;
+      }
 
       if (inBlockComment) {
-        //HS
         if (i + 1 < n && input.substring(i, i + 2) == '*/') {
-          //HS
-          out.add(' '); //HS
-          out.add(' '); //HS
-          i++; //HS
-          inBlockComment = false; //HS
+          out.add(' ');
+          out.add(' ');
+          i++;
+          inBlockComment = false;
         } else {
-          //HS
-          out.add(ch == '\n' ? '\n' : ' '); //HS
-        } //HS
-        continue; //HS
-      } //HS
+          out.add(ch == '\n' ? '\n' : ' ');
+        }
+        continue;
+      }
 
       if (inString) {
-        out.add(ch == '\n' ? '\n' : ' '); //HS
+        out.add(ch == '\n' ? '\n' : ' ');
         if (ch == '\\') {
-          //HS
           if (i + 1 < n) {
             out.add(' ');
             i++;
-          } //HS
-          continue; //HS
+          }
+          continue;
         }
         if (ch == '\'')
-          inString = false; //HS
-        continue; //HS
+          inString = false;
+        continue;
       }
 
       if (i + 1 < n) {
-        //HS
-        String two = input.substring(i, i + 2); //HS
+        String two = input.substring(i, i + 2);
         if (two == '//') {
-          //HS
-          out.add(' '); //HS
-          out.add(' '); //HS
-          i++; //HS
-          inLineComment = true; //HS
-          continue; //HS
+          out.add(' ');
+          out.add(' ');
+          i++;
+          inLineComment = true;
+          continue;
         }
         if (two == '/*') {
-          //HS
-          out.add(' '); //HS
-          out.add(' '); //HS
-          i++; //HS
-          inBlockComment = true; //HS
-          continue; //HS
+          out.add(' ');
+          out.add(' ');
+          i++;
+          inBlockComment = true;
+          continue;
         }
       }
 
       if (ch == '\'') {
-        //HS
-        out.add(' '); //HS
-        inString = true; //HS
-        continue; //HS
+        out.add(' ');
+        inString = true;
+        continue;
       }
 
-      out.add(ch); //HS
+      out.add(ch);
     }
 
-    return String.join(out, ''); //HS
+    return String.join(out, '');
   }
   private static String maskCommentsPreserveLength(String input) {
     if (String.isBlank(input))
@@ -2355,18 +2094,16 @@ return Pattern.compile(
     Boolean inBlock = false;
 
     for (Integer i = 0; i < n; i++) {
-      String ch = input.substring(i, i + 1); //HS
+      String ch = input.substring(i, i + 1);
 
       if (inLine) {
-        //HS
-        out.add(ch == '\n' ? '\n' : ' '); //HS
+        out.add(ch == '\n' ? '\n' : ' ');
         if (ch == '\n')
-          inLine = false; //HS
-        continue; //HS
-      } //HS
+          inLine = false;
+        continue;
+      }
 
       if (inBlock) {
-        //HS
         if (i + 1 < n && input.substring(i, i + 2) == '*/') {
           out.add(' ');
           out.add(' ');
@@ -2376,24 +2113,23 @@ return Pattern.compile(
           out.add(ch == '\n' ? '\n' : ' ');
         }
         continue;
-      } //HS
+      }
 
       if (i + 1 < n) {
         String two = input.substring(i, i + 2);
         if (two == '//') {
           out.add(' ');
           out.add(' ');
-          i++; //HS
-          inLine = true; //HS
-          continue; //HS
+          i++;
+          inLine = true;
+          continue;
         }
         if (two == '/*') {
-          //HS
-          out.add(' '); //HS
-          out.add(' '); //HS
-          i++; //HS
-          inBlock = true; //HS
-          continue; //HS
+          out.add(' ');
+          out.add(' ');
+          i++;
+          inBlock = true;
+          continue;
         }
       }
 
