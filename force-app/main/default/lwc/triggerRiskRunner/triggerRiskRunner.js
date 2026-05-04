@@ -263,13 +263,6 @@ export default class TriggerRiskRunner extends LightningElement {
 
   //==========Phase7.0.2 START code change=========
   get impactChips() {
-    /*
-  // OLD (kept): breaks because architectImpacts is now List<String>, not a string
-  const s = (this.architectImpacts || '').trim();
-  if (!s) return [];
-  return s.split(',').map((x) => x.trim()).filter(Boolean);
-  */
-
     const v = this.architectImpacts;
 
     // Preferred: Apex sends List<String>
