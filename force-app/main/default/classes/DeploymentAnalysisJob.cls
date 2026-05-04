@@ -195,7 +195,7 @@ public with sharing class DeploymentAnalysisJob implements Queueable, Database.A
           item.Risk__c = f.severity;
           item.Category__c = String.isBlank(f.category)
             ? 'General'
-            : f.category; //Phase5.4.1
+            : f.category;
           item.Severity_Sort__c = rank(f.severity);
 
           // Store the single-rule context (one item per rule hit)
@@ -399,7 +399,6 @@ public with sharing class DeploymentAnalysisJob implements Queueable, Database.A
           ? null
           : String.join(gate.topRisks, '\n')
       );
-      //==========Phase7.0.1 END code change=========
 
       update runRec;
     } catch (Exception e) {
@@ -651,17 +650,17 @@ public with sharing class DeploymentAnalysisJob implements Queueable, Database.A
     // ExecutiveSignal: keep this deterministic + manager-readable.
     String risk = String.isBlank(overallRisk) ? 'Low' : overallRisk;
 
-    String impacts = buildArchitectImpacts(ruleKeyCounts); // Phase6.0-ArchitectSignal
+    String impacts = buildArchitectImpacts(ruleKeyCounts);
 
-    String out = '\n\nEXECUTIVE SIGNAL:\n'; // Phase6.0-ExecutiveSignal
-    out += '- Overall Deployment Risk: ' + risk + '\n'; // Phase6.0-ExecutiveSignal
+    String out = '\n\nEXECUTIVE SIGNAL:\n';
+    out += '- Overall Deployment Risk: ' + risk + '\n';
     out +=
       '- Architect Impacts: ' +
       (String.isBlank(impacts) ? 'None detected' : impacts) +
-      '\n'; // Phase6.0-ArchitectSignal
+      '\n';
 
     // Short closure line for managers
-    out += '\nExecutive note: This signal summarizes detected patterns. See the RELEASE GATE section for release recommendation and top risks.\n'; // Phase6.0-ExecutiveSignal
+    out += '\nExecutive note: This signal summarizes detected patterns. See the RELEASE GATE section for release recommendation and top risks.\n';
     return out;
   }
 
