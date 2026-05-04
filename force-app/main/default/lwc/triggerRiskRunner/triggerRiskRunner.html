@@ -214,7 +214,6 @@
               <p class="slds-m-top_x-small">
                 <b>Overall Risk:</b> {overallRisk}
               </p>
-              <!-- ExecutiveSignal -->
               <template if:true={hasReleaseGate}>
                 <p class="slds-m-top_x-small">
                   <b>Release Recommendation:</b>
@@ -244,7 +243,6 @@
                   </div>
                 </template>
               </template>
-              <!-- ExecutiveSignal   -->
               <p class="slds-m-top_x-small"><b>Findings:</b> {findingsCount}</p>
               <p class="slds-m-top_x-small">
                 <b>Last Updated:</b>
@@ -412,8 +410,7 @@
               </lightning-datatable>
             </div>
           </template>
-          <template if:false={showTable}
-            ><!--HS-->
+          <template if:false={showTable}>
             <div class="slds-m-top_medium slds-text-color_weak">
               <template if:false={hasAnyFindings}>
                 No findings detected. This trigger passed all active rules.
