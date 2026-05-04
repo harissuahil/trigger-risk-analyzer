@@ -275,8 +275,6 @@ public with sharing class TriggerRiskEngine {
       f.severity = String.isBlank(r.Severity__c) ? 'Low' : r.Severity__c;
       f.category = r.Category__c;
       f.message = r.Message__c;
-      /* f.matchPos  = m.start();
-       f.lineNumber = computeLineNumber(body, m.start());*/
       f.matchPos = matchPos;
       f.lineNumber = computeLineNumber(body, matchPos);
       findings.add(f);
@@ -1770,7 +1768,6 @@ public with sharing class TriggerRiskEngine {
     }
 
     // 3) Modifying Trigger.new in AFTER trigger
-    //if (isAfter && body.contains('trigger.new') && body.contains('=')) {
     Integer afterMutPos = findAfterTriggerNewMutationPos(
       ctx.body,
       body,
@@ -1824,7 +1821,6 @@ public with sharing class TriggerRiskEngine {
       ? 'Trigger'
       : ctx.triggerName;
 
-    //String msg = 'Bulk safety concerns detected.';
     String msg = (r.level == 'High')
       ? 'Bulk-safe patterns detected.'
       : 'Bulk safety concerns detected.';
@@ -1850,7 +1846,6 @@ public with sharing class TriggerRiskEngine {
     } else {
       msg += '\n\nNo high-impact bulk processing risks were identified.';
     }
-    //msg += '\n\nThis trigger is functional but may require refactoring before deployment to high-volume environments.';
     if (r.level != 'High' || !String.isBlank(r.deductions)) {
       msg += '\n\nThis trigger is functional but may require refactoring before deployment to high-volume environments.';
     } else {
