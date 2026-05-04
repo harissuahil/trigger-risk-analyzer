@@ -463,8 +463,6 @@ export default class TriggerRiskRunner extends LightningElement {
 
       //==========Phase7.0.2 START code change=========
       // Apex returns architectImpacts as a String (comma-separated). Convert to array for UI/CSV.
-      //this.architectImpacts = s.architectImpacts || this.architectImpacts || [];
-
       const aiRaw = s.architectImpacts;
       if (aiRaw != null) {
         const raw = String(aiRaw).trim();
