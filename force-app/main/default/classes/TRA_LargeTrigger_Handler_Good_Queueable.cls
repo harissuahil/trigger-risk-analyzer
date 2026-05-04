@@ -18,7 +18,6 @@ public class TRA_LargeTrigger_Handler_Good_Queueable implements Queueable {
 
     if (!children.isEmpty()) {
       for (HS_Test_Child__c c : children) {
-        // No-op update to simulate business processing
         c.Name = c.Name;
       }
       update children;
