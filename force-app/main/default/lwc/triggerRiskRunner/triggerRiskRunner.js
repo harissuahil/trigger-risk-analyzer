@@ -568,17 +568,6 @@ export default class TriggerRiskRunner extends LightningElement {
             severityClass: this.severityToClass(r.severity)
           }))
           .sort((a, b) => (b.severitySort || 0) - (a.severitySort || 0));
-        //==========Phase5.4.4 END code change=========
-
-        //==========Phase5.4.4 START code change=========
-        // OLD logic commented to avoid duplicate const declaration
-        // const enriched = (rows || [])
-        //   .map((r) => ({
-        //     ...r,
-        //     severityClass: this.severityToClass(r.severity)
-        //   }))
-        //   .sort((a, b) => (b.severitySort || 0) - (a.severitySort || 0));
-        //==========Phase5.4.4 END code change=========
 
         this.items = enriched;
       }
