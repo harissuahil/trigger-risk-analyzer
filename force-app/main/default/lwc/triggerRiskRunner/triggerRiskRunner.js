@@ -1,4 +1,17 @@
-//triggerRiskRunner.js
+/************************************************************
+ * Main LWC controller for the Trigger Risk Analyzer runner UI.
+ *
+ * Responsibilities:
+ * - Load available Apex trigger names from Salesforce.
+ * - Start a Deployment Analysis Run for selected triggers.
+ * - Poll run status until the analysis completes or fails.
+ * - Display finding counts, filtered finding rows, and item detail modal data.
+ * - Display manager-facing Executive Signal and Release Gate decision output.
+ * - Export CSV and release decision artifacts for review or audit use.
+ *
+ * Keep this component focused on UI orchestration.
+ * Detection logic and release decision rules belong in Apex.
+ ***************************************************************/
 import { LightningElement, track } from "lwc";
 import getTriggerNames from "@salesforce/apex/DeploymentAnalysisController.getTriggerNames";
 import startRun from "@salesforce/apex/DeploymentAnalysisController.startRun";
@@ -45,31 +58,19 @@ export default class TriggerRiskRunner extends LightningElement {
   lastUpdated;
   overallRisk = "Low";
   findingsCount = 0;
-  //==========Phase7.0.2 START code change=========
   releaseDecision; // BLOCKED / APPROVED_WITH_CONDITIONS / APPROVED
   gatePolicyProfile; // e.g., Standard
   gateVersion; // e.g., 7.0.1
   gateRationaleRaw; // multi-line string
   gateRequiredFixesRaw; // multi-line string
-  //==========Phase7.0.2 END code change=========
-
-  //==========Phase6.0.3 START code change=========
   // Executive / Architect Signal (manager-friendly)
   releaseRecommendation; // e.g., PROCEED / PROCEED WITH CAUTION / HOLD
   architectImpacts = []; // array of strings
   executiveNote; // optional string
-  //==========Phase6.0.3 END code change=========
-
-  // =========================
-  // Phase6.0-ExecutiveSignal
-  // =========================
+  //ExecutiveSignal
   @track topRisks = [];
   executiveSummary;
   completedAt;
-  // =========================
-  // Phase6.0-ExecutiveSignal
-  // =========================
-
   // Items
   @track items = [];
   columns = [
@@ -149,13 +150,13 @@ export default class TriggerRiskRunner extends LightningElement {
   }
 
   get hasRows() {
-    return (this.filteredItems || []).length > 0; //Phase5.6.2
+    return (this.filteredItems || []).length > 0;
   }
 
   get disableExport() {
     //HS Enable export when run is complete even if 0 findings (manager/audit artifact)
-    const canExport = !!this.runId && this.isRunComplete; //HS
-    return this.isLoading || !canExport; //HS
+    const canExport = !!this.runId && this.isRunComplete;
+    return this.isLoading || !canExport;
   }
 
   get isPolling() {
@@ -165,15 +166,14 @@ export default class TriggerRiskRunner extends LightningElement {
   get isRunComplete() {
     return this.status === "Done" || this.status === "Failed";
   }
-  //==========Phase7.0.2 START code change=========
+
   get hasReleaseGate() {
     return !!(
       this.runId &&
       (this.releaseDecision || this.gateVersion || this.gatePolicyProfile)
     );
   }
-  //==========Phase7.0.2 END code change=========
-  //==========BUG FIX START=========
+
   get hasGateRationale() {
     return (this.gateRationaleLines || []).length > 0;
   }
@@ -181,7 +181,6 @@ export default class TriggerRiskRunner extends LightningElement {
   get hasGateRequiredFixes() {
     return (this.gateRequiredFixLines || []).length > 0;
   }
-  //==========BUG FIX END=========
 
   get releaseGateBadgeClass() {
     const d = this.releaseDecision;
@@ -217,7 +216,6 @@ export default class TriggerRiskRunner extends LightningElement {
     // Fixes must keep "Collect/Add/Move" lines; strip numbering so UI bullets don't double-number
     return this.cleanGateLines(raw.split("\n"), { removeFixLikeLines: false });
   }
-  //==========Phase7.0.2 END code change=========
 
   // Summary tile styling
   get highTileClass() {
@@ -243,9 +241,8 @@ export default class TriggerRiskRunner extends LightningElement {
   get detailRuleKeys() {
     return this.detail ? this.detail.ruleKeys || this.detail.ruleKey : null;
   }
-  // =========================
-  // Phase6.0-ExecutiveSignal
-  // =========================
+
+  //ExecutiveSignal
   get recommendationBadgeClass() {
     const rec = this.releaseRecommendation;
     if (rec === "NOT RECOMMENDED") return "badge badge-high";
@@ -253,7 +250,6 @@ export default class TriggerRiskRunner extends LightningElement {
     return "badge badge-low";
   }
 
-  //==========Phase7.0.2 START code change=========
   get impactChips() {
     const v = this.architectImpacts;
 
@@ -270,11 +266,6 @@ export default class TriggerRiskRunner extends LightningElement {
       .map((x) => x.trim())
       .filter(Boolean);
   }
-  //==========Phase7.0.2 END code change=========
-
-  // =========================
-  // Phase6.0-ExecutiveSignal
-  // =========================
 
   get filteredItems() {
     const sev = this.severityFilter;
@@ -337,7 +328,6 @@ export default class TriggerRiskRunner extends LightningElement {
   }
   //HS - handle trigger search input
   handleTriggerSearch(e) {
-    //HS
     this.triggerSearchText = e.target.value || "";
   }
 
@@ -401,13 +391,11 @@ export default class TriggerRiskRunner extends LightningElement {
     this.items = [];
     this.resetRunStatus();
     this.stopPolling();
-    //==========BUG FIX START code change=========
     this.releaseDecision = null;
     this.gatePolicyProfile = null;
     this.gateVersion = null;
     this.gateRationaleRaw = "";
     this.gateRequiredFixesRaw = "";
-    //==========BUG FIX END code change=========
 
     try {
       const triggerNames = Array.from(this.selected);
@@ -443,17 +431,11 @@ export default class TriggerRiskRunner extends LightningElement {
       this.lowCount = s.lowCount || 0;
       this.errorMessage = s.errorMessage;
       this.lastUpdated = s.lastUpdated;
-
-      // =========================
-      // Phase6.0-ExecutiveSignal
-      // =========================
+      // ExecutiveSignal
       this.overallRisk = s.overallRisk || this.computeOverallRisk();
-      //==========Phase6.0.3 START code change=========
       // Keep these in memory so Export CSV can include the same Executive Signal shown in the UI
       this.releaseRecommendation =
         s.releaseRecommendation || this.releaseRecommendation;
-
-      //==========Phase7.0.2 START code change=========
       // Apex returns architectImpacts as a String (comma-separated). Convert to array for UI/CSV.
       const aiRaw = s.architectImpacts;
       if (aiRaw != null) {
@@ -465,17 +447,10 @@ export default class TriggerRiskRunner extends LightningElement {
               .filter(Boolean)
           : [];
       }
-      //==========Phase7.0.2 END code change===========
-      //==========BUG 4 FIX  START code change=========
       this.architectImpacts = this.uniqueLines(this.architectImpacts || []);
-      //==========BUG 4 FIX END code change============
-      //==========BUG 4 START code change==============
-      this.topRisks = this.uniqueLines(s.topRisks || this.topRisks || []); //HS
-      //==========BUG 4 END code change================
+      this.topRisks = this.uniqueLines(s.topRisks || this.topRisks || []);
       this.executiveNote = s.executiveNote || this.executiveNote;
-      //==========Phase6.0.3 END code change===========
       this.executiveSummary = s.executiveSummary;
-      //==========Phase7.0.2 START code change=========
       // Release Gate: parse from executiveSummary text (since gate fields are embedded there)
       try {
         const raw = this.executiveSummary || "";
@@ -494,12 +469,8 @@ export default class TriggerRiskRunner extends LightningElement {
       } catch {
         // do not block UI
       }
-      //==========Phase7.0.2 END code change=========
       this.completedAt = s.completedAt;
-      // =========================
-      // Phase6.0-ExecutiveSignal
-      // =========================
-      //==========BUG FIX START code change=========
+      //ExecutiveSignal
       // IMPORTANT: allow empty string to overwrite old values (prevents stale APPROVED screen)
       this.releaseDecision =
         s.releaseDecision !== undefined && s.releaseDecision !== null
@@ -525,14 +496,12 @@ export default class TriggerRiskRunner extends LightningElement {
         s.requiredFixes !== undefined && s.requiredFixes !== null
           ? s.requiredFixes
           : this.gateRequiredFixesRaw || "";
-      //==========BUG FIX END code change=========
 
       this.findingsCount =
         (this.highCount || 0) + (this.mediumCount || 0) + (this.lowCount || 0);
 
       if (this.status === "Done" || this.status === "Failed") {
         const rows = await getRunItems({ runId: this.runId });
-        //==========Phase5.4.4 START code change=========
         const enriched = (rows || [])
           .map((r) => ({
             ...r,
@@ -590,12 +559,10 @@ export default class TriggerRiskRunner extends LightningElement {
     return "sev-low";
   }
 
-  //==========Phase5.7.1 START code change=========
   exportCsv() {
     try {
       const rows = this.filteredItems || []; //HS
       //HS Do not return on 0 rows, still export a clean report artifact
-
       // Header / metadata (manager-friendly)
       const now = new Date();
       const ymd = now.toISOString().slice(0, 10);
@@ -605,7 +572,6 @@ export default class TriggerRiskRunner extends LightningElement {
       const sev = this.severityFilter || "All";
       const cat = this.categoryFilter || "All";
       const q = (this.searchText || "").trim();
-      //==========Phase6.0.3 START code change=========
       const impacts = Array.isArray(this.architectImpacts)
         ? this.architectImpacts
         : [];
@@ -639,9 +605,7 @@ export default class TriggerRiskRunner extends LightningElement {
         execLines.push(" ");
         execLines.push(`Executive note: ${this.executiveNote}`);
       }
-      //==========Phase6.0.3 END code change=========
 
-      //==========Phase6.0.3 START code change=========
       const headerLines = [
         "Trigger Risk Analyzer Export",
         `TRA Build: ${TRA_BUILD_LABEL}`, //HS
@@ -655,7 +619,6 @@ export default class TriggerRiskRunner extends LightningElement {
         ...execLines,
         "---"
       ];
-      //==========Phase6.0.3 END code change=========
 
       // Column order matches UI
       const headers = [
@@ -703,9 +666,7 @@ export default class TriggerRiskRunner extends LightningElement {
       this.errorMsg = this.normalizeError(e);
     }
   }
-  //==========Phase5.7.1 END code change=========
 
-  //==========Phase8.0 START code change=========
   exportReleaseDecision() {
     try {
       if (!this.runId) return;
@@ -743,15 +704,12 @@ export default class TriggerRiskRunner extends LightningElement {
     // Release gate
     const policy = this.gatePolicyProfile || "N/A";
     const version = this.gateVersion || "N/A";
-
-    //==========Phase8.0.1 START code change=========
     const rationaleLines = this.cleanGateLines(this.gateRationaleLines || [], {
       removeFixLikeLines: true
     });
     const fixLines = this.cleanGateLines(this.gateRequiredFixLines || [], {
       removeFixLikeLines: false
     });
-    //==========Phase8.0.1 END code change=========
 
     let out = "";
     out += "Trigger Risk Analyzer - Release Decision\n";
@@ -793,13 +751,11 @@ export default class TriggerRiskRunner extends LightningElement {
     }
 
     if (fixLines.length) {
-      //HS
       out += "\nRequired Fixes (to unblock):\n"; //HS
       fixLines.forEach((l, i) => {
-        //HS
         out += `${i + 1}) ${l}\n`; //HS
-      }); //HS
-    } //HS
+      });
+    }
 
     out += "\n---\n";
     out +=
@@ -807,8 +763,7 @@ export default class TriggerRiskRunner extends LightningElement {
 
     return out;
   }
-  //==========Phase8.0 END code change=========
-  //==========Phase8.0.3 START code change=========
+
   cleanGateLines(lines, options) {
     const opts = options || {};
     const removeFixLikeLines = !!opts.removeFixLikeLines; // ONLY true when cleaning rationale
@@ -845,8 +800,7 @@ export default class TriggerRiskRunner extends LightningElement {
         })
     );
   }
-  //==========Phase8.0.3 END code change=========
-  //==========Phase8.1.1 START code change=========
+
   //HS Dedupe strings while keeping order (first wins)
   uniqueLines(lines) {
     const out = [];
@@ -861,9 +815,7 @@ export default class TriggerRiskRunner extends LightningElement {
     });
     return out;
   }
-  //==========Phase8.1.1 END code change=========
 
-  //==========Phase5.7.1 START code change=========
   makeSafeFilePart(s) {
     if (!s) return "";
     return String(s)
@@ -871,7 +823,6 @@ export default class TriggerRiskRunner extends LightningElement {
       .replace(/\s+/g, "_")
       .replace(/[^a-zA-Z0-9_-]/g, "");
   }
-  //==========Phase5.7.1 END code change=========
 
   csvEscape(v) {
     if (v == null) return '""';
@@ -879,7 +830,6 @@ export default class TriggerRiskRunner extends LightningElement {
     return `"${s}"`;
   }
 
-  //==========Phase5.6.2 START code change=========
   downloadTextFile(text, fileName, mimeType) {
     try {
       // LWS-safe download using data URI (no Blob/ObjectURL)
@@ -901,9 +851,7 @@ export default class TriggerRiskRunner extends LightningElement {
       this.errorMsg = this.normalizeError(e);
     }
   }
-  //==========Phase5.6.2 END code change=========
 
-  //==========Phase5.6.3 START code change=========
   async copySummaryToClipboard() {
     try {
       const summary = this.buildShareableSummary();
@@ -945,9 +893,6 @@ export default class TriggerRiskRunner extends LightningElement {
         "Medium-severity risks were identified. Review recommended before deployment.";
     }
 
-    // =========================
-    // Phase6.0-ExecutiveSignal
-    // =========================
     const rec = this.releaseRecommendation
       ? `\nRelease Recommendation: ${this.releaseRecommendation}\n`
       : "\n";
@@ -959,9 +904,6 @@ export default class TriggerRiskRunner extends LightningElement {
         this.topRisks.map((x, i) => `${i + 1}) ${x}`).join("\n") +
         "\n"
       : "";
-    // =========================
-    // Phase6.0-ExecutiveSignal
-    // =========================
 
     return (
       "Trigger Risk Analysis completed.\n\n" +
@@ -981,8 +923,7 @@ export default class TriggerRiskRunner extends LightningElement {
       assessment
     );
   }
-  //==========Phase5.6.3 END code change=========
-  //==========Phase8.1.1 START code change=========
+
   async copyReleaseDecisionToClipboard() {
     try {
       const text = this.buildReleaseDecisionExecutiveText();
@@ -1052,7 +993,6 @@ export default class TriggerRiskRunner extends LightningElement {
     }
     return out;
   }
-  //==========Phase8.1.1 END code change=========
 
   async handleRowAction(event) {
     const actionName = event.detail.action.name;
@@ -1110,20 +1050,14 @@ export default class TriggerRiskRunner extends LightningElement {
     this.lastUpdated = null;
     this.overallRisk = "Low";
     this.findingsCount = 0;
-
-    // =========================
-    // Phase6.0-ExecutiveSignal
-    // =========================
+    // ExecutiveSignal
     this.releaseRecommendation = null;
     this.architectImpacts = null;
     this.topRisks = [];
     this.executiveSummary = null;
     this.completedAt = null;
-    // =========================
-    // Phase6.0-ExecutiveSignal
-    // =========================
+    // ExecutiveSignal
   }
-  //==========Phase7.0.2 START code change=========
   parseReleaseGateFromSummary(text) {
     const t = text == null ? "" : String(text);
 
@@ -1180,7 +1114,6 @@ export default class TriggerRiskRunner extends LightningElement {
       requiredFixesRaw
     };
   }
-  //==========Phase7.0.2 END code change=========
 
   normalizeError(err) {
     try {
