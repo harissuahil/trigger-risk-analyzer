@@ -32,47 +32,37 @@ public with sharing class DeploymentAnalysisController {
     );
   }
 
-  //HS DTO for polling run status
+  //DTO for polling run status
   public class RunStatusResponse {
-    //HS
     @AuraEnabled
-    public Id runId; //HS
+    public Id runId;
     @AuraEnabled
-    public String status; //HS
+    public String status;
     @AuraEnabled
-    public Integer totalTriggers; //HS
+    public Integer totalTriggers;
     @AuraEnabled
-    public Integer processedTriggers; //HS
+    public Integer processedTriggers;
     @AuraEnabled
-    public Integer highCount; //HS
+    public Integer highCount;
     @AuraEnabled
-    public Integer mediumCount; //HS
+    public Integer mediumCount;
     @AuraEnabled
-    public Integer lowCount; //HS
+    public Integer lowCount;
     @AuraEnabled
-    public String errorMessage; //HS
+    public String errorMessage;
+    public Datetime lastUpdated;
     @AuraEnabled
-    public Datetime lastUpdated; //HS
-
-    // ============================
-    // Phase6.0-ExecutiveSignal
-    // ============================
+    public String overallRisk;
     @AuraEnabled
-    public String overallRisk; // Phase6.0-ExecutiveSignal
+    public String releaseRecommendation;
     @AuraEnabled
-    public String releaseRecommendation; // Phase6.0-ExecutiveSignal
+    public String architectImpacts;
     @AuraEnabled
-    public String architectImpacts; // Phase6.0-ArchitectSignal
+    public List<String> topRisks;
     @AuraEnabled
-    public List<String> topRisks; // Phase6.0-ExecutiveSignal
+    public String executiveSummary;
     @AuraEnabled
-    public String executiveSummary; // Phase6.0-ExecutiveSignal
-    @AuraEnabled
-    public Datetime completedAt; // Phase6.0-ExecutiveSignal
-    // ============================
-    // Phase6.0-ExecutiveSignal
-    // ============================
-    //==========Phase7.0.1 START code change=========
+    public Datetime completedAt;
     @AuraEnabled
     public String releaseDecision;
     @AuraEnabled
@@ -83,10 +73,8 @@ public with sharing class DeploymentAnalysisController {
     public String releaseRationale;
     @AuraEnabled
     public String requiredFixes;
-    //==========Phase7.0.1 END code change=========
   }
 
-  //HS
   @AuraEnabled
   public static RunStatusResponse getRunStatus(Id runId) {
     Deployment_Analysis_Run__c r = [
@@ -117,17 +105,15 @@ public with sharing class DeploymentAnalysisController {
     ];
 
     RunStatusResponse resp = new RunStatusResponse();
-    //HS
-    resp.runId = r.Id; //HS
-    resp.status = r.Status__c; //HS
-    resp.totalTriggers = (Integer) r.Total_Triggers__c; //HS
-    resp.processedTriggers = (Integer) r.Processed_Triggers__c; //HS
-    resp.highCount = (Integer) r.High_Count__c; //HS
-    resp.mediumCount = (Integer) r.Medium_Count__c; //HS
-    resp.lowCount = (Integer) r.Low_Count__c; //HS
-    resp.errorMessage = r.Error_Message__c; //HS
-    resp.lastUpdated = r.Last_Updated__c; //HS
-    //==========Phase7.0.1 START code change=========
+    resp.runId = r.Id;
+    resp.status = r.Status__c;
+    resp.totalTriggers = (Integer) r.Total_Triggers__c;
+    resp.processedTriggers = (Integer) r.Processed_Triggers__c;
+    resp.highCount = (Integer) r.High_Count__c;
+    resp.mediumCount = (Integer) r.Medium_Count__c;
+    resp.lowCount = (Integer) r.Low_Count__c;
+    resp.errorMessage = r.Error_Message__c;
+    resp.lastUpdated = r.Last_Updated__c;
     Map<String, Schema.SObjectField> fMap = r.getSObjectType()
       .getDescribe()
       .fields.getMap();
@@ -139,93 +125,67 @@ public with sharing class DeploymentAnalysisController {
     resp.architectImpacts = r.Architect_Impacts__c;
     resp.releaseRationale = r.Release_Rationale__c;
     resp.requiredFixes = r.Required_Fixes__c;
-    //==========Phase7.0.1 START code change=========
-    // Top_Risks__c is stored as Long Text (String) -> convert to List<String>
     String risksRaw = r.Top_Risks__c;
     if (!String.isBlank(risksRaw)) {
       resp.topRisks = risksRaw.split('\n');
     } else {
       resp.topRisks = new List<String>();
     }
-    //==========Phase7.0.1 END code change=========
 
-    //==========Phase7.0.1 END code change=========
+    resp.overallRisk = r.Overall_Risk__c;
+    resp.completedAt = r.Completed_At__c;
 
-    // ============================
-    // Phase6.0-ExecutiveSignal START
-    // ============================
-    resp.overallRisk = r.Overall_Risk__c; // Phase6.0-ExecutiveSignal
-    resp.completedAt = r.Completed_At__c; // Phase6.0-ExecutiveSignal
-
-    // We store the executive block inside Summary__c (no schema changes).
-    // Extract signal fields from the Summary__c block if present.
-    String summary = r.Summary__c; // Phase6.0-ExecutiveSignal
-    resp.executiveSummary = extractExecutiveBlock(summary); // Phase6.0-ExecutiveSignal
-    //==========Phase7.0.2 START code change=========
+    String summary = r.Summary__c;
+    resp.executiveSummary = extractExecutiveBlock(summary);
     // Do NOT overwrite Release Gate fields (Release_Decision__c, Policy_Profile__c, etc.)
-    // Keep Phase6 parsed values only if the structured fields are blank.
     if (String.isBlank(resp.releaseRecommendation)) {
       resp.releaseRecommendation = extractSingleLineValue(
         summary,
         'Release Recommendation:'
-      ); // Phase6.0-ExecutiveSignal
+      );
     }
 
-    // Phase6 architect impacts (summary) should not overwrite Phase7 gate architect impacts field.
     // Only fill if blank.
     if (String.isBlank(resp.architectImpacts)) {
       resp.architectImpacts = extractSingleLineValue(
         summary,
         'Architect Impacts:'
-      ); // Phase6.0-ArchitectSignal
+      );
     }
 
-    // Only fill top risks from Summary if Phase7 didn't already set them.
     if (resp.topRisks == null || resp.topRisks.isEmpty()) {
-      resp.topRisks = extractTopRisks(summary); // Phase6.0-ExecutiveSignal
+      resp.topRisks = extractTopRisks(summary);
     }
-    //==========Phase7.0.2 END code change=========
-
-    // ============================
-    // Phase6.0-ExecutiveSignal END
-    // ============================
-
-    return resp; //HS
-    //HS
+    return resp;
   }
 
-  //HS
-  //HS DTO for datatable rows
+  //DTO for datatable rows
   public class ItemRowDTO {
-    //HS
     @AuraEnabled
-    public Id itemId; //HS
+    public Id itemId;
     @AuraEnabled
-    public String triggerName; //HS
+    public String triggerName;
     @AuraEnabled
-    public String severity; //HS
+    public String severity;
     @AuraEnabled
-    public Integer severitySort; //HS
+    public Integer severitySort;
     @AuraEnabled
-    public String ruleKeys; //HS
+    public String ruleKeys;
     @AuraEnabled
-    public String ruleLabel; //HS
+    public String ruleLabel;
     @AuraEnabled
-    public Integer lineNumber; //HS
+    public Integer lineNumber;
     @AuraEnabled
-    public String messageShort; //HS
+    public String messageShort;
     @AuraEnabled
-    public Boolean hasSnippet; //HS
+    public Boolean hasSnippet;
     @AuraEnabled
-    public String category; //Phase5.4.3
+    public String category;
   }
 
-  //HS
   @AuraEnabled
   public static List<ItemRowDTO> getRunItems(Id runId) {
-    //HS
     List<Deployment_Analysis_Item__c> items = [
-      //HS
       SELECT
         Id,
         Trigger_Name__c,
@@ -236,69 +196,53 @@ public with sharing class DeploymentAnalysisController {
         Line_Number__c,
         Message__c,
         Snippet_Text__c,
-        Category__c //Phase5.4.3
+        Category__c
       FROM Deployment_Analysis_Item__c
-      //HS
       WHERE Run__c = :runId
-      //HS
       ORDER BY Severity_Sort__c DESC, Trigger_Name__c ASC
-      //HS
     ];
-    //HS
     List<ItemRowDTO> out = new List<ItemRowDTO>();
-    //HS
     for (Deployment_Analysis_Item__c it : items) {
-      //HS
       if (it.Matched_Rules__c == 'BULK_CONFIDENCE_SCORE') {
         continue;
-      } //HS
-      //HS
+      }
       ItemRowDTO row = new ItemRowDTO();
-
-      //HS
-      row.itemId = it.Id; //HS
-      row.triggerName = it.Trigger_Name__c; //HS
-      row.severity = it.Risk__c; //HS
+      row.itemId = it.Id;
+      row.triggerName = it.Trigger_Name__c;
+      row.severity = it.Risk__c;
       row.severitySort = (it.Severity_Sort__c == null)
         ? null
-        : Integer.valueOf(String.valueOf(it.Severity_Sort__c)); //HS
-      row.ruleKeys = it.Matched_Rules__c; //HS
-      row.ruleLabel = it.Rule_Label__c; //HS
+        : Integer.valueOf(String.valueOf(it.Severity_Sort__c));
+      row.ruleKeys = it.Matched_Rules__c;
+      row.ruleLabel = it.Rule_Label__c;
       row.lineNumber = (it.Line_Number__c == null)
         ? null
-        : Integer.valueOf(String.valueOf(it.Line_Number__c)); //HS
-      row.category = it.Category__c; //Phase5.4.3
-      //HS
-      String msg = it.Message__c; //HS
+        : Integer.valueOf(String.valueOf(it.Line_Number__c));
+      row.category = it.Category__c;
+      String msg = it.Message__c;
       row.messageShort = String.isBlank(msg)
         ? null
-        : (msg.length() > 140 ? msg.substring(0, 140) + '…' : msg); //HS
-      row.hasSnippet = !String.isBlank(it.Snippet_Text__c); //HS
-      out.add(row); //HS
+        : (msg.length() > 140 ? msg.substring(0, 140) + '…' : msg);
+      row.hasSnippet = !String.isBlank(it.Snippet_Text__c);
+      out.add(row);
     }
-    //HS
-    return out; //HS
-    //HS
+    return out;
   }
 
-  //HS
-  //HS DTO for modal snippet
+  //DTO for modal snippet
   public class SnippetDTO {
-    //HS
     @AuraEnabled
-    public Integer startLine; //HS
+    public Integer startLine;
     @AuraEnabled
-    public Integer endLine; //HS
+    public Integer endLine;
     @AuraEnabled
-    public Integer highlightLine; //HS
+    public Integer highlightLine;
     @AuraEnabled
-    public String text; //HS
-    //HS
+    public String text;
   }
 
   // DTO for modal details
   public class ItemDetailDTO {
-    //HS
     @AuraEnabled
     public Id itemId;
     @AuraEnabled
@@ -310,7 +254,7 @@ public with sharing class DeploymentAnalysisController {
     @AuraEnabled
     public String ruleLabel;
     @AuraEnabled
-    public String category; //Phase10.5 - modal category chip fix
+    public String category;
     @AuraEnabled
     public Integer lineNumber;
     @AuraEnabled
@@ -337,7 +281,7 @@ public with sharing class DeploymentAnalysisController {
         Snippet_Start_Line__c,
         Snippet_End_Line__c,
         Highlight_Line__c,
-        Category__c //Phase10.5
+        Category__c
       FROM Deployment_Analysis_Item__c
       WHERE Id = :itemId
       LIMIT 1
@@ -352,10 +296,10 @@ public with sharing class DeploymentAnalysisController {
     d.ruleLabel = it.Rule_Label__c;
     d.lineNumber = (it.Line_Number__c == null)
       ? null
-      : Integer.valueOf(String.valueOf(it.Line_Number__c)); //HS
-    d.message = it.Message__c; //HS
-    d.recommendation = it.Recommendation__c; //HS
-    d.category = it.Category__c; //Phase10.5 - modal category chip fix
+      : Integer.valueOf(String.valueOf(it.Line_Number__c));
+    d.message = it.Message__c;
+    d.recommendation = it.Recommendation__c;
+    d.category = it.Category__c;
 
     SnippetDTO sn = new SnippetDTO();
     sn.text = it.Snippet_Text__c;
@@ -372,12 +316,7 @@ public with sharing class DeploymentAnalysisController {
     return d;
   }
 
-  // =========================================================
-  // Phase6.0-ExecutiveSignal Parsing Helpers (ADD ONLY)
-  // =========================================================
-
   private static String extractExecutiveBlock(String summary) {
-    // Phase6.0-ExecutiveSignal
     if (String.isBlank(summary))
       return null;
 
@@ -393,7 +332,6 @@ public with sharing class DeploymentAnalysisController {
   }
 
   private static String extractSingleLineValue(String summary, String key) {
-    // Phase6.0-ExecutiveSignal
     if (String.isBlank(summary) || String.isBlank(key))
       return null;
 
@@ -413,7 +351,6 @@ public with sharing class DeploymentAnalysisController {
   }
 
   private static List<String> extractTopRisks(String summary) {
-    // Phase6.0-ExecutiveSignal
     List<String> out = new List<String>();
     if (String.isBlank(summary))
       return out;
@@ -441,7 +378,7 @@ public with sharing class DeploymentAnalysisController {
     }
     return out;
   }
-  //==========Phase7.0.1 START code change=========
+
   private static String safeGetString(
     SObject sob,
     Map<String, Schema.SObjectField> fMap,
@@ -458,5 +395,4 @@ public with sharing class DeploymentAnalysisController {
       return null;
     }
   }
-  //==========Phase7.0.1 END code change=========
 }
