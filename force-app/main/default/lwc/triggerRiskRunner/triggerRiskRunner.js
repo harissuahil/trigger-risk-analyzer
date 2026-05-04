@@ -508,15 +508,6 @@ export default class TriggerRiskRunner extends LightningElement {
       // Phase6.0-ExecutiveSignal
       // =========================
       //==========BUG FIX START code change=========
-      //==========Phase7.0.2 START code change=========
-      // Release Gate fields (from Apex RunStatusResponse)
-      // this.releaseDecision = s.releaseDecision || this.releaseDecision;
-      // this.gatePolicyProfile = s.policyProfile || this.gatePolicyProfile;
-      // this.gateVersion = s.gateVersion || this.gateVersion;
-      // this.gateRationaleRaw = s.releaseRationale || this.gateRationaleRaw || '';
-      // this.gateRequiredFixesRaw = s.requiredFixes || this.gateRequiredFixesRaw || '';
-      //==========Phase7.0.2 END code change=========
-
       // IMPORTANT: allow empty string to overwrite old values (prevents stale APPROVED screen)
       this.releaseDecision =
         s.releaseDecision !== undefined && s.releaseDecision !== null
