@@ -300,4 +300,85 @@ describe("c-trigger-risk-runner — polling", () => {
     });
     expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
   });
+
+  // ──────────────────────────────────────────────────────────────────
+  // Test 3: stops polling and shows timeout error when max polls is reached
+  //
+  // Verified source flow on a tick where pollCount >= maxPolls and status
+  // is still non-terminal:
+  //   if (this.pollCount >= this.maxPolls) {
+  //     this.stopPolling();
+  //     this.errorMsg =
+  //       "Timed out waiting for analysis to finish. Click Refresh.";
+  //   }
+  //
+  // We do NOT override element.maxPolls. LWC blocks external assignment
+  // to non-@api fields in Jest, and adding @api just for a test would
+  // leak internal state into the public surface. Instead, we invoke the
+  // captured interval callback maxPolls (60) times. Each tick keeps
+  // status "Running" so refreshRun does NOT call getRunItems and the
+  // Done branch in the callback never fires — leaving only the
+  // pollCount >= maxPolls path to terminate the loop.
+  // ──────────────────────────────────────────────────────────────────
+  it("stops polling and shows timeout error when max polls is reached", async () => {
+    element = createElement("c-trigger-risk-runner", {
+      is: TriggerRiskRunner
+    });
+
+    getTriggerNames.mockResolvedValue(["TRA_SoqlInLoop_Bad"]);
+    document.body.appendChild(element);
+    await flushPromises();
+
+    const cb = element.shadowRoot.querySelector(
+      'lightning-input[data-name="TRA_SoqlInLoop_Bad"]'
+    );
+    expect(cb).not.toBeNull();
+    cb.checked = true;
+    cb.dispatchEvent(new CustomEvent("change", { bubbles: false }));
+    await flushPromises();
+
+    // Status returns Running for every call (initial refreshRun + every
+    // poll tick). No getRunItems should ever be triggered.
+    startRun.mockResolvedValue("a02000000000001AAA");
+    getRunStatus.mockResolvedValue(runningRunStatus());
+
+    const buttons = element.shadowRoot.querySelectorAll("lightning-button");
+    expect(buttons.length).toBe(1);
+    buttons[0].dispatchEvent(new CustomEvent("click", { bubbles: true }));
+
+    await flushPromises();
+    await flushPromises();
+    await flushPromises();
+
+    // Polling scheduled
+    expect(setIntervalSpy).toHaveBeenCalledTimes(1);
+
+    // Capture and invoke the interval callback 60 times.
+    // Source default maxPolls = 60. We do not override maxPolls because
+    // it is not @api and LWC blocks external assignment in Jest.
+    const intervalCallback = setIntervalSpy.mock.calls[0][0];
+    await Array.from({ length: 60 }).reduce(
+      (chain) => chain.then(() => intervalCallback()),
+      Promise.resolve()
+    );
+
+    await flushPromises();
+
+    // 1 initial refreshRun during runAnalysis + 60 polling ticks
+    expect(getRunStatus).toHaveBeenCalledTimes(61);
+
+    // Status was Running on every refreshRun → no items fetch
+    expect(getRunItems).not.toHaveBeenCalled();
+
+    // Timeout branch ran stopPolling()
+    expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
+
+    // Error message rendered. We check shadowRoot.textContent rather
+    // than a specific selector so the assertion is robust to where in
+    // the template the error is displayed.
+    const allText = element.shadowRoot.textContent || "";
+    expect(allText).toContain(
+      "Timed out waiting for analysis to finish. Click Refresh."
+    );
+  });
 });
