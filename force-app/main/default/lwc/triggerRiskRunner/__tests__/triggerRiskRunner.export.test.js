@@ -351,19 +351,8 @@ describe("c-trigger-risk-runner — export buttons", () => {
     );
 
     // MIME type from the data URI.
-    //
-    // KNOWN COMPONENT BUG (worth flagging in cleanup pass):
-    //   downloadTextFile(text, fileName, mimeType) declares a mimeType
-    //   parameter but IGNORES it. The href is hardcoded as:
-    //     `data:application/octet-stream;charset=utf-8,${encoded}`
-    //   So every export — CSV, Release Decision, anything else —
-    //   produces the same MIME regardless of the passed value.
-    //
-    // The test asserts what the component ACTUALLY does, not what
-    // exportCsv() passes in. If the component is fixed later to
-    // honor the mimeType parameter, this assertion will need to
-    // change to 'application/octet-stream;charset=utf-8;' (with
-    // trailing semicolon) to match the value that exportCsv passes.
+    // CSV export passes application/octet-stream;charset=utf-8;
+    // to downloadTextFile, and the generated data URI should preserve it.
     expect(mimeType).toBe("application/octet-stream;charset=utf-8;");
   });
 
@@ -430,9 +419,8 @@ describe("c-trigger-risk-runner — export buttons", () => {
   //   - RELEASE GATE (Gate Outcome, Policy, Version, Rationale, Required Fixes)
   //
   // We verify section headers and key field values reach the file.
-  // Filename matches exportReleaseDecision(); MIME currently reflects
-  // the known downloadTextFile behavior where the mimeType parameter
-  // is ignored (see Test 2 comment for full bug description).
+  // Filename matches exportReleaseDecision(); MIME should reflect the
+  // text/plain value passed to downloadTextFile.
   // ─────────────────────────────────────────────────────────────────
   it("Export Release Decision generates text file with executive and gate sections", async () => {
     const element = await setupCompletedRun(blockedRunStatus(), [
