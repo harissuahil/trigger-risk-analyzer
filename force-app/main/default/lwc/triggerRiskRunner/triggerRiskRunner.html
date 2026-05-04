@@ -1,4 +1,9 @@
 <template>
+  <!--
+    Trigger Risk Analyzer runner UI.
+    Organizes trigger selection, run actions, Executive Signal,
+    Release Gate, findings, and detail modal sections.
+  -->
   <lightning-card title="Trigger Risk Analyzer">
     <div class="slds-p-around_medium">
       <lightning-input
@@ -209,9 +214,7 @@
               <p class="slds-m-top_x-small">
                 <b>Overall Risk:</b> {overallRisk}
               </p>
-              <!-- ========================= -->
-              <!-- Phase6.0-ExecutiveSignal   -->
-              <!-- ========================= -->
+              <!-- ExecutiveSignal -->
               <template if:true={hasReleaseGate}>
                 <p class="slds-m-top_x-small">
                   <b>Release Recommendation:</b>
@@ -241,10 +244,7 @@
                   </div>
                 </template>
               </template>
-              <!-- ========================= -->
-              <!-- Phase6.0-ExecutiveSignal   -->
-              <!-- ========================= -->
-
+              <!-- ExecutiveSignal   -->
               <p class="slds-m-top_x-small"><b>Findings:</b> {findingsCount}</p>
               <p class="slds-m-top_x-small">
                 <b>Last Updated:</b>
@@ -293,8 +293,6 @@
           </div>
         </div>
       </template>
-
-      <!--==========Phase7.0.2 START code change==========-->
       <template if:true={hasReleaseGate}>
         <!-- Section: Release Gate -->
         <div class="sectionHeader slds-m-top_medium">
@@ -343,8 +341,6 @@
           </template>
         </div>
       </template>
-      <!--==========Phase7.0.2 END code change==========-->
-
       <!-- Filters -->
       <template if:true={runId}>
         <template if:false={isRunComplete}>
