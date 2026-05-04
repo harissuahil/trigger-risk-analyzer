@@ -683,19 +683,12 @@ export default class TriggerRiskRunner extends LightningElement {
       ];
 
       const lines = [];
-      //==========Phase6.0.3 START code change=========
-      // OLD (caused Excel #NAME? because lines like "- Overall ..." were not quoted)
-      // headerLines.forEach((l) => lines.push(this.csvEscape(l).replace(/^"|"$/g, '')));
-
-      // NEW: keep header lines as a single quoted CSV cell (Excel-safe)
       headerLines.forEach((l) => lines.push(this.csvEscape(l)));
-      //==========Phase6.0.3 END code change=========
       lines.push(headers.join(","));
       //HS If no rows, add a friendly note (keeps report useful for “clean trigger” proof)
       if (!rows.length) {
-        //HS
         lines.push(this.csvEscape("No findings detected for current filters.")); //HS
-      } //HS
+      }
 
       rows.forEach((r) => {
         const vals = [
