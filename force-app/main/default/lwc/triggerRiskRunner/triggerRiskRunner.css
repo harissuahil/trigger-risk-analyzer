@@ -30,7 +30,6 @@
   border-left: 4px solid #f4b400;
 }
 
-/* --- NEW UI POLISH --- */
 .badge {
   display: inline-block;
   padding: 2px 10px;
@@ -67,11 +66,11 @@
   padding: 2px 10px;
   font-size: 12px;
 }
-/*==========Phase8.1.1 START code change==========*/
+
 .actionBtn {
   margin-left: 8px;
 }
-/*==========Phase8.1.1 END code change==========*/
+
 .selectedTriggersTitle {
   font-weight: 600;
   margin-bottom: 6px;
@@ -100,11 +99,11 @@
   font-weight: 700;
   line-height: 1;
 }
-/* HS - search input spacing */
+/* Search input spacing */
 lightning-input[type="search"] {
   margin-bottom: 8px;
 }
-/* HS - helper text under Run Analysis button */
+/* Helper text under Run Analysis button */
 .runHelpText {
   margin-top: 6px;
   font-size: 0.75rem;
@@ -125,7 +124,7 @@ lightning-input[type="search"] {
   width: 20px;
   height: 20px;
 }
-/* HS - empty state card */
+/* Empty state card */
 .emptyStateCard {
   border: 1px solid #e5e5e5;
   background: #fafaf9;
