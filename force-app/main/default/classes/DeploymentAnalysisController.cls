@@ -1,4 +1,16 @@
-//CLASS: DeploymentAnalysisController
+/******************************************************************************************************
+ * Apex controller used by the Trigger Risk Analyzer LWC.
+ *
+ * Responsibilities:
+ * - Return Apex trigger names for the runner UI.
+ * - Start Deployment Analysis Runs for selected triggers.
+ * - Return run status, finding rows, and finding detail data to the LWC.
+ * - Map Deployment Analysis records into simple DTOs for the UI.
+ * - Preserve fallback parsing for older Summary__c-based run data.
+ *
+ * Keep this class focused on UI-facing orchestration and DTO mapping.
+ * Detection logic belongs in TriggerRiskEngine, and queueable run processing belongs in DeploymentAnalysisJob.
+ *******************************************************************************************************/
 public with sharing class DeploymentAnalysisController {
   @AuraEnabled(cacheable=true)
   public static List<String> getTriggerNames() {
