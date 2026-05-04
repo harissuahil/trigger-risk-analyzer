@@ -6,7 +6,7 @@ import getRunStatus from "@salesforce/apex/DeploymentAnalysisController.getRunSt
 import getRunItems from "@salesforce/apex/DeploymentAnalysisController.getRunItems";
 import getItemDetail from "@salesforce/apex/DeploymentAnalysisController.getItemDetail";
 
-//HS - TRA build label (shown in exports)
+//TRA build label (shown in exports)
 const TRA_BUILD_LABEL = "GOLD Phase 7 Validated"; //HS
 
 export default class TriggerRiskRunner extends LightningElement {
@@ -239,44 +239,6 @@ export default class TriggerRiskRunner extends LightningElement {
   get lowTileClass() {
     return "slds-col slds-box slds-text-align_center slds-theme_success";
   }
-
-  /*  //==========Phase7.0.2 START code change=========
-    // Release Gate UI helpers
-
-  get hasReleaseGate() {
-    // Show card as soon as decision is available
-    return !!(this.runId && this.releaseDecision);
-    }
-
-  get releaseGateDecisionLabel() {
-    return this.releaseDecision || 'N/A';
-    }
-
-  get releaseGateBadgeClass() {
-    const d = (this.releaseDecision || '').toUpperCase();
-    if (d === 'BLOCKED') return 'badge badge-high';
-    if (d === 'APPROVED') return 'badge badge-low';
-    return 'badge badge-medium'; // e.g., "CONDITIONAL"
-    }
-
-  get releaseGateCardClass() {
-    // Keep it simple: just use a boxed section like your other panels
-    return 'slds-m-top_medium slds-box';
-    }
-
-  get gateRationaleLines() {
-    const raw = (this.gateRationaleRaw || '').trim();
-    if (!raw) return [];
-    return raw.split('\n').map((x) => x.trim()).filter(Boolean);
-    }
-
-  get gateRequiredFixLines() {
-    const raw = (this.gateRequiredFixesRaw || '').trim();
-    if (!raw) return [];
-    return raw.split('\n').map((x) => x.trim()).filter(Boolean);
-    }
-    //==========Phase7.0.2 END code change=========
-   */
 
   get detailSeverityBadgeClass() {
     const sev = this.detail ? this.detail.severity : null;
