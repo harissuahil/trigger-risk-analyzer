@@ -314,13 +314,9 @@ describe("c-trigger-risk-runner — gate display and field priority", () => {
   // The Phase 5 architecture fix added 8 structured fields, not just 3.
   // Tests 1-4 cover releaseDecision / policyProfile / gateVersion.
   // This test covers the remaining structured-field rendering path:
-  //   Release_Rationale__c → releaseRationale → gate rationale section
-  //   Required_Fixes__c    → requiredFixes    → required fixes section
-  //
-  // SOURCE evidence: triggerRiskRunner.js logs `TRA gateRequiredFixesRaw`
-  // at line 580 (visible in jest console output), proving the component
-  // consumes requiredFixes from the DTO and processes it for rendering.
-  //
+  // Release_Rationale__c → releaseRationale → gate rationale section
+  // Required_Fixes__c    → requiredFixes    → required fixes section
+  // This verifies that structured gate fields from the DTO reach the rendered UI.
   // Uses textContent.toContain() so the test stays robust to changes in
   // the exact getter names or DOM structure — what matters is that the
   // text the gate engine produced reaches the user.
