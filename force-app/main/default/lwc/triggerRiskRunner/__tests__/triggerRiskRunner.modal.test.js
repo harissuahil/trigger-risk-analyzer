@@ -281,16 +281,11 @@ describe("c-trigger-risk-runner — finding detail modal", () => {
       "Move SOQL outside the loop and bulkify the query."
     );
     // ruleLabel chip — safe to assert because ruleLabel is in the real
-    // ruleLabel chip — safe to assert because ruleLabel is in the real
     // ItemDetailDTO.
     expect(modalText).toContain("SOQL in Loop");
-    // ruleKeys chip — keystone assertion for the Phase 9 modal chip fix.
-    // The modal HTML used to read {detail.ruleKey} (singular) which never
-    // populated against real Apex data (ItemDetailDTO sends ruleKeys,
-    // plural). The fix introduced a detailRuleKeys getter with the
-    // standard `ruleKeys || ruleKey` fallback, matching the Phase 8
-    // filteredItems haystack pattern. If the getter or template binding
-    // regresses, this assertion fails immediately with a clear signal.
+    // ruleKeys chip — verifies the modal uses the real ItemDetailDTO field.
+    // The detailRuleKeys getter supports ruleKeys first, with ruleKey as a legacy fallback.
+    // If the getter or template binding regresses, this assertion fails with a clear signal.
     expect(modalText).toContain("SOQL_IN_LOOP");
     expect(modalText).toContain("BulkRisk");
   });
