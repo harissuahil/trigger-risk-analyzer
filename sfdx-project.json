@@ -3,6 +3,10 @@
     {
       "path": "force-app",
       "default": true
+    },
+    {
+      "path": "tra-package",
+      "default": false
     }
   ],
   "name": "trigger-risk-analyzer",
