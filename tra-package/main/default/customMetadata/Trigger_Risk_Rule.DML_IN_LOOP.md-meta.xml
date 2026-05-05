@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>DML in Loop</label>
+    <protected>false</protected>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">BulkRisk</value>
+    </values>
+    <values>
+        <field>Detection_Mode__c</field>
+        <value xsi:type="xsd:string">ENGINE</value>
+    </values>
+    <values>
+        <field>Is_Enabled__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Message__c</field>
+        <value
+      xsi:type="xsd:string"
+    >DML inside a loop can hit governor limits and fail in bulk.</value>
+    </values>
+    <values>
+        <field>Pattern__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Recommendation__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Rule_Key__c</field>
+        <value xsi:type="xsd:string">DML_IN_LOOP</value>
+    </values>
+    <values>
+        <field>Severity__c</field>
+        <value xsi:type="xsd:string">High</value>
+    </values>
+</CustomMetadata>

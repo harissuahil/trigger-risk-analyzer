@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Catch only debug</label>
+    <protected>false</protected>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Maintainability</value>
+    </values>
+    <values>
+        <field>Detection_Mode__c</field>
+        <value xsi:type="xsd:string">REGEX</value>
+    </values>
+    <values>
+        <field>Is_Enabled__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Message__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Catch block only logs with System.debug. Consider persistent logging or surfacing errors safely.</value>
+    </values>
+    <values>
+        <field>Pattern__c</field>
+        <value
+      xsi:type="xsd:string"
+    >catch\s*\([^)]*\)\s*\{[\s\S]{0,120}?System\.debug\s*\(</value>
+    </values>
+    <values>
+        <field>Recommendation__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Rule_Key__c</field>
+        <value xsi:type="xsd:string">CATCH_DEBUG_ONLY</value>
+    </values>
+    <values>
+        <field>Severity__c</field>
+        <value xsi:type="xsd:string">Low</value>
+    </values>
+</CustomMetadata>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Without sharing reference</label>
+    <protected>false</protected>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Security</value>
+    </values>
+    <values>
+        <field>Detection_Mode__c</field>
+        <value xsi:type="xsd:string">REGEX</value>
+    </values>
+    <values>
+        <field>Is_Enabled__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Message__c</field>
+        <value
+      xsi:type="xsd:string"
+    >&apos;without sharing&apos; detected. Ensure this is intentional for trigger context and security.</value>
+    </values>
+    <values>
+        <field>Pattern__c</field>
+        <value xsi:type="xsd:string">\bwithout\s+sharing\b</value>
+    </values>
+    <values>
+        <field>Recommendation__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Rule_Key__c</field>
+        <value xsi:type="xsd:string">WITHOUT_SHARING_CLASS_REF</value>
+    </values>
+    <values>
+        <field>Severity__c</field>
+        <value xsi:type="xsd:string">Low</value>
+    </values>
+</CustomMetadata>

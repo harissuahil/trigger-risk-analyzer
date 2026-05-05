@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Recursion Risk</label>
+    <protected>false</protected>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">TransactionRisk</value>
+    </values>
+    <values>
+        <field>Detection_Mode__c</field>
+        <value xsi:type="xsd:string">ENGINE</value>
+    </values>
+    <values>
+        <field>Is_Enabled__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Message__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Possible recursion: DML on the same object inside its trigger can cause repeated trigger execution and limit failures.</value>
+    </values>
+    <values>
+        <field>Pattern__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Recommendation__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Add a static recursion guard (e.g., static Set&lt;Id&gt;/Boolean) and avoid doing DML on the same object in its trigger. If updates are required, perform them once with a guarded pattern or move the work to async.</value>
+    </values>
+    <values>
+        <field>Rule_Key__c</field>
+        <value xsi:type="xsd:string">RECURSION_RISK</value>
+    </values>
+    <values>
+        <field>Severity__c</field>
+        <value xsi:type="xsd:string">High</value>
+    </values>
+</CustomMetadata>

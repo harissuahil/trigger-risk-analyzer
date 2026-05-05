@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <brand>
+        <headerColor>#0070D2</headerColor>
+        <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+    </brand>
+    <formFactors>Small</formFactors>
+    <formFactors>Large</formFactors>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+    <isOmniPinnedViewEnabled>false</isOmniPinnedViewEnabled>
+    <label>Trigger Risk Analyzer</label>
+    <navType>Standard</navType>
+    <tabs>Deployment_Analysis_Item__c</tabs>
+    <tabs>Deployment_Analysis_Run__c</tabs>
+    <tabs>Run_Trigger_Risk_Analyzer</tabs>
+    <uiType>Lightning</uiType>
+    <utilityBar>Trigger_Risk_Analyzer_UtilityBar</utilityBar>
+</CustomApplication>
