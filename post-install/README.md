@@ -9,10 +9,18 @@ The core package should deploy cleanly into a new org. Post-install setup is onl
 The core package has been validated in a clean org with this result:
 
 ```text
-Components: 95/95 deployed
+Components: 96/96 deployed
 Tests: 110/110 passing
 Status: Succeeded
 ```
+
+The core package now includes:
+
+```text
+TRA_User_Access
+```
+
+`TRA_User_Access` is package-safe and gives normal users access to the TRA app, tabs, Apex classes, Deployment Analysis objects, and fields.
 
 The remaining runtime dependency is the Tooling API connection used by `ToolingApiClient`.
 
@@ -60,25 +68,40 @@ All local tests pass
 No TRA_Integration_Access cross-reference error
 ```
 
-## Manual post-install setup
+After deployment, assign the core user permission set:
 
-Complete these steps after the core package is deployed.
-
-### 1. Create the integration credential setup
-
-In the target org, create/configure the integration pieces needed by the Tooling API callout:
-
-```text
-Named Credential API Name: SF_TOOLING
-External Credential: TRA_SF_External_Cred
-Principal: SF_Tooling_Principal
+```powershell
+sf org assign permset --name TRA_User_Access --target-org <org-alias>
 ```
 
-The exact authentication setup may require an admin to authenticate or reconnect the Principal in the target org.
+## Post-install credential templates
 
-### 2. Confirm the Named Credential name
+Credential metadata retrieved from the working org is stored as sanitized templates under:
 
-The Named Credential must be named exactly:
+```text
+post-install/templates/
+```
+
+Current templates:
+
+```text
+post-install/templates/SF_TOOLING.namedCredential-meta.xml.template
+post-install/templates/TRA_SF_External_Cred.externalCredential-meta.xml.template
+post-install/templates/TRA_SF_AuthProvider.authprovider-meta.xml.template
+```
+
+These files are **templates**, not ready-to-deploy metadata.
+
+Before using them, replace placeholders such as:
+
+```text
+__TARGET_ORG_MY_DOMAIN_URL__
+__CONNECTED_APP_CONSUMER_KEY__
+```
+
+Do not commit real customer secrets, tokens, passwords, or consumer secrets.
+
+The Named Credential template must keep this API name:
 
 ```text
 SF_TOOLING
@@ -90,9 +113,56 @@ The Apex callout uses this endpoint pattern:
 callout:SF_TOOLING/services/data/v61.0/tooling/query/?q=...
 ```
 
-If this name changes, `ToolingApiClient.cls` must also be changed.
+If the Named Credential API name changes, `ToolingApiClient.cls` must also be changed.
 
-### 3. Deploy or assign integration access
+## Manual post-install setup
+
+Complete these steps after the core package is deployed.
+
+### 1. Prepare target-org credential metadata
+
+Copy the template files from:
+
+```text
+post-install/templates/
+```
+
+into deployable metadata folders, then replace the placeholders with target-org values.
+
+Recommended deployable folder layout:
+
+```text
+post-install/authproviders/
+post-install/externalCredentials/
+post-install/namedCredentials/
+```
+
+Required setup names:
+
+```text
+Named Credential API Name: SF_TOOLING
+External Credential: TRA_SF_External_Cred
+Auth Provider: TRA_SF_AuthProvider
+Principal: SF_Tooling_Principal
+```
+
+### 2. Deploy the credential metadata
+
+After placeholders are replaced, deploy the credential metadata to the target org.
+
+Example:
+
+```powershell
+sf project deploy start --source-dir post-install/authproviders --source-dir post-install/externalCredentials --source-dir post-install/namedCredentials --target-org <org-alias> --wait 10
+```
+
+### 3. Authenticate or reconnect the Principal
+
+The exact authentication setup may require an admin to authenticate or reconnect the Principal in the target org.
+
+This is the main manual step that may not be fully automatable.
+
+### 4. Deploy or assign integration access
 
 After the External Credential Principal exists, deploy or assign:
 
@@ -102,7 +172,19 @@ post-install/permissionsets/TRA_Integration_Access.permissionset-meta.xml
 
 This permission set should not be deployed before the External Credential Principal exists.
 
-### 4. Validate the runtime connection
+Example deploy:
+
+```powershell
+sf project deploy start --source-dir post-install/permissionsets --target-org <org-alias> --wait 10
+```
+
+Example assignment:
+
+```powershell
+sf org assign permset --name TRA_Integration_Access --target-org <org-alias>
+```
+
+### 5. Validate the runtime connection
 
 Open the TRA app and click the runner page.
 
@@ -113,13 +195,21 @@ Trigger list loads successfully
 No SF_TOOLING / callout endpoint error appears
 ```
 
-## Current permission set location
+## Current permission set locations
+
+Core user access, included in `tra-package`:
+
+```text
+tra-package/main/default/permissionsets/TRA_User_Access.permissionset-meta.xml
+```
+
+Integration access, kept outside `tra-package`:
 
 ```text
 post-install/permissionsets/TRA_Integration_Access.permissionset-meta.xml
 ```
 
-Do not move this permission set back into `tra-package` unless the External Credential and Principal metadata are also included and clean-org validation proves the full package deploys successfully.
+Do not move `TRA_Integration_Access` back into `tra-package` unless the External Credential and Principal metadata are also included and clean-org validation proves the full package deploys successfully.
 
 ## Future install automation plan
 
@@ -128,20 +218,23 @@ For large-scale installs across many orgs, manual work should be limited to the 
 Recommended direction:
 
 1. Keep `tra-package` as the clean core package.
-2. Add a package-safe `TRA_User_Access` permission set inside `tra-package` for app, tab, object, field, Apex, and LWC access.
+2. Keep `TRA_User_Access` inside `tra-package` for app, tab, object, field, Apex, and LWC access.
 3. Keep `TRA_Integration_Access` separate unless the External Credential and Principal are also packaged and validated.
-4. Create a scripted post-install command sequence for repeatable setup.
-5. Document the only manual step as: authenticate/reconnect the External Credential Principal in the target org.
+4. Generate target-org credential metadata from the sanitized templates.
+5. Automatically replace the target org URL and other safe placeholders.
+6. Document the only manual step as: authenticate/reconnect the External Credential Principal in the target org.
+7. Run a smoke test that loads triggers through `SF_TOOLING`.
 
 Target future flow:
 
 ```text
 1. Install/deploy core TRA package
 2. Assign TRA_User_Access
-3. Deploy/create Named Credential and External Credential metadata
-4. Admin authenticates the Principal
-5. Deploy/assign TRA_Integration_Access
-6. Run a smoke test that loads triggers through SF_TOOLING
+3. Generate credential metadata from templates
+4. Deploy Named Credential / External Credential / Auth Provider metadata
+5. Admin authenticates the Principal
+6. Deploy/assign TRA_Integration_Access
+7. Run a smoke test that loads triggers through SF_TOOLING
 ```
 
 The long-term goal is a fast install where the admin only performs the authentication step, and everything else is packaged or scripted.
