@@ -46,3 +46,11 @@ $RECYCLE.BIN/
 **/__pycache__/
 **/.venv/
 **/venv/
+
+# TRA local post-install generated metadata with org-specific OAuth values
+post-install/authproviders/
+post-install/externalCredentials/
+post-install/namedCredentials/
+
+# TRA temporary clean-org validation artifacts
+temp-validation/
