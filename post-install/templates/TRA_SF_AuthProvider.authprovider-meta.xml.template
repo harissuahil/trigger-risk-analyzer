@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <AuthProvider xmlns="http://soap.sforce.com/2006/04/metadata">
     <consumerKey>__CONNECTED_APP_CONSUMER_KEY__</consumerKey>
-    <consumerSecret>Placeholder_Value</consumerSecret>
+    <consumerSecret>__CONNECTED_APP_CONSUMER_SECRET__</consumerSecret>
     <defaultScopes>refresh_token full api</defaultScopes>
     <friendlyName>TRA_SF_AuthProvider</friendlyName>
     <includeOrgIdInIdentifier>true</includeOrgIdInIdentifier>
