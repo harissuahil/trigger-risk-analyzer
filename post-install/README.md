@@ -150,10 +150,53 @@ If authentication fails with OAUTH_APPROVAL_ERROR_GENERIC, check that full acces
 
 A helper script is available to generate deployable credential metadata from the sanitized templates:
 
-````powershell
+```powershell
 .\scripts\prepare-post-install.ps1 `
   -TargetOrgAlias <org-alias> `
   -MyDomainUrl "https://<mydomain>.my.salesforce.com"
+```
+
+The script prompts for:
+
+```text
+Connected App Consumer Key
+Connected App Consumer Secret
+```
+
+The generated metadata is written to gitignored folders:
+
+```text
+post-install/authproviders/
+post-install/externalCredentials/
+post-install/namedCredentials/
+```
+
+These generated files are org-specific and must not be committed.
+
+To generate and deploy the credential metadata in one step, use:
+
+```powershell
+.\scripts\prepare-post-install.ps1 `
+  -TargetOrgAlias <org-alias> `
+  -MyDomainUrl "https://<mydomain>.my.salesforce.com" `
+  -Deploy
+```
+
+After the metadata deploy succeeds, an admin still needs to authenticate or reconnect the External Credential Principal:
+
+```text
+External Credential: TRA_SF_External_Cred
+Principal: SF_Tooling_Principal
+```
+
+Then deploy and assign the integration permission set:
+
+```powershell
+sf project deploy start --source-dir post-install/permissionsets --target-org <org-alias> --wait 10
+sf org assign permset --name TRA_Integration_Access --target-org <org-alias>
+```
+
+Finally, smoke test TRA by opening the app and confirming the trigger list loads through SF_TOOLING.
 
 ## Manual post-install setup
 
@@ -165,7 +208,7 @@ Copy the template files from:
 
 ```text
 post-install/templates/
-````
+```
 
 into deployable metadata folders, then replace the placeholders with target-org values.
 

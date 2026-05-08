@@ -60,7 +60,7 @@ $templateDir = Join-Path $repoRootPath "post-install\templates"
 
 $normalizedMyDomainUrl = $MyDomainUrl.TrimEnd("/")
 
-if ($normalizedMyDomainUrl -notmatch '^https://[^/]+\.my\.salesforce\.com$') {
+if ($normalizedMyDomainUrl -notmatch '^https://[^/]+\.salesforce\.com$') {
     throw "MyDomainUrl must be a Salesforce My Domain URL that starts with https:// and ends with .my.salesforce.com. Got: $MyDomainUrl"
 }
 
