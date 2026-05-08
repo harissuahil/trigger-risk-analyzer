@@ -49,7 +49,7 @@ function New-MetadataFromTemplate {
     $remainingPlaceholders = [regex]::Matches($content, "__[A-Z0-9_]+__")
     if ($remainingPlaceholders.Count -gt 0) {
         $names = ($remainingPlaceholders | ForEach-Object { $_.Value } | Sort-Object -Unique) -join ", "
-        throw "Unresolved placeholders remain in $OutputFile: $names"
+        throw "Unresolved placeholders remain in ${OutputFile}: $names"
     }
 
     Set-Content -Path $OutputFile -Value $content -Encoding utf8
