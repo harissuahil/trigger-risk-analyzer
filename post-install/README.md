@@ -146,6 +146,15 @@ If authentication fails with redirect_uri_mismatch, the callback URL is wrong.
 If authentication fails with OAUTH_APPROVAL_ERROR_GENERIC, check that full access is selected and PKCE is unchecked.
 ```
 
+## Using the helper script
+
+A helper script is available to generate deployable credential metadata from the sanitized templates:
+
+````powershell
+.\scripts\prepare-post-install.ps1 `
+  -TargetOrgAlias <org-alias> `
+  -MyDomainUrl "https://<mydomain>.my.salesforce.com"
+
 ## Manual post-install setup
 
 Complete these steps after the core package is deployed.
@@ -156,7 +165,7 @@ Copy the template files from:
 
 ```text
 post-install/templates/
-```
+````
 
 into deployable metadata folders, then replace the placeholders with target-org values.
 
