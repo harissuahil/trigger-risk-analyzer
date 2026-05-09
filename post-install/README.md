@@ -22,6 +22,24 @@ TRA_User_Access
 
 `TRA_User_Access` is package-safe and gives normal users access to the TRA app, tabs, Apex classes, Deployment Analysis objects, and fields.
 
+A full fresh-install validation has also passed in a new org:
+
+```text
+Core package deploy: PASSED
+RunLocalTests: 110/110 passing
+TRA_User_Access assignment: PASSED
+Post-install credential metadata deploy: 3/3 components deployed
+External Credential Principal authentication: PASSED
+TRA_Integration_Access deploy and assignment: PASSED
+Runtime smoke test: PASSED
+Run Analysis smoke test: PASSED
+Run Status: Done
+Overall Risk: Low
+Release Recommendation: APPROVED WITH CONDITIONS
+```
+
+The smoke test used a temporary validation trigger. The trigger was removed after testing.
+
 The remaining runtime dependency is the Tooling API connection used by `ToolingApiClient`.
 
 The Apex code expects this Named Credential API name:
@@ -181,6 +199,41 @@ To generate and deploy the credential metadata in one step, use:
   -MyDomainUrl "https://<mydomain>.my.salesforce.com" `
   -Deploy
 ```
+
+### Safer key and secret input option
+
+Some terminals may not paste cleanly into a secure prompt. If the Auth Provider deploy fails with an XML parse error such as `invalid XML character Unicode: 0x16`, pass the key and secret as `SecureString` variables instead of pasting into the prompt.
+
+Use placeholders only. Do not commit or share real values.
+
+```powershell
+$ckPlain = @'
+PASTE_CONSUMER_KEY_HERE
+'@.Trim()
+
+$csPlain = @'
+PASTE_CONSUMER_SECRET_HERE
+'@.Trim()
+
+$ck = ConvertTo-SecureString -String $ckPlain -AsPlainText -Force
+$cs = ConvertTo-SecureString -String $csPlain -AsPlainText -Force
+
+$ckPlain = $null
+$csPlain = $null
+
+.\scripts\prepare-post-install.ps1 `
+  -TargetOrgAlias <org-alias> `
+  -MyDomainUrl "https://<mydomain>.my.salesforce.com" `
+  -ConsumerKey $ck `
+  -ConsumerSecret $cs `
+  -Deploy
+
+$ck = $null
+$cs = $null
+[GC]::Collect()
+```
+
+If a Consumer Secret is exposed during testing, rotate or regenerate it after validation.
 
 After the metadata deploy succeeds, an admin still needs to authenticate or reconnect the External Credential Principal:
 
