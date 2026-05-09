@@ -62,6 +62,8 @@ Overall Risk: Low
 Release Recommendation: APPROVED WITH CONDITIONS
 ```
 
+A reduced OAuth scope validation also passed. TRA works without `Full access (full)` for the current Tooling API flow.
+
 ## Required names
 
 The Apex code expects this Named Credential API name:
@@ -199,8 +201,9 @@ Add these OAuth scopes:
 ```text
 Manage user data via APIs (api)
 Perform requests at any time (refresh_token, offline_access)
-Full access (full)
 ```
+
+`Full access (full)` is not required for the current Tooling API flow.
 
 Configure these OAuth settings:
 
