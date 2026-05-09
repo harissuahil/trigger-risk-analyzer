@@ -83,11 +83,11 @@ foreach ($relativePath in $ignoredOutputDirs) {
 }
 
 if (-not $ConsumerKey) {
-    $ConsumerKey = Read-Host "Connected App Consumer Key" -AsSecureString
+    $ConsumerKey = Read-Host "External Client App Consumer Key" -AsSecureString
 }
 
 if (-not $ConsumerSecret) {
-    $ConsumerSecret = Read-Host "Connected App Consumer Secret" -AsSecureString
+    $ConsumerSecret = Read-Host "External Client App Consumer Secret" -AsSecureString
 }
 
 $plainConsumerKey = Convert-SecureStringToPlainText -SecureValue $ConsumerKey
