@@ -1,28 +1,52 @@
-# TRA Post-Install Setup
+# TRA Fresh Install and Post-Install Setup
 
-This folder contains setup items that are intentionally kept outside the core `tra-package` deployment.
+This guide explains how to deploy TRA into a fresh Salesforce org and complete the required post-install setup for the Tooling API connection.
 
-The core package should deploy cleanly into a new org. Post-install setup is only for org-specific integration work that cannot be fully completed until the target org exists.
+## Purpose
 
-## Current install status
+TRA is split into two setup layers.
 
-The core package has been validated in a clean org with this result:
+### Core package
 
-```text
-Components: 96/96 deployed
-Tests: 110/110 passing
-Status: Succeeded
-```
-
-The core package now includes:
+The core package is under:
 
 ```text
-TRA_User_Access
+tra-package/main/default
 ```
 
-`TRA_User_Access` is package-safe and gives normal users access to the TRA app, tabs, Apex classes, Deployment Analysis objects, and fields.
+It contains the product metadata that should deploy cleanly into a new org:
 
-A full fresh-install validation has also passed in a new org:
+```text
+TRA app
+Apex classes and tests
+LWC runner
+Deployment Analysis objects and fields
+Custom metadata rules
+Tabs and FlexiPages
+TRA_User_Access permission set
+```
+
+### Post-install setup
+
+The post-install setup is under:
+
+```text
+post-install/
+```
+
+It contains org-specific integration setup for the Tooling API connection:
+
+```text
+Credential templates
+Generated credential metadata folders
+TRA_Integration_Access permission set
+```
+
+`TRA_Integration_Access` stays outside the core package because it grants access to an External Credential Principal that does not exist until the credential metadata is deployed in the target org.
+
+## Validation status
+
+A full fresh-install validation passed in a new org with this result:
 
 ```text
 Core package deploy: PASSED
@@ -38,9 +62,7 @@ Overall Risk: Low
 Release Recommendation: APPROVED WITH CONDITIONS
 ```
 
-The smoke test used a temporary validation trigger. The trigger was removed after testing.
-
-The remaining runtime dependency is the Tooling API connection used by `ToolingApiClient`.
+## Required names
 
 The Apex code expects this Named Credential API name:
 
@@ -48,97 +70,131 @@ The Apex code expects this Named Credential API name:
 SF_TOOLING
 ```
 
-If `SF_TOOLING` does not exist or the user does not have access to its External Credential Principal, TRA can show this runtime error:
+The credential setup uses these names:
 
 ```text
-The callout couldn't access the endpoint. You might not have the required permissions, or the named credential "SF_TOOLING" might not exist.
+Named Credential: SF_TOOLING
+External Credential: TRA_SF_External_Cred
+Auth Provider: TRA_SF_AuthProvider
+Principal: SF_Tooling_Principal
+Integration Permission Set: TRA_Integration_Access
+User Permission Set: TRA_User_Access
 ```
 
-## Why this folder exists
+Do not rename `SF_TOOLING` unless `ToolingApiClient.cls` is also updated.
 
-`TRA_Integration_Access.permissionset-meta.xml` is kept here because it grants access to an External Credential Principal:
+## Full install sequence
+
+Run these steps from the project root unless noted otherwise.
+
+### 1. Log in to the target org
+
+```powershell
+sf org login web --alias <org-alias> --set-default
+```
+
+Log in with the target org username and password when the browser opens.
+
+### 2. Confirm the org is connected
+
+```powershell
+sf org list
+```
+
+Expected result:
 
 ```text
-TRA_SF_External_Cred-SF_Tooling_Principal
+<org-alias>    Connected
 ```
 
-That principal must exist in the target org before this permission set can be deployed or assigned. In a clean org, deploying this permission set before the External Credential Principal exists causes this error:
+### 3. Confirm Salesforce CLI can communicate with the org
+
+```powershell
+sf org display --target-org <org-alias>
+```
+
+### 4. Confirm the repo is clean
+
+```powershell
+git status
+```
+
+Expected result:
 
 ```text
-PermissionSet TRA_Integration_Access invalid cross reference id
+nothing to commit, working tree clean
 ```
 
-For that reason, the integration permission set is intentionally outside `tra-package`.
-
-## Core package validation
-
-Deploy the core package first:
+### 5. Deploy the clean core package
 
 ```powershell
 sf project deploy start --source-dir tra-package/main/default --target-org <org-alias> --test-level RunLocalTests --wait 30
 ```
 
-Expected clean-org result:
+Expected result:
 
 ```text
-Components deploy successfully
-All local tests pass
-No TRA_Integration_Access cross-reference error
+Status: Succeeded
+Tests passing
 ```
 
-After deployment, assign the core user permission set:
+Do not run the post-install credential script until this core package deployment succeeds.
+
+### 6. Assign normal TRA user access
 
 ```powershell
 sf org assign permset --name TRA_User_Access --target-org <org-alias>
 ```
 
-## Post-install credential templates
+After this step, the TRA app should be available to the assigned user.
 
-Credential metadata retrieved from the working org is stored as sanitized templates under:
+### 7. Get the target org base URL
 
-```text
-post-install/templates/
+Open the org:
+
+```powershell
+sf org open --target-org <org-alias>
 ```
 
-Current templates:
+Copy the base org URL from the browser. It should look similar to:
 
 ```text
-post-install/templates/SF_TOOLING.namedCredential-meta.xml.template
-post-install/templates/TRA_SF_External_Cred.externalCredential-meta.xml.template
-post-install/templates/TRA_SF_AuthProvider.authprovider-meta.xml.template
+https://<mydomain>.my.salesforce.com
 ```
 
-These files are **templates**, not ready-to-deploy metadata.
-
-Before using them, replace placeholders such as:
+or another Salesforce org URL ending in:
 
 ```text
-__TARGET_ORG_MY_DOMAIN_URL__
-__CONNECTED_APP_CONSUMER_KEY__
-__CONNECTED_APP_CONSUMER_SECRET__
+.salesforce.com
 ```
 
-Do not commit real customer secrets, tokens, passwords, or consumer secrets.
+Use the base URL only. Do not include any path after `.salesforce.com`.
 
-The Named Credential template must keep this API name:
+### 8. Create the External Client App
+
+In Salesforce Setup, go to:
 
 ```text
-SF_TOOLING
+Setup → External Client App Manager → New External Client App
 ```
 
-The Apex callout uses this endpoint pattern:
+Use values similar to these:
 
 ```text
-callout:SF_TOOLING/services/data/v61.0/tooling/query/?q=...
+External Client App Name: TRA SF Tooling Client
+API Name: TRA_SF_Tooling_Client
+Contact Email: <admin email>
 ```
 
-If the Named Credential API name changes, `ToolingApiClient.cls` must also be changed.
+Enable OAuth and add a temporary callback URL:
 
-## External Client App OAuth settings
+```text
+https://login.salesforce.com/services/authcallback/TRA_SF_AuthProvider
+```
 
-Create or configure the target org External Client App before authenticating the External Credential Principal.
+This temporary callback URL is replaced later after `TRA_SF_AuthProvider` is deployed and the real callback URL is available.
 
-Required OAuth scopes:
+Add these OAuth scopes:
 
 ```text
 Manage user data via APIs (api)
@@ -146,7 +202,7 @@ Perform requests at any time (refresh_token, offline_access)
 Full access (full)
 ```
 
-Required OAuth settings:
+Configure these OAuth settings:
 
 ```text
 Require Proof Key for Code Exchange (PKCE): unchecked
@@ -156,32 +212,40 @@ Permitted Users: All users may self-authorize
 Refresh Token Policy: Refresh token is valid until revoked
 ```
 
-Important notes:
+Save the External Client App.
+
+### 9. Get the Consumer Key and Consumer Secret
+
+Go back to:
 
 ```text
-The Callback URL in the External Client App must exactly match the Callback URL generated by TRA_SF_AuthProvider.
-If authentication fails with redirect_uri_mismatch, the callback URL is wrong.
-If authentication fails with OAUTH_APPROVAL_ERROR_GENERIC, check that full access is selected and PKCE is unchecked.
+Setup → External Client App Manager
 ```
 
-## Using the helper script
-
-A helper script is available to generate deployable credential metadata from the sanitized templates:
-
-```powershell
-.\scripts\prepare-post-install.ps1 `
-  -TargetOrgAlias <org-alias> `
-  -MyDomainUrl "https://<mydomain>.my.salesforce.com"
-```
-
-The script prompts for:
+Open the External Client App created above, then go to:
 
 ```text
-Connected App Consumer Key
-Connected App Consumer Secret
+Settings → OAuth Settings → Consumer Key and Secret
 ```
 
-The generated metadata is written to gitignored folders:
+Copy these values:
+
+```text
+Consumer Key
+Consumer Secret
+```
+
+Do not commit or share real values.
+
+### 10. Generate and deploy credential metadata
+
+A helper script generates deployable metadata from sanitized templates in:
+
+```text
+post-install/templates/
+```
+
+The generated files are written to gitignored folders:
 
 ```text
 post-install/authproviders/
@@ -191,20 +255,7 @@ post-install/namedCredentials/
 
 These generated files are org-specific and must not be committed.
 
-To generate and deploy the credential metadata in one step, use:
-
-```powershell
-.\scripts\prepare-post-install.ps1 `
-  -TargetOrgAlias <org-alias> `
-  -MyDomainUrl "https://<mydomain>.my.salesforce.com" `
-  -Deploy
-```
-
-### Safer key and secret input option
-
-Some terminals may not paste cleanly into a secure prompt. If the Auth Provider deploy fails with an XML parse error such as `invalid XML character Unicode: 0x16`, pass the key and secret as `SecureString` variables instead of pasting into the prompt.
-
-Use placeholders only. Do not commit or share real values.
+Use the safer `SecureString` variable method below. Paste the real key and secret only into your local terminal.
 
 ```powershell
 $ckPlain = @'
@@ -233,39 +284,150 @@ $cs = $null
 [GC]::Collect()
 ```
 
-If a Consumer Secret is exposed during testing, rotate or regenerate it after validation.
-
-After the metadata deploy succeeds, an admin still needs to authenticate or reconnect the External Credential Principal:
+Expected result:
 
 ```text
-External Credential: TRA_SF_External_Cred
-Principal: SF_Tooling_Principal
+Generated deployable credential metadata
+Deploying generated credential metadata
+Deploy complete
 ```
 
-Then deploy and assign the integration permission set:
+### 11. Replace the temporary callback URL
+
+After the credential metadata deploys, open:
+
+```text
+Setup → Auth. Providers → TRA_SF_AuthProvider
+```
+
+Copy the generated Callback URL.
+
+Then open:
+
+```text
+Setup → External Client App Manager → TRA SF Tooling Client → Settings → OAuth Settings
+```
+
+Replace the temporary callback URL with the exact Callback URL from `TRA_SF_AuthProvider`.
+
+Save the External Client App.
+
+### 12. Authenticate the External Credential Principal
+
+Go to:
+
+```text
+Setup → Named Credentials → External Credentials → TRA_SF_External_Cred
+```
+
+Find:
+
+```text
+SF_Tooling_Principal
+```
+
+Click:
+
+```text
+Authenticate
+```
+
+or:
+
+```text
+Reconnect
+```
+
+Use the same Salesforce user that will run TRA.
+
+### 13. Deploy and assign integration access
+
+After the Principal authentication succeeds, deploy the integration permission set:
+
+```powershell
+sf project deploy start --source-dir post-install/permissionsets --target-org <org-alias> --wait 10
+```
+
+Then assign it:
+
+```powershell
+sf org assign permset --name TRA_Integration_Access --target-org <org-alias>
+```
+
+### 14. Smoke test TRA
+
+Open the org:
+
+```powershell
+sf org open --target-org <org-alias>
+```
+
+Open the TRA app and go to the runner page.
+
+Expected result:
+
+```text
+No SF_TOOLING / credential access error appears
+Trigger list loads successfully
+```
+
+If the org has no Apex triggers, the trigger selector may be empty even when the integration is working. For validation only, deploy a temporary trigger, run analysis, and remove the trigger after testing.
+
+Expected run result after selecting a trigger:
+
+```text
+Run is created
+Status: Done
+Open Run works
+Findings display correctly
+Release Gate displays correctly
+```
+
+## Troubleshooting
+
+### `The callout couldn't access the endpoint... SF_TOOLING might not exist`
+
+Check that:
+
+```text
+SF_TOOLING Named Credential exists
+TRA_SF_External_Cred exists
+SF_Tooling_Principal is authenticated
+TRA_Integration_Access is deployed and assigned
+```
+
+### `We couldn't access the credential(s)`
+
+This usually means the user does not have access to the External Credential Principal.
+
+Run:
 
 ```powershell
 sf project deploy start --source-dir post-install/permissionsets --target-org <org-alias> --wait 10
 sf org assign permset --name TRA_Integration_Access --target-org <org-alias>
 ```
 
-Finally, smoke test TRA by opening the app and confirming the trigger list loads through SF_TOOLING.
+Then refresh the TRA app.
 
-## Manual post-install setup
+### `redirect_uri_mismatch`
 
-Complete these steps after the core package is deployed.
+The callback URL in the External Client App does not match the Callback URL generated by `TRA_SF_AuthProvider`.
 
-### 1. Prepare target-org credential metadata
+Fix the External Client App callback URL and try Principal authentication again.
 
-Copy the template files from:
+### `invalid XML character Unicode: 0x16`
 
-```text
-post-install/templates/
-```
+Some terminals may not paste cleanly into a secure prompt. Use the `SecureString` variable method in step 10 instead of pasting into the script prompt.
 
-into deployable metadata folders, then replace the placeholders with target-org values.
+### `PermissionSet TRA_Integration_Access invalid cross reference id`
 
-Recommended deployable folder layout:
+This means `TRA_Integration_Access` was deployed before the External Credential Principal existed.
+
+Deploy the credential metadata first, authenticate the Principal, then deploy and assign `TRA_Integration_Access`.
+
+## Security notes
+
+Do not commit generated credential metadata from these folders:
 
 ```text
 post-install/authproviders/
@@ -273,95 +435,13 @@ post-install/externalCredentials/
 post-install/namedCredentials/
 ```
 
-Required setup names:
+These folders are intentionally gitignored.
 
-```text
-Named Credential API Name: SF_TOOLING
-External Credential: TRA_SF_External_Cred
-Auth Provider: TRA_SF_AuthProvider
-Principal: SF_Tooling_Principal
-```
-
-### 2. Deploy the credential metadata
-
-After placeholders are replaced, deploy the credential metadata to the target org.
-
-Example:
-
-```powershell
-sf project deploy start --source-dir post-install/authproviders --source-dir post-install/externalCredentials --source-dir post-install/namedCredentials --target-org <org-alias> --wait 10
-```
-
-### 3. Authenticate or reconnect the Principal
-
-The exact authentication setup may require an admin to authenticate or reconnect the Principal in the target org.
-
-This is the main manual step that may not be fully automatable.
-
-### 4. Deploy or assign integration access
-
-After the External Credential Principal exists, deploy or assign:
-
-```text
-post-install/permissionsets/TRA_Integration_Access.permissionset-meta.xml
-```
-
-This permission set should not be deployed before the External Credential Principal exists.
-
-Example deploy:
-
-```powershell
-sf project deploy start --source-dir post-install/permissionsets --target-org <org-alias> --wait 10
-```
-
-Example assignment:
-
-```powershell
-sf org assign permset --name TRA_Integration_Access --target-org <org-alias>
-```
-
-### 5. Validate the runtime connection
-
-Open the TRA app and click the runner page.
-
-Expected behavior:
-
-```text
-Trigger list loads successfully
-No SF_TOOLING / callout endpoint error appears
-```
-
-If the clean org has no Apex triggers, the trigger selector may be empty even when the integration is working. Add or deploy a temporary validation trigger only for smoke testing, then remove it afterward.
-
-## Current permission set locations
-
-Core user access, included in `tra-package`:
-
-```text
-tra-package/main/default/permissionsets/TRA_User_Access.permissionset-meta.xml
-```
-
-Integration access, kept outside `tra-package`:
-
-```text
-post-install/permissionsets/TRA_Integration_Access.permissionset-meta.xml
-```
-
-Do not move `TRA_Integration_Access` back into `tra-package` unless the External Credential and Principal metadata are also included and clean-org validation proves the full package deploys successfully.
+If a Consumer Secret is exposed during testing, rotate or regenerate it after validation.
 
 ## Future install automation plan
 
-For large-scale installs across many orgs, manual work should be limited to the authentication step that truly requires human/admin approval.
-
-Recommended direction:
-
-1. Keep `tra-package` as the clean core package.
-2. Keep `TRA_User_Access` inside `tra-package` for app, tab, object, field, Apex, and LWC access.
-3. Keep `TRA_Integration_Access` separate unless the External Credential and Principal are also packaged and validated.
-4. Generate target-org credential metadata from the sanitized templates.
-5. Automatically replace the target org URL and other safe placeholders.
-6. Document the only manual step as: authenticate/reconnect the External Credential Principal in the target org.
-7. Run a smoke test that loads triggers through `SF_TOOLING`.
+For large-scale installs across many orgs, manual work should be limited to the authentication step that truly requires human or admin approval.
 
 Target future flow:
 
