@@ -7,10 +7,10 @@
   <div class="traShell">
     <div class="traTopbar">
       <div class="traBrand">
-        <div class="traLogoMark" aria-hidden="true">⚡</div>
+        <div class="traLogoMark" aria-hidden="true">T</div>
         <div>
           <div class="traProductTitle">Trigger Risk Analyzer</div>
-          <div class="traProductSubtitle">See trigger risk before deployment.</div>
+          <div class="traProductSubtitle">Ship triggers with confidence. Defend every release.</div>
         </div>
       </div>
 
@@ -26,10 +26,10 @@
       </div>
     </div>
 
-    <div class="slds-card">
+    <div class="traMainCard">
       <div class="slds-p-around_medium">
         <div class="traPanelHeader">
-          <h1 class="traPanelTitle">New Release Risk Analysis</h1>
+          <h1 class="traPanelTitle">New analysis run</h1>
         </div>
 
         <div class="slds-grid slds-wrap slds-gutters traInputGrid">
@@ -105,7 +105,7 @@
         </template>
 
         <div class="slds-m-top_medium slds-grid slds-gutters slds-wrap">
-          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+          <div class="slds-col slds-size_1-of-1">
             <div class="traRunActionRow">
               <lightning-button
                 label="Run Analysis"
@@ -117,30 +117,14 @@
               </lightning-button>
               <template if:true={isRunDisabled}>
                 <div class="traRunHelpInline">
-                  Select a trigger to evaluate release risk.
+                  Select at least one trigger to run analysis.
                 </div>
               </template>
             </div>
-            <template if:true={isRunDisabled}>
-              <template if:false={runId}>
-                <div class="emptyStateCard slds-box slds-m-top_small">
-                  <h3 class="slds-text-heading_small">Get started</h3>
-                  <ol
-                    class="slds-list_ordered slds-m-top_x-small slds-m-left_medium"
-                  >
-                    <li>Select one or more triggers from the list.</li>
-                    <li>Click <b>Run Analysis</b> to generate results.</li>
-                  </ol>
-                  <p class="slds-text-color_weak slds-m-top_x-small">
-                    Tip: Use Search triggers to quickly find a trigger.
-                  </p>
-                </div>
-              </template>
-            </template>
           </div>
 
           <div
-            class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3 slds-text-align_right"
+            class="slds-col slds-size_1-of-1 slds-text-align_right"
           >
             <template if:true={runId}>
               <!-- Share actions -->
