@@ -4,28 +4,58 @@
     Organizes trigger selection, run actions, Executive Signal,
     Release Gate, findings, and detail modal sections.
   -->
-  <lightning-card title="Trigger Risk Analyzer">
-    <div class="slds-p-around_medium">
-      <lightning-input
-        label="Release Label"
-        value={releaseLabel}
-        onchange={handleReleaseLabelChange}
-      >
-      </lightning-input>
+  <div class="traShell">
+    <div class="traTopbar">
+      <div class="traBrand">
+        <div class="traLogoMark" aria-hidden="true">⚡</div>
+        <div>
+          <div class="traProductTitle">Trigger Risk Analyzer</div>
+          <div class="traProductSubtitle">See trigger risk before deployment.</div>
+        </div>
+      </div>
 
-      <div class="slds-m-top_medium">
-        <lightning-input
-          type="search"
-          label="Search triggers"
-          placeholder="Type to filter triggers"
-          value={triggerSearchText}
-          onchange={handleTriggerSearch}
-          class="slds-m-bottom_small"
-        >
-        </lightning-input>
+      <div class="traNav" role="tablist" aria-label="TRA navigation">
+        <button class="traNavButton traNavButtonActive" type="button">Runner</button>
+        <button class="traNavButton" type="button" disabled>Dashboard</button>
+      </div>
+
+      <div class="traStatusPill">
+        <span class="traStatusDot"></span>
+        <template if:true={runId}>Run complete</template>
+        <template if:false={runId}>Ready</template>
+      </div>
+    </div>
+
+    <div class="slds-card">
+      <div class="slds-p-around_medium">
+        <div class="traPanelHeader">
+          <h1 class="traPanelTitle">New Release Risk Analysis</h1>
+        </div>
+
+        <div class="slds-grid slds-wrap slds-gutters traInputGrid">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <lightning-input
+              label="Release Label"
+              value={releaseLabel}
+              onchange={handleReleaseLabelChange}
+            >
+            </lightning-input>
+          </div>
+
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <lightning-input
+              type="search"
+              label="Search triggers"
+              placeholder="Type to filter triggers"
+              value={triggerSearchText}
+              onchange={handleTriggerSearch}
+            >
+            </lightning-input>
+          </div>
+        </div>
 
         <template if:true={hasSelectedTriggers}>
-          <div class="selectedTriggers slds-m-top_x-small">
+          <div class="selectedTriggers slds-m-top_small">
             <div class="selectedTriggersTitle">
               Selected Triggers ({selectedTriggersCount})
             </div>
@@ -50,10 +80,7 @@
         </template>
 
         <template if:true={triggers}>
-          <div
-            class="slds-box slds-m-top_x-small"
-            style="max-height: 240px; overflow: auto"
-          >
+          <div class="traTriggerList slds-m-top_medium">
             <template for:each={triggerOptions} for:item="t">
               <lightning-input
                 key={t.name}
@@ -76,435 +103,437 @@
             ></lightning-spinner>
           </div>
         </template>
-      </div>
 
-      <div class="slds-m-top_medium slds-grid slds-gutters slds-wrap">
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
-          <lightning-button
-            label="Run Analysis"
-            variant="brand"
-            title="Run Trigger Risk Analyzer on the selected triggers"
-            onclick={runAnalysis}
-            disabled={isRunDisabled}
-          >
-          </lightning-button>
-          <template if:true={isRunDisabled}>
-            <div class="runHelpText">
-              Select at least one trigger to run analysis.
+        <div class="slds-m-top_medium slds-grid slds-gutters slds-wrap">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <div class="traRunActionRow">
+              <lightning-button
+                label="Run Analysis"
+                variant="brand"
+                title="Run Trigger Risk Analyzer on the selected triggers"
+                onclick={runAnalysis}
+                disabled={isRunDisabled}
+              >
+              </lightning-button>
+              <template if:true={isRunDisabled}>
+                <div class="traRunHelpInline">
+                  Select a trigger to evaluate release risk.
+                </div>
+              </template>
             </div>
-          </template>
-          <template if:true={isRunDisabled}>
-            <template if:false={runId}>
-              <div class="emptyStateCard slds-box slds-m-top_small">
-                <h3 class="slds-text-heading_small">Get started</h3>
-                <ol
-                  class="slds-list_ordered slds-m-top_x-small slds-m-left_medium"
-                >
-                  <li>Select one or more triggers from the list.</li>
-                  <li>Click <b>Run Analysis</b> to generate results.</li>
-                </ol>
-                <p class="slds-text-color_weak slds-m-top_x-small">
-                  Tip: Use Search triggers to quickly find a trigger.
-                </p>
-              </div>
+            <template if:true={isRunDisabled}>
+              <template if:false={runId}>
+                <div class="emptyStateCard slds-box slds-m-top_small">
+                  <h3 class="slds-text-heading_small">Get started</h3>
+                  <ol
+                    class="slds-list_ordered slds-m-top_x-small slds-m-left_medium"
+                  >
+                    <li>Select one or more triggers from the list.</li>
+                    <li>Click <b>Run Analysis</b> to generate results.</li>
+                  </ol>
+                  <p class="slds-text-color_weak slds-m-top_x-small">
+                    Tip: Use Search triggers to quickly find a trigger.
+                  </p>
+                </div>
+              </template>
             </template>
-          </template>
-        </div>
+          </div>
 
-        <div
-          class="slds-col slds-size_1-of-1 slds-medium-size_3-of-4 slds-text-align_right"
-        >
-          <template if:true={runId}>
-            <!-- Share actions -->
-            <div class="slds-button-group" role="group">
-              <lightning-button
-                class="actionBtn"
-                label="Copy Summary"
-                title="Copy a shareable summary for tickets, Slack, or email"
-                onclick={copySummaryToClipboard}
-                disabled={isLoading}
-              >
-              </lightning-button>
-
-              <lightning-button
-                class="actionBtn"
-                label="Copy Release Decision"
-                title="Copy the executive release decision (CAB / audit friendly)"
-                onclick={copyReleaseDecisionToClipboard}
-                disabled={isLoading}
-              >
-              </lightning-button>
-            </div>
-
-            <!-- Export actions -->
-            <div class="slds-button-group slds-m-left_small" role="group">
-              <lightning-button
-                class="actionBtn"
-                label="Export CSV"
-                title="Export findings to CSV with Executive Signal and Release Gate details"
-                onclick={exportCsv}
-                disabled={disableExport}
-              >
-              </lightning-button>
-
-              <lightning-button
-                class="actionBtn"
-                label="Export Release Decision"
-                title="Export a release decision text file for CAB or audit evidence"
-                onclick={exportReleaseDecision}
-                disabled={isLoading}
-              >
-              </lightning-button>
-            </div>
-
-            <!-- Refresh (separate control action) -->
-            <template if:false={isPolling}>
-              <div class="slds-button-group slds-m-left_medium" role="group">
+          <div
+            class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3 slds-text-align_right"
+          >
+            <template if:true={runId}>
+              <!-- Share actions -->
+              <div class="slds-button-group" role="group">
                 <lightning-button
                   class="actionBtn"
-                  label="Refresh"
-                  title="Refresh run status and findings"
-                  onclick={refreshRun}
+                  label="Copy Summary"
+                  title="Copy a shareable summary for tickets, Slack, or email"
+                  onclick={copySummaryToClipboard}
+                  disabled={isLoading}
+                >
+                </lightning-button>
+
+                <lightning-button
+                  class="actionBtn"
+                  label="Copy Release Decision"
+                  title="Copy the executive release decision (CAB / audit friendly)"
+                  onclick={copyReleaseDecisionToClipboard}
                   disabled={isLoading}
                 >
                 </lightning-button>
               </div>
-            </template>
 
-            <template if:true={isPolling}>
-              <span class="slds-text-color_weak slds-m-left_medium">
-                Auto-refreshing…
-              </span>
-            </template>
-          </template>
-        </div>
-      </div>
-
-      <template if:true={runId}>
-        <!-- Section: Executive Signal -->
-        <div class="sectionHeader slds-m-top_medium">
-          <h2 class="slds-text-heading_small">Executive Signal</h2>
-          <p class="slds-text-color_weak slds-text-body_small">
-            Risk summary for quick decisions
-          </p>
-        </div>
-        <div class="slds-m-top_medium slds-box">
-          <template if:false={isRunComplete}>
-            <div
-              class="inlineSpinnerRow slds-grid slds-grid_vertical-align-center slds-m-bottom_small"
-            >
-              <div class="inlineSpinner">
-                <lightning-spinner
-                  size="small"
-                  alternative-text="Running analysis"
-                ></lightning-spinner>
-              </div>
-              <div class="slds-m-left_small slds-text-color_weak">
-                Running analysis… Results will populate as processing completes.
-              </div>
-            </div>
-          </template>
-          <div class="slds-grid slds-wrap slds-gutters">
-            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
-              <p><b>Run:</b> {runId}</p>
-              <p class="slds-m-top_x-small"><b>Status:</b> {status}</p>
-              <p class="slds-m-top_x-small">
-                <b>Progress:</b> {processedTriggers} / {totalTriggers}
-              </p>
-              <p class="slds-m-top_x-small">
-                <b>Overall Risk:</b> {overallRisk}
-              </p>
-              <template if:true={hasReleaseGate}>
-                <p class="slds-m-top_x-small">
-                  <b>Release Recommendation:</b>
-                  <span class={releaseGateBadgeClass}
-                    >{releaseGateDecisionLabel}</span
-                  >
-                </p>
-              </template>
-
-              <template if:true={impactChips}>
-                <div class="metaRow slds-m-top_x-small">
-                  <template for:each={impactChips} for:item="c">
-                    <span key={c} class="metaChip">{c}</span>
-                  </template>
-                </div>
-              </template>
-
-              <template if:true={topRisks}>
-                <template if:true={topRisks.length}>
-                  <div class="slds-m-top_small">
-                    <p class="slds-text-title_bold">Top Risks</p>
-                    <ul class="slds-list_dotted slds-m-left_medium">
-                      <template for:each={topRisks} for:item="r" for:index="i">
-                        <li key={r}>{r}</li>
-                      </template>
-                    </ul>
-                  </div>
-                </template>
-              </template>
-              <p class="slds-m-top_x-small"><b>Findings:</b> {findingsCount}</p>
-              <p class="slds-m-top_x-small">
-                <b>Last Updated:</b>
-                <lightning-formatted-date-time
-                  value={lastUpdated}
-                  year="numeric"
-                  month="2-digit"
-                  day="2-digit"
-                  hour="2-digit"
-                  minute="2-digit"
-                  second="2-digit"
-                  time-zone-name="short"
+              <!-- Export actions -->
+              <div class="slds-button-group slds-m-left_small" role="group">
+                <lightning-button
+                  class="actionBtn"
+                  label="Export CSV"
+                  title="Export findings to CSV with Executive Signal and Release Gate details"
+                  onclick={exportCsv}
+                  disabled={disableExport}
                 >
-                </lightning-formatted-date-time>
-              </p>
+                </lightning-button>
 
-              <p class="slds-m-top_x-small">
-                <a href={runUrl} target="_blank">Open Run</a>
-              </p>
-            </div>
-
-            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
-              <div class="slds-grid slds-gutters">
-                <div class={highTileClass}>
-                  <div class="slds-text-title">High</div>
-                  <div class="slds-text-heading_medium">{highCount}</div>
-                </div>
-
-                <div class={mediumTileClass}>
-                  <div class="slds-text-title">Medium</div>
-                  <div class="slds-text-heading_medium">{mediumCount}</div>
-                </div>
-
-                <div class={lowTileClass}>
-                  <div class="slds-text-title">Low</div>
-                  <div class="slds-text-heading_medium">{lowCount}</div>
-                </div>
+                <lightning-button
+                  class="actionBtn"
+                  label="Export Release Decision"
+                  title="Export a release decision text file for CAB or audit evidence"
+                  onclick={exportReleaseDecision}
+                  disabled={isLoading}
+                >
+                </lightning-button>
               </div>
 
-              <template if:true={errorMessage}>
-                <div class="slds-m-top_small slds-text-color_error">
-                  <b>Error:</b> {errorMessage}
+              <!-- Refresh (separate control action) -->
+              <template if:false={isPolling}>
+                <div class="slds-button-group slds-m-left_medium" role="group">
+                  <lightning-button
+                    class="actionBtn"
+                    label="Refresh"
+                    title="Refresh run status and findings"
+                    onclick={refreshRun}
+                    disabled={isLoading}
+                  >
+                  </lightning-button>
                 </div>
               </template>
-            </div>
-          </div>
-        </div>
-      </template>
-      <template if:true={hasReleaseGate}>
-        <!-- Section: Release Gate -->
-        <div class="sectionHeader slds-m-top_medium">
-          <h2 class="slds-text-heading_small">Release Gate</h2>
-          <p class="slds-text-color_weak slds-text-body_small">
-            Policy-based release decision
-          </p>
-        </div>
-        <div class={releaseGateCardClass}>
-          <div class="slds-text-title_bold">Release Gate</div>
 
-          <div class="metaRow slds-m-top_x-small">
-            <span class={releaseGateBadgeClass}
-              >{releaseGateDecisionLabel}</span
-            >
-
-            <template if:true={gatePolicyProfile}>
-              <span class="metaChip">Policy: {gatePolicyProfile}</span>
-            </template>
-
-            <template if:true={gateVersion}>
-              <span class="metaChip">Version: {gateVersion}</span>
+              <template if:true={isPolling}>
+                <span class="slds-text-color_weak slds-m-left_medium">
+                  Auto-refreshing…
+                </span>
+              </template>
             </template>
           </div>
-
-          <div class="slds-m-top_small">
-            <p><b>Gate Outcome:</b> {releaseGateDecisionLabel}</p>
-          </div>
-
-          <template if:true={hasGateRationale}>
-            <div class="slds-m-top_small">
-              <p class="slds-text-title_bold">Rationale</p>
-              <template for:each={gateRationaleLines} for:item="l">
-                <div key={l} class="slds-m-top_xx-small">• {l}</div>
-              </template>
-            </div>
-          </template>
-
-          <template if:true={hasGateRequiredFixes}>
-            <div class="slds-m-top_small">
-              <p class="slds-text-title_bold">Required Fixes (to unblock)</p>
-              <template for:each={gateRequiredFixLines} for:item="l">
-                <div key={l} class="slds-m-top_xx-small">• {l}</div>
-              </template>
-            </div>
-          </template>
         </div>
-      </template>
-      <!-- Filters -->
-      <template if:true={runId}>
-        <template if:false={isRunComplete}>
-          <div class="slds-m-top_small slds-text-color_weak">
-            Running analysis… Detailed findings will appear when the run
-            completes.
-          </div>
-        </template>
 
-        <template if:true={isRunComplete}>
-          <!-- Section: Detailed Findings -->
+        <template if:true={runId}>
+          <!-- Section: Executive Signal -->
           <div class="sectionHeader slds-m-top_medium">
-            <h2 class="slds-text-heading_small">Findings</h2>
+            <h2 class="slds-text-heading_small">Executive Signal</h2>
             <p class="slds-text-color_weak slds-text-body_small">
-              Filter and review individual findings
+              Risk summary for quick decisions
             </p>
           </div>
-
-          <!-- Filters -->
-          <div class="slds-m-top_medium slds-grid slds-wrap slds-gutters">
-            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
-              <lightning-combobox
-                label="Severity"
-                value={severityFilter}
-                options={severityOptions}
-                onchange={handleSeverityFilter}
+          <div class="slds-m-top_medium slds-box">
+            <template if:false={isRunComplete}>
+              <div
+                class="inlineSpinnerRow slds-grid slds-grid_vertical-align-center slds-m-bottom_small"
               >
-              </lightning-combobox>
-            </div>
+                <div class="inlineSpinner">
+                  <lightning-spinner
+                    size="small"
+                    alternative-text="Running analysis"
+                  ></lightning-spinner>
+                </div>
+                <div class="slds-m-left_small slds-text-color_weak">
+                  Running analysis… Results will populate as processing completes.
+                </div>
+              </div>
+            </template>
+            <div class="slds-grid slds-wrap slds-gutters">
+              <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                <p><b>Run:</b> {runId}</p>
+                <p class="slds-m-top_x-small"><b>Status:</b> {status}</p>
+                <p class="slds-m-top_x-small">
+                  <b>Progress:</b> {processedTriggers} / {totalTriggers}
+                </p>
+                <p class="slds-m-top_x-small">
+                  <b>Overall Risk:</b> {overallRisk}
+                </p>
+                <template if:true={hasReleaseGate}>
+                  <p class="slds-m-top_x-small">
+                    <b>Release Recommendation:</b>
+                    <span class={releaseGateBadgeClass}
+                      >{releaseGateDecisionLabel}</span
+                    >
+                  </p>
+                </template>
 
-            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
-              <lightning-combobox
-                label="Category"
-                value={categoryFilter}
-                options={categoryOptions}
-                onchange={handleCategoryFilter}
-              >
-              </lightning-combobox>
-            </div>
+                <template if:true={impactChips}>
+                  <div class="metaRow slds-m-top_x-small">
+                    <template for:each={impactChips} for:item="c">
+                      <span key={c} class="metaChip">{c}</span>
+                    </template>
+                  </div>
+                </template>
 
-            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
-              <lightning-input
-                label="Search"
-                value={searchText}
-                onchange={handleSearchChange}
-                placeholder="Search trigger, rule, message..."
-              >
-              </lightning-input>
+                <template if:true={topRisks}>
+                  <template if:true={topRisks.length}>
+                    <div class="slds-m-top_small">
+                      <p class="slds-text-title_bold">Top Risks</p>
+                      <ul class="slds-list_dotted slds-m-left_medium">
+                        <template for:each={topRisks} for:item="r" for:index="i">
+                          <li key={r}>{r}</li>
+                        </template>
+                      </ul>
+                    </div>
+                  </template>
+                </template>
+                <p class="slds-m-top_x-small"><b>Findings:</b> {findingsCount}</p>
+                <p class="slds-m-top_x-small">
+                  <b>Last Updated:</b>
+                  <lightning-formatted-date-time
+                    value={lastUpdated}
+                    year="numeric"
+                    month="2-digit"
+                    day="2-digit"
+                    hour="2-digit"
+                    minute="2-digit"
+                    second="2-digit"
+                    time-zone-name="short"
+                  >
+                  </lightning-formatted-date-time>
+                </p>
 
-              <div class="slds-m-top_x-small">
-                <lightning-button
-                  label="Clear"
-                  onclick={clearSearch}
-                ></lightning-button>
+                <p class="slds-m-top_x-small">
+                  <a href={runUrl} target="_blank">Open Run</a>
+                </p>
+              </div>
+
+              <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                <div class="slds-grid slds-gutters">
+                  <div class={highTileClass}>
+                    <div class="slds-text-title">High</div>
+                    <div class="slds-text-heading_medium">{highCount}</div>
+                  </div>
+
+                  <div class={mediumTileClass}>
+                    <div class="slds-text-title">Medium</div>
+                    <div class="slds-text-heading_medium">{mediumCount}</div>
+                  </div>
+
+                  <div class={lowTileClass}>
+                    <div class="slds-text-title">Low</div>
+                    <div class="slds-text-heading_medium">{lowCount}</div>
+                  </div>
+                </div>
+
+                <template if:true={errorMessage}>
+                  <div class="slds-m-top_small slds-text-color_error">
+                    <b>Error:</b> {errorMessage}
+                  </div>
+                </template>
               </div>
             </div>
           </div>
+        </template>
+        <template if:true={hasReleaseGate}>
+          <!-- Section: Release Gate -->
+          <div class="sectionHeader slds-m-top_medium">
+            <h2 class="slds-text-heading_small">Release Gate</h2>
+            <p class="slds-text-color_weak slds-text-body_small">
+              Policy-based release decision
+            </p>
+          </div>
+          <div class={releaseGateCardClass}>
+            <div class="slds-text-title_bold">Release Gate</div>
 
-          <!-- Table -->
-          <template if:true={showTable}>
-            <div class="slds-m-top_medium">
-              <lightning-datatable
-                key-field="itemId"
-                data={filteredItems}
-                columns={columns}
-                onrowaction={handleRowAction}
-                hide-checkbox-column
+            <div class="metaRow slds-m-top_x-small">
+              <span class={releaseGateBadgeClass}
+                >{releaseGateDecisionLabel}</span
               >
-              </lightning-datatable>
+
+              <template if:true={gatePolicyProfile}>
+                <span class="metaChip">Policy: {gatePolicyProfile}</span>
+              </template>
+
+              <template if:true={gateVersion}>
+                <span class="metaChip">Version: {gateVersion}</span>
+              </template>
+            </div>
+
+            <div class="slds-m-top_small">
+              <p><b>Gate Outcome:</b> {releaseGateDecisionLabel}</p>
+            </div>
+
+            <template if:true={hasGateRationale}>
+              <div class="slds-m-top_small">
+                <p class="slds-text-title_bold">Rationale</p>
+                <template for:each={gateRationaleLines} for:item="l">
+                  <div key={l} class="slds-m-top_xx-small">• {l}</div>
+                </template>
+              </div>
+            </template>
+
+            <template if:true={hasGateRequiredFixes}>
+              <div class="slds-m-top_small">
+                <p class="slds-text-title_bold">Required Fixes (to unblock)</p>
+                <template for:each={gateRequiredFixLines} for:item="l">
+                  <div key={l} class="slds-m-top_xx-small">• {l}</div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </template>
+        <!-- Filters -->
+        <template if:true={runId}>
+          <template if:false={isRunComplete}>
+            <div class="slds-m-top_small slds-text-color_weak">
+              Running analysis… Detailed findings will appear when the run
+              completes.
             </div>
           </template>
-          <template if:false={showTable}>
-            <div class="slds-m-top_medium slds-text-color_weak">
-              <template if:false={hasAnyFindings}>
-                No findings detected. This trigger passed all active rules.
-              </template>
-              <template if:true={hasAnyFindings}>
-                No findings match the current filters.
-              </template>
+
+          <template if:true={isRunComplete}>
+            <!-- Section: Detailed Findings -->
+            <div class="sectionHeader slds-m-top_medium">
+              <h2 class="slds-text-heading_small">Findings</h2>
+              <p class="slds-text-color_weak slds-text-body_small">
+                Filter and review individual findings
+              </p>
             </div>
+
+            <!-- Filters -->
+            <div class="slds-m-top_medium slds-grid slds-wrap slds-gutters">
+              <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                <lightning-combobox
+                  label="Severity"
+                  value={severityFilter}
+                  options={severityOptions}
+                  onchange={handleSeverityFilter}
+                >
+                </lightning-combobox>
+              </div>
+
+              <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                <lightning-combobox
+                  label="Category"
+                  value={categoryFilter}
+                  options={categoryOptions}
+                  onchange={handleCategoryFilter}
+                >
+                </lightning-combobox>
+              </div>
+
+              <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                <lightning-input
+                  label="Search"
+                  value={searchText}
+                  onchange={handleSearchChange}
+                  placeholder="Search trigger, rule, message..."
+                >
+                </lightning-input>
+
+                <div class="slds-m-top_x-small">
+                  <lightning-button
+                    label="Clear"
+                    onclick={clearSearch}
+                  ></lightning-button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Table -->
+            <template if:true={showTable}>
+              <div class="slds-m-top_medium">
+                <lightning-datatable
+                  key-field="itemId"
+                  data={filteredItems}
+                  columns={columns}
+                  onrowaction={handleRowAction}
+                  hide-checkbox-column
+                >
+                </lightning-datatable>
+              </div>
+            </template>
+            <template if:false={showTable}>
+              <div class="slds-m-top_medium slds-text-color_weak">
+                <template if:false={hasAnyFindings}>
+                  No findings detected. This trigger passed all active rules.
+                </template>
+                <template if:true={hasAnyFindings}>
+                  No findings match the current filters.
+                </template>
+              </div>
+            </template>
           </template>
         </template>
-      </template>
-      <!-- Modal -->
-      <template if:true={isModalOpen}>
-        <section
-          role="dialog"
-          tabindex="-1"
-          class="slds-modal slds-fade-in-open"
-        >
-          <div class="slds-modal__container">
-            <header class="slds-modal__header">
-              <h2 class="slds-text-heading_medium">{detail.triggerName}</h2>
+        <!-- Modal -->
+        <template if:true={isModalOpen}>
+          <section
+            role="dialog"
+            tabindex="-1"
+            class="slds-modal slds-fade-in-open"
+          >
+            <div class="slds-modal__container">
+              <header class="slds-modal__header">
+                <h2 class="slds-text-heading_medium">{detail.triggerName}</h2>
 
-              <div class="metaRow">
-                <span class={detailSeverityBadgeClass}>{detail.severity}</span>
+                <div class="metaRow">
+                  <span class={detailSeverityBadgeClass}>{detail.severity}</span>
 
-                <template if:true={detail.ruleLabel}>
-                  <span class="metaChip">{detail.ruleLabel}</span>
+                  <template if:true={detail.ruleLabel}>
+                    <span class="metaChip">{detail.ruleLabel}</span>
+                  </template>
+
+                  <template if:true={detailRuleKeys}>
+                    <span class="metaChip">{detailRuleKeys}</span>
+                  </template>
+
+                  <template if:true={detail.category}>
+                    <span class="metaChip">{detail.category}</span>
+                  </template>
+                </div>
+              </header>
+
+              <div class="slds-modal__content slds-p-around_medium">
+                <template if:true={detailLoading}>
+                  <lightning-spinner
+                    size="small"
+                    alternative-text="Loading details"
+                  ></lightning-spinner>
                 </template>
 
-                <template if:true={detailRuleKeys}>
-                  <span class="metaChip">{detailRuleKeys}</span>
-                </template>
+                <template if:true={detail}>
+                  <template if:true={detail.message}>
+                    <div class="slds-m-top_medium">
+                      <p class="slds-text-title_bold">Message</p>
+                      <div class="slds-box slds-theme_default">
+                        {detail.message}
+                      </div>
+                    </div>
+                  </template>
 
-                <template if:true={detail.category}>
-                  <span class="metaChip">{detail.category}</span>
+                  <template if:true={detail.recommendation}>
+                    <div class="slds-m-top_medium">
+                      <p class="slds-text-title_bold">Recommendation</p>
+                      <div class="slds-box slds-theme_default">
+                        {detail.recommendation}
+                      </div>
+                    </div>
+                  </template>
+
+                  <template if:true={snippetLines}>
+                    <div class="slds-m-top_medium">
+                      <p class="slds-text-title_bold">Snippet</p>
+                      <div class="slds-box slds-theme_default snippetBox">
+                        <template for:each={snippetLines} for:item="l">
+                          <div key={l.key} class={l.cssClass}>{l.text}</div>
+                        </template>
+                      </div>
+                    </div>
+                  </template>
                 </template>
               </div>
-            </header>
 
-            <div class="slds-modal__content slds-p-around_medium">
-              <template if:true={detailLoading}>
-                <lightning-spinner
-                  size="small"
-                  alternative-text="Loading details"
-                ></lightning-spinner>
-              </template>
-
-              <template if:true={detail}>
-                <template if:true={detail.message}>
-                  <div class="slds-m-top_medium">
-                    <p class="slds-text-title_bold">Message</p>
-                    <div class="slds-box slds-theme_default">
-                      {detail.message}
-                    </div>
-                  </div>
-                </template>
-
-                <template if:true={detail.recommendation}>
-                  <div class="slds-m-top_medium">
-                    <p class="slds-text-title_bold">Recommendation</p>
-                    <div class="slds-box slds-theme_default">
-                      {detail.recommendation}
-                    </div>
-                  </div>
-                </template>
-
-                <template if:true={snippetLines}>
-                  <div class="slds-m-top_medium">
-                    <p class="slds-text-title_bold">Snippet</p>
-                    <div class="slds-box slds-theme_default snippetBox">
-                      <template for:each={snippetLines} for:item="l">
-                        <div key={l.key} class={l.cssClass}>{l.text}</div>
-                      </template>
-                    </div>
-                  </div>
-                </template>
-              </template>
+              <footer class="slds-modal__footer">
+                <lightning-button
+                  label="Close"
+                  onclick={closeModal}
+                ></lightning-button>
+              </footer>
             </div>
+          </section>
 
-            <footer class="slds-modal__footer">
-              <lightning-button
-                label="Close"
-                onclick={closeModal}
-              ></lightning-button>
-            </footer>
-          </div>
-        </section>
+          <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
 
-        <div class="slds-backdrop slds-backdrop_open"></div>
-      </template>
-
-      <template if:true={errorMsg}>
-        <div class="slds-m-top_medium slds-text-color_error">{errorMsg}</div>
-      </template>
+        <template if:true={errorMsg}>
+          <div class="slds-m-top_medium slds-text-color_error">{errorMsg}</div>
+        </template>
+      </div>
     </div>
-  </lightning-card>
+  </div>
 </template>
