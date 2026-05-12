@@ -73,15 +73,19 @@
 .traLogoMark {
   width: 32px;
   height: 32px;
-  border-radius: 7px;
-  background: var(--tra-brand-dark);
-  color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
+  flex: 0 0 32px;
+  background: transparent;
+  border-radius: 0;
+  color: inherit;
+}
+
+.traLogoSvg {
+  display: block;
+  width: 32px;
+  height: 32px;
 }
 
 .traProductTitle {
