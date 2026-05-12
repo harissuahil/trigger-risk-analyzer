@@ -77,7 +77,8 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 32px;
-  background: transparent;
+  background: linear-gradient(180deg, #0b5cab 0%, #013668 100%);
+  clip-path: polygon(50% 6.25%, 87.5% 18.75%, 87.5% 50%, 70.3125% 71.875%, 50% 93.75%, 29.6875% 71.875%, 12.5% 50%, 12.5% 18.75%);
   border-radius: 0;
   color: inherit;
 }
