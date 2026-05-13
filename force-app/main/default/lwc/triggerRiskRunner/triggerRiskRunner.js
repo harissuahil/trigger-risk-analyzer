@@ -160,7 +160,30 @@ export default class TriggerRiskRunner extends LightningElement {
 
   get runWorkspaceMessage() {
     const count = this.selectedTriggersCount || this.totalTriggers || 0;
-    return `Running analysis on ${count} trigger${count === 1 ? "" : "s"}...`;
+    return `${count} trigger${count === 1 ? "" : "s"} selected`;
+  }
+
+  get runSummaryStatusLabel() {
+    if (this.isRunComplete) {
+      return this.status === "Failed" ? "Failed" : "Done";
+    }
+
+    return "In progress";
+  }
+
+  get runUpdatedDisplay() {
+    if (!this.isRunComplete || !this.lastUpdated) {
+      return "—";
+    }
+
+    try {
+      return new Date(this.lastUpdated).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    } catch {
+      return this.lastUpdated;
+    }
   }
 
   get showTable() {

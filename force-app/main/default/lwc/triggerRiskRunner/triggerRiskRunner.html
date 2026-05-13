@@ -315,14 +315,14 @@
                     class="slds-grid slds-grid_align-spread slds-m-bottom_x-small"
                   >
                     <span class="slds-text-color_weak">Status</span>
-                    <strong>{status}</strong>
+                    <strong>{runSummaryStatusLabel}</strong>
                   </div>
 
                   <div
                     class="slds-grid slds-grid_align-spread slds-m-bottom_x-small"
                   >
-                    <span class="slds-text-color_weak">Progress</span>
-                    <strong>{processedTriggers} / {totalTriggers}</strong>
+                    <span class="slds-text-color_weak">Triggers</span>
+                    <strong>{selectedTriggersCount}</strong>
                   </div>
 
                   <div
@@ -335,9 +335,18 @@
                     </strong>
                   </div>
 
-                  <div class="slds-grid slds-grid_align-spread">
+                  <div
+                    class="slds-grid slds-grid_align-spread slds-m-bottom_x-small"
+                  >
                     <span class="slds-text-color_weak">Findings</span>
                     <strong>{findingsCount}</strong>
+                  </div>
+
+                  <div
+                    class="slds-grid slds-grid_align-spread slds-m-top_x-small"
+                  >
+                    <span class="slds-text-color_weak">Updated</span>
+                    <strong>{runUpdatedDisplay}</strong>
                   </div>
                 </div>
 
