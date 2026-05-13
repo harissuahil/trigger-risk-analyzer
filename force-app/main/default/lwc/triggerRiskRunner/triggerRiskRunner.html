@@ -166,40 +166,42 @@
                 </div>
               </div>
 
-              <div class="slds-col slds-size_1-of-1 slds-large-size_6-of-12">
-                <div class="slds-grid slds-wrap slds-gutters_x-small">
-                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
-                    <div class="slds-box slds-box_x-small slds-text-align_center">
-                      <div class="slds-text-title_caps slds-text-color_weak">Triggers</div>
-                      <div class="slds-text-heading_small">{selectedTriggersCount}</div>
+              <template if:true={runId}>
+                <div class="slds-col slds-size_1-of-1 slds-large-size_6-of-12">
+                  <div class="slds-grid slds-wrap slds-gutters_x-small">
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
+                      <div class="slds-box slds-box_x-small slds-text-align_center">
+                        <div class="slds-text-title_caps slds-text-color_weak">Triggers</div>
+                        <div class="slds-text-heading_small">{selectedTriggersCount}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
-                    <div class="slds-box slds-box_x-small slds-text-align_center">
-                      <div class="slds-text-title_caps slds-text-color_weak">Findings</div>
-                      <div class="slds-text-heading_small">{findingsCount}</div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
+                      <div class="slds-box slds-box_x-small slds-text-align_center">
+                        <div class="slds-text-title_caps slds-text-color_weak">Findings</div>
+                        <div class="slds-text-heading_small">{findingsCount}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
-                    <div class="slds-box slds-box_x-small slds-text-align_center">
-                      <div class="slds-text-title_caps slds-text-color_weak">High</div>
-                      <div class="slds-text-heading_small slds-text-color_error">{highCount}</div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
+                      <div class="slds-box slds-box_x-small slds-text-align_center">
+                        <div class="slds-text-title_caps slds-text-color_weak">High</div>
+                        <div class="slds-text-heading_small slds-text-color_error">{highCount}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
-                    <div class="slds-box slds-box_x-small slds-text-align_center">
-                      <div class="slds-text-title_caps slds-text-color_weak">Medium</div>
-                      <div class="slds-text-heading_small">{mediumCount}</div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
+                      <div class="slds-box slds-box_x-small slds-text-align_center">
+                        <div class="slds-text-title_caps slds-text-color_weak">Medium</div>
+                        <div class="slds-text-heading_small">{mediumCount}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
-                    <div class="slds-box slds-box_x-small slds-text-align_center">
-                      <div class="slds-text-title_caps slds-text-color_weak">Low</div>
-                      <div class="slds-text-heading_small slds-text-color_success">{lowCount}</div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
+                      <div class="slds-box slds-box_x-small slds-text-align_center">
+                        <div class="slds-text-title_caps slds-text-color_weak">Low</div>
+                        <div class="slds-text-heading_small slds-text-color_success">{lowCount}</div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </template>
 
               <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-12 slds-text-align_right">
                 <lightning-button
