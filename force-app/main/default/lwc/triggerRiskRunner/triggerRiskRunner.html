@@ -166,7 +166,7 @@
             >
               <div class="slds-col slds-size_1-of-1 slds-large-size_5-of-12">
                 <div class="slds-text-title_caps slds-text-color_weak">
-                  Analysis run
+                  Release
                 </div>
                 <div class="slds-text-heading_medium slds-m-top_xx-small">
                   {releaseLabel}
@@ -180,7 +180,24 @@
                 <div class="slds-col slds-size_1-of-1 slds-large-size_6-of-12">
                   <div class="slds-grid slds-wrap slds-gutters_x-small">
                     <div
-                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5"
+                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6"
+                    >
+                      <div
+                        class="slds-box slds-box_x-small slds-text-align_center"
+                      >
+                        <div class="slds-text-title_caps slds-text-color_weak">
+                          Gate
+                        </div>
+                        <div class="slds-text-heading_small">
+                          <template if:true={hasReleaseGate}>
+                            {releaseGateDecisionLabel}
+                          </template>
+                          <template if:false={hasReleaseGate}> — </template>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6"
                     >
                       <div
                         class="slds-box slds-box_x-small slds-text-align_center"
@@ -194,7 +211,7 @@
                       </div>
                     </div>
                     <div
-                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5"
+                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6"
                     >
                       <div
                         class="slds-box slds-box_x-small slds-text-align_center"
@@ -208,7 +225,7 @@
                       </div>
                     </div>
                     <div
-                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5"
+                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6"
                     >
                       <div
                         class="slds-box slds-box_x-small slds-text-align_center"
@@ -224,7 +241,7 @@
                       </div>
                     </div>
                     <div
-                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5"
+                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6"
                     >
                       <div
                         class="slds-box slds-box_x-small slds-text-align_center"
@@ -236,7 +253,7 @@
                       </div>
                     </div>
                     <div
-                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5"
+                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6"
                     >
                       <div
                         class="slds-box slds-box_x-small slds-text-align_center"
