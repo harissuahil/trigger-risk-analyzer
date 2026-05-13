@@ -46,6 +46,7 @@ export default class TriggerRiskRunner extends LightningElement {
   runId;
   errorMsg;
   isLoading = false;
+  hasRunStarted = false;
 
   // Run status
   status;
@@ -139,6 +140,27 @@ export default class TriggerRiskRunner extends LightningElement {
     return this.runId
       ? `/lightning/r/Deployment_Analysis_Run__c/${this.runId}/view`
       : "#";
+  }
+
+  get showSetupPanel() {
+    return !this.hasRunStarted;
+  }
+
+  get showRunWorkspace() {
+    return this.hasRunStarted;
+  }
+
+  get runStatusLabel() {
+    if (this.isRunComplete) {
+      return this.status === "Failed" ? "Failed" : "Completed";
+    }
+
+    return "In progress";
+  }
+
+  get runWorkspaceMessage() {
+    const count = this.selectedTriggersCount || this.totalTriggers || 0;
+    return `Running analysis on ${count} trigger${count === 1 ? "" : "s"}...`;
   }
 
   get showTable() {
