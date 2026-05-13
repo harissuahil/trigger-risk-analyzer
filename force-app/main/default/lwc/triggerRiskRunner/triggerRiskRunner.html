@@ -156,18 +156,52 @@
         </template>
 
         <template if:true={showRunWorkspace}>
-          <div class="traPanelHeader">
-            <h1 class="traPanelTitle">Analysis run</h1>
-          </div>
-
           <div class="slds-box slds-theme_default">
-            <div class="slds-grid slds-grid_vertical-align-center slds-gutters">
-              <div class="slds-col">
-                <p class="slds-text-title_bold">{runStatusLabel}</p>
-                <p class="slds-text-color_weak">{runWorkspaceMessage}</p>
+            <div class="slds-grid slds-wrap slds-gutters slds-grid_vertical-align-center">
+              <div class="slds-col slds-size_1-of-1 slds-large-size_5-of-12">
+                <div class="slds-text-title_caps slds-text-color_weak">Analysis run</div>
+                <div class="slds-text-heading_medium slds-m-top_xx-small">{releaseLabel}</div>
+                <div class="slds-text-color_weak slds-m-top_xx-small">
+                  {runStatusLabel} · {runWorkspaceMessage}
+                </div>
               </div>
 
-              <div class="slds-col slds-no-flex">
+              <div class="slds-col slds-size_1-of-1 slds-large-size_6-of-12">
+                <div class="slds-grid slds-wrap slds-gutters_x-small">
+                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
+                    <div class="slds-box slds-box_x-small slds-text-align_center">
+                      <div class="slds-text-title_caps slds-text-color_weak">Triggers</div>
+                      <div class="slds-text-heading_small">{selectedTriggersCount}</div>
+                    </div>
+                  </div>
+                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
+                    <div class="slds-box slds-box_x-small slds-text-align_center">
+                      <div class="slds-text-title_caps slds-text-color_weak">Findings</div>
+                      <div class="slds-text-heading_small">{findingsCount}</div>
+                    </div>
+                  </div>
+                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
+                    <div class="slds-box slds-box_x-small slds-text-align_center">
+                      <div class="slds-text-title_caps slds-text-color_weak">High</div>
+                      <div class="slds-text-heading_small slds-text-color_error">{highCount}</div>
+                    </div>
+                  </div>
+                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
+                    <div class="slds-box slds-box_x-small slds-text-align_center">
+                      <div class="slds-text-title_caps slds-text-color_weak">Medium</div>
+                      <div class="slds-text-heading_small">{mediumCount}</div>
+                    </div>
+                  </div>
+                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-5">
+                    <div class="slds-box slds-box_x-small slds-text-align_center">
+                      <div class="slds-text-title_caps slds-text-color_weak">Low</div>
+                      <div class="slds-text-heading_small slds-text-color_success">{lowCount}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-12 slds-text-align_right">
                 <lightning-button
                   label="New run"
                   onclick={handleNewRun}
@@ -176,62 +210,68 @@
             </div>
 
             <template if:true={runId}>
-              <div class="slds-m-top_medium slds-grid slds-grid_align-spread slds-wrap">
-                <div class="slds-button-group" role="group">
-                  <lightning-button
-                    class="actionBtn"
-                    label="Copy Summary"
-                    title="Copy a shareable summary for tickets, Slack, or email"
-                    onclick={copySummaryToClipboard}
-                    disabled={isLoading}
-                  >
-                  </lightning-button>
+              <div class="slds-m-top_medium slds-p-top_small slds-border_top">
+                <div class="slds-grid slds-wrap slds-grid_align-spread slds-gutters_x-small">
+                  <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
+                    <div class="slds-button-group" role="group">
+                      <lightning-button
+                        class="actionBtn"
+                        label="Copy Summary"
+                        title="Copy a shareable summary for tickets, Slack, or email"
+                        onclick={copySummaryToClipboard}
+                        disabled={isLoading}
+                      >
+                      </lightning-button>
 
-                  <lightning-button
-                    class="actionBtn"
-                    label="Copy Release Decision"
-                    title="Copy the executive release decision (CAB / audit friendly)"
-                    onclick={copyReleaseDecisionToClipboard}
-                    disabled={isLoading}
-                  >
-                  </lightning-button>
-                </div>
+                      <lightning-button
+                        class="actionBtn"
+                        label="Copy Release Decision"
+                        title="Copy the executive release decision (CAB / audit friendly)"
+                        onclick={copyReleaseDecisionToClipboard}
+                        disabled={isLoading}
+                      >
+                      </lightning-button>
+                    </div>
+                  </div>
 
-                <div class="slds-button-group" role="group">
-                  <lightning-button
-                    class="actionBtn"
-                    label="Export CSV"
-                    title="Export findings to CSV with Executive Signal and Release Gate details"
-                    onclick={exportCsv}
-                    disabled={disableExport}
-                  >
-                  </lightning-button>
+                  <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2 slds-text-align_right">
+                    <div class="slds-button-group" role="group">
+                      <lightning-button
+                        class="actionBtn"
+                        label="Export CSV"
+                        title="Export findings to CSV with Executive Signal and Release Gate details"
+                        onclick={exportCsv}
+                        disabled={disableExport}
+                      >
+                      </lightning-button>
 
-                  <lightning-button
-                    class="actionBtn"
-                    label="Export Release Decision"
-                    title="Export a release decision text file for CAB or audit evidence"
-                    onclick={exportReleaseDecision}
-                    disabled={isLoading}
-                  >
-                  </lightning-button>
+                      <lightning-button
+                        class="actionBtn"
+                        label="Export Release Decision"
+                        title="Export a release decision text file for CAB or audit evidence"
+                        onclick={exportReleaseDecision}
+                        disabled={isLoading}
+                      >
+                      </lightning-button>
 
-                  <template if:false={isPolling}>
-                    <lightning-button
-                      class="actionBtn"
-                      label="Refresh"
-                      title="Refresh run status and findings"
-                      onclick={refreshRun}
-                      disabled={isLoading}
-                    >
-                    </lightning-button>
-                  </template>
+                      <template if:false={isPolling}>
+                        <lightning-button
+                          class="actionBtn"
+                          label="Refresh"
+                          title="Refresh run status and findings"
+                          onclick={refreshRun}
+                          disabled={isLoading}
+                        >
+                        </lightning-button>
+                      </template>
+                    </div>
+                  </div>
                 </div>
 
                 <template if:true={isPolling}>
-                  <span class="slds-text-color_weak slds-m-left_medium slds-m-top_x-small">
+                  <div class="slds-text-color_weak slds-m-top_x-small">
                     Auto-refreshing…
-                  </span>
+                  </div>
                 </template>
               </div>
             </template>
