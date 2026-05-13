@@ -1156,4 +1156,20 @@ export default class TriggerRiskRunner extends LightningElement {
       return "Unknown error";
     }
   }
+
+  handleNewRun() {
+    this.stopPolling();
+    this.hasRunStarted = false;
+    this.runId = null;
+    this.items = [];
+    this.errorMsg = null;
+    this.errorMessage = null;
+    this.resetRunStatus();
+    this.releaseDecision = null;
+    this.gatePolicyProfile = null;
+    this.gateVersion = null;
+    this.gateRationaleRaw = "";
+    this.gateRequiredFixesRaw = "";
+    this.topRisks = [];
+  }
 }
