@@ -54,8 +54,11 @@
 
       <div class="traStatusPill">
         <span class="traStatusDot"></span>
-        <template if:true={runId}>Run complete</template>
-        <template if:false={runId}>Ready</template>
+        <template if:true={isRunComplete}>Run complete</template>
+        <template if:false={isRunComplete}>
+          <template if:true={runId}>Running</template>
+          <template if:false={runId}>Ready</template>
+        </template>
       </div>
     </div>
 
@@ -326,7 +329,10 @@
                     class="slds-grid slds-grid_align-spread slds-m-bottom_x-small"
                   >
                     <span class="slds-text-color_weak">Overall risk</span>
-                    <strong>{overallRisk}</strong>
+                    <strong>
+                      <template if:true={isRunComplete}>{overallRisk}</template>
+                      <template if:false={isRunComplete}>—</template>
+                    </strong>
                   </div>
 
                   <div class="slds-grid slds-grid_align-spread">
@@ -372,7 +378,7 @@
                         label="Copy Summary"
                         title="Copy a shareable summary for tickets, Slack, or email"
                         onclick={copySummaryToClipboard}
-                        disabled={isLoading}
+                        disabled={disableExport}
                       >
                       </lightning-button>
                     </div>
@@ -383,7 +389,7 @@
                         label="Copy Release Decision"
                         title="Copy the executive release decision (CAB / audit friendly)"
                         onclick={copyReleaseDecisionToClipboard}
-                        disabled={isLoading}
+                        disabled={disableExport}
                       >
                       </lightning-button>
                     </div>
@@ -405,7 +411,7 @@
                         label="Export Release Decision"
                         title="Export a release decision text file for CAB or audit evidence"
                         onclick={exportReleaseDecision}
-                        disabled={isLoading}
+                        disabled={disableExport}
                       >
                       </lightning-button>
                     </div>
@@ -494,13 +500,6 @@
                       </template>
                     </div>
                   </template>
-                </div>
-              </template>
-
-              <template if:false={isRunComplete}>
-                <div class="slds-m-top_small slds-text-color_weak">
-                  Running analysis… Detailed findings will appear when the run
-                  completes.
                 </div>
               </template>
 
