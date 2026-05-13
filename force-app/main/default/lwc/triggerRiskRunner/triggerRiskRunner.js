@@ -417,6 +417,7 @@ export default class TriggerRiskRunner extends LightningElement {
 
   async runAnalysis() {
     this.isLoading = true;
+    this.hasRunStarted = true;
     this.errorMsg = null;
     this.runId = null;
     this.items = [];
