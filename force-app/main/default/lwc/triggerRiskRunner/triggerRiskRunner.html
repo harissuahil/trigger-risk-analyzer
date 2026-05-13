@@ -192,10 +192,12 @@
                           Gate
                         </div>
                         <div class="slds-text-heading_small">
-                          <template if:true={hasReleaseGate}>
+                          <template if:true={isRunComplete}>
                             {releaseGateDecisionLabel}
                           </template>
-                          <template if:false={hasReleaseGate}> — </template>
+                          <template if:false={isRunComplete}
+                            >Analyzing…</template
+                          >
                         </div>
                       </div>
                     </div>
@@ -223,7 +225,10 @@
                           Findings
                         </div>
                         <div class="slds-text-heading_small">
-                          {findingsCount}
+                          <template if:true={isRunComplete}
+                            >{findingsCount}</template
+                          >
+                          <template if:false={isRunComplete}>—</template>
                         </div>
                       </div>
                     </div>
@@ -239,7 +244,10 @@
                         <div
                           class="slds-text-heading_small slds-text-color_error"
                         >
-                          {highCount}
+                          <template if:true={isRunComplete}
+                            >{highCount}</template
+                          >
+                          <template if:false={isRunComplete}>—</template>
                         </div>
                       </div>
                     </div>
@@ -252,7 +260,12 @@
                         <div class="slds-text-title_caps slds-text-color_weak">
                           Medium
                         </div>
-                        <div class="slds-text-heading_small">{mediumCount}</div>
+                        <div class="slds-text-heading_small">
+                          <template if:true={isRunComplete}
+                            >{mediumCount}</template
+                          >
+                          <template if:false={isRunComplete}>—</template>
+                        </div>
                       </div>
                     </div>
                     <div
@@ -267,7 +280,10 @@
                         <div
                           class="slds-text-heading_small slds-text-color_success"
                         >
-                          {lowCount}
+                          <template if:true={isRunComplete}
+                            >{lowCount}</template
+                          >
+                          <template if:false={isRunComplete}>—</template>
                         </div>
                       </div>
                     </div>
@@ -339,7 +355,12 @@
                     class="slds-grid slds-grid_align-spread slds-m-bottom_x-small"
                   >
                     <span class="slds-text-color_weak">Findings</span>
-                    <strong>{findingsCount}</strong>
+                    <strong>
+                      <template if:true={isRunComplete}
+                        >{findingsCount}</template
+                      >
+                      <template if:false={isRunComplete}>—</template>
+                    </strong>
                   </div>
 
                   <div
@@ -375,11 +396,9 @@
                   </template>
                 </template>
 
-                <p class="slds-m-top_medium">
-                  <a href={runUrl} target="_blank">Open Run</a>
-                </p>
-
-                <div class="slds-m-top_medium slds-p-top_small slds-border_top">
+                <div
+                  class="runSummaryActions slds-m-top_medium slds-p-top_small slds-border_top"
+                >
                   <div class="slds-grid slds-wrap slds-gutters_x-small">
                     <div class="slds-col slds-size_1-of-1">
                       <lightning-button
@@ -423,6 +442,10 @@
                         disabled={disableExport}
                       >
                       </lightning-button>
+                    </div>
+
+                    <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                      <a href={runUrl} target="_blank">Open Run</a>
                     </div>
 
                     <template if:false={isPolling}>
