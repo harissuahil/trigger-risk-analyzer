@@ -152,7 +152,7 @@ async function runAnalysisWithStatus(runStatusOverrides) {
   // This proves the component is driving the run flow correctly, not just
   // rendering whatever the mocks return.
   expect(startRun).toHaveBeenCalledWith({
-    releaseLabel: "UI-RUN",
+    releaseLabel: expect.stringMatching(/^R-\d{4}\.\d{2}\.\d{2}$/),
     triggerNames: ["TRA_Test"]
   });
   expect(getRunStatus).toHaveBeenCalledWith({ runId: "testRunId" });

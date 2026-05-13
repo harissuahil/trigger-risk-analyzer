@@ -294,7 +294,7 @@ describe("c-trigger-risk-runner — error handling", () => {
     // "Apex genuinely rejected a valid request."
     expect(startRun).toHaveBeenCalledTimes(1);
     expect(startRun).toHaveBeenCalledWith({
-      releaseLabel: "UI-RUN",
+      releaseLabel: expect.stringMatching(/^R-\d{4}\.\d{2}\.\d{2}$/),
       triggerNames: ["TRA_SoqlInLoop_Bad"]
     });
 

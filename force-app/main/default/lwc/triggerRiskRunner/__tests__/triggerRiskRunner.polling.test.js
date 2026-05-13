@@ -209,7 +209,7 @@ describe("c-trigger-risk-runner — polling", () => {
     // Apex calls happened with the expected payloads
     expect(startRun).toHaveBeenCalledTimes(1);
     expect(startRun).toHaveBeenCalledWith({
-      releaseLabel: "UI-RUN",
+      releaseLabel: expect.stringMatching(/^R-\d{4}\.\d{2}\.\d{2}$/),
       triggerNames: ["TRA_SoqlInLoop_Bad"]
     });
     expect(getRunStatus).toHaveBeenCalledTimes(1);

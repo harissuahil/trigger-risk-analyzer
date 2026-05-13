@@ -42,7 +42,7 @@ export default class TriggerRiskRunner extends LightningElement {
 
   selected = new Set();
 
-  releaseLabel = "UI-RUN";
+  releaseLabel = this.buildDefaultReleaseLabel();
   runId;
   errorMsg;
   isLoading = false;
@@ -307,6 +307,15 @@ export default class TriggerRiskRunner extends LightningElement {
   // Disable Run button when no triggers selected
   get isRunDisabled() {
     return !this.hasSelectedTriggers;
+  }
+
+  buildDefaultReleaseLabel() {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+
+    return `R-${yyyy}.${mm}.${dd}`;
   }
 
   handleReleaseLabelChange(e) {

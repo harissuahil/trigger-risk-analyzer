@@ -332,7 +332,7 @@ describe("c-trigger-risk-runner — export buttons", () => {
     expect(csvText).toContain("GOLD Phase 7 Validated");
     expect(csvText).toContain("Release Gate Policy: Standard");
     expect(csvText).toContain("Release Gate Version: 7.0.1");
-    expect(csvText).toContain("Release Label: UI-RUN");
+    expect(csvText).toMatch(/Release Label: R-\d{4}\.\d{2}\.\d{2}/);
 
     // Executive signal block
     expect(csvText).toContain("EXECUTIVE SIGNAL");
@@ -347,7 +347,7 @@ describe("c-trigger-risk-runner — export buttons", () => {
 
     // Filename pattern: TRA_<release>_<runId>_<ymd>.csv
     expect(fileName).toMatch(
-      /^TRA_UI-RUN_a02000000000001AAA_\d{4}-\d{2}-\d{2}\.csv$/
+      /^TRA_R-\d{8}_a02000000000001AAA_\d{4}-\d{2}-\d{2}\.csv$/
     );
 
     // MIME type from the data URI.
@@ -470,7 +470,7 @@ describe("c-trigger-risk-runner — export buttons", () => {
 
     // Filename pattern: TRA_ReleaseDecision_<release>_<runId>_<ymd>.txt
     expect(fileName).toMatch(
-      /^TRA_ReleaseDecision_UI-RUN_a02000000000001AAA_\d{4}-\d{2}-\d{2}\.txt$/
+      /^TRA_ReleaseDecision_R-\d{8}_a02000000000001AAA_\d{4}-\d{2}-\d{2}\.txt$/
     );
 
     // MIME type from the data URI.
