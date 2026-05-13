@@ -57,169 +57,193 @@
 
     <div class="traMainCard">
       <div class="slds-p-around_medium">
-        <div class="traPanelHeader">
-          <h1 class="traPanelTitle">New analysis run</h1>
-        </div>
-
-        <div class="slds-grid slds-wrap slds-gutters traInputGrid">
-          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
-            <lightning-input
-              label="Release Label"
-              value={releaseLabel}
-              onchange={handleReleaseLabelChange}
-            >
-            </lightning-input>
+        <template if:true={showSetupPanel}>
+          <div class="traPanelHeader">
+            <h1 class="traPanelTitle">New analysis run</h1>
           </div>
 
-          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
-            <lightning-input
-              type="search"
-              label="Search Triggers"
-              placeholder="Type to filter triggers"
-              value={triggerSearchText}
-              onchange={handleTriggerSearch}
-            >
-            </lightning-input>
-          </div>
-        </div>
-
-        <template if:true={hasSelectedTriggers}>
-          <div class="selectedTriggers slds-m-top_small">
-            <div class="selectedTriggersTitle">
-              Selected Triggers ({selectedTriggersCount})
-            </div>
-
-            <div class="selectedTriggersPills">
-              <template for:each={selectedTriggersList} for:item="trg">
-                <span key={trg} class="selectedPill">
-                  {trg}
-                  <button
-                    type="button"
-                    class="selectedPillRemove"
-                    data-name={trg}
-                    onclick={handleRemoveTrigger}
-                    title="Remove"
-                  >
-                    ✕
-                  </button>
-                </span>
-              </template>
-            </div>
-          </div>
-        </template>
-
-        <template if:true={triggers}>
-          <div class="traTriggerList slds-m-top_medium">
-            <template for:each={triggerOptions} for:item="t">
+          <div class="slds-grid slds-wrap slds-gutters traInputGrid">
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
               <lightning-input
-                key={t.name}
-                type="checkbox"
-                label={t.name}
-                data-name={t.name}
-                checked={t.checked}
-                onchange={handleToggle}
+                label="Release Label"
+                value={releaseLabel}
+                onchange={handleReleaseLabelChange}
               >
               </lightning-input>
-            </template>
-          </div>
-        </template>
+            </div>
 
-        <template if:true={isLoading}>
-          <div class="slds-m-top_small">
-            <lightning-spinner
-              size="small"
-              alternative-text="Loading analysis"
-            ></lightning-spinner>
-          </div>
-        </template>
-
-        <div class="slds-m-top_medium slds-grid slds-gutters slds-wrap">
-          <div class="slds-col slds-size_1-of-1">
-            <div class="traRunActionRow">
-              <lightning-button
-                label="Run Analysis"
-                variant="brand"
-                title="Run Trigger Risk Analyzer on the selected triggers"
-                onclick={runAnalysis}
-                disabled={isRunDisabled}
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+              <lightning-input
+                type="search"
+                label="Search Triggers"
+                placeholder="Type to filter triggers"
+                value={triggerSearchText}
+                onchange={handleTriggerSearch}
               >
-              </lightning-button>
-              <template if:true={isRunDisabled}>
-                <div class="traRunHelpInline">
-                  Select at least one trigger to run analysis.
-                </div>
-              </template>
+              </lightning-input>
             </div>
           </div>
 
-          <div
-            class="slds-col slds-size_1-of-1 slds-text-align_right"
-          >
-            <template if:true={runId}>
-              <!-- Share actions -->
-              <div class="slds-button-group" role="group">
-                <lightning-button
-                  class="actionBtn"
-                  label="Copy Summary"
-                  title="Copy a shareable summary for tickets, Slack, or email"
-                  onclick={copySummaryToClipboard}
-                  disabled={isLoading}
-                >
-                </lightning-button>
-
-                <lightning-button
-                  class="actionBtn"
-                  label="Copy Release Decision"
-                  title="Copy the executive release decision (CAB / audit friendly)"
-                  onclick={copyReleaseDecisionToClipboard}
-                  disabled={isLoading}
-                >
-                </lightning-button>
+          <template if:true={hasSelectedTriggers}>
+            <div class="selectedTriggers slds-m-top_small">
+              <div class="selectedTriggersTitle">
+                Selected Triggers ({selectedTriggersCount})
               </div>
 
-              <!-- Export actions -->
-              <div class="slds-button-group slds-m-left_small" role="group">
-                <lightning-button
-                  class="actionBtn"
-                  label="Export CSV"
-                  title="Export findings to CSV with Executive Signal and Release Gate details"
-                  onclick={exportCsv}
-                  disabled={disableExport}
-                >
-                </lightning-button>
-
-                <lightning-button
-                  class="actionBtn"
-                  label="Export Release Decision"
-                  title="Export a release decision text file for CAB or audit evidence"
-                  onclick={exportReleaseDecision}
-                  disabled={isLoading}
-                >
-                </lightning-button>
+              <div class="selectedTriggersPills">
+                <template for:each={selectedTriggersList} for:item="trg">
+                  <span key={trg} class="selectedPill">
+                    {trg}
+                    <button
+                      type="button"
+                      class="selectedPillRemove"
+                      data-name={trg}
+                      onclick={handleRemoveTrigger}
+                      title="Remove"
+                    >
+                      ✕
+                    </button>
+                  </span>
+                </template>
               </div>
+            </div>
+          </template>
 
-              <!-- Refresh (separate control action) -->
-              <template if:false={isPolling}>
-                <div class="slds-button-group slds-m-left_medium" role="group">
+          <template if:true={triggers}>
+            <div class="traTriggerList slds-m-top_medium">
+              <template for:each={triggerOptions} for:item="t">
+                <lightning-input
+                  key={t.name}
+                  type="checkbox"
+                  label={t.name}
+                  data-name={t.name}
+                  checked={t.checked}
+                  onchange={handleToggle}
+                >
+                </lightning-input>
+              </template>
+            </div>
+          </template>
+
+          <template if:true={isLoading}>
+            <div class="slds-m-top_small">
+              <lightning-spinner
+                size="small"
+                alternative-text="Loading analysis"
+              ></lightning-spinner>
+            </div>
+          </template>
+
+          <div class="slds-m-top_medium slds-grid slds-gutters slds-wrap">
+            <div class="slds-col slds-size_1-of-1">
+              <div class="traRunActionRow">
+                <lightning-button
+                  label="Run Analysis"
+                  variant="brand"
+                  title="Run Trigger Risk Analyzer on the selected triggers"
+                  onclick={runAnalysis}
+                  disabled={isRunDisabled}
+                >
+                </lightning-button>
+                <template if:true={isRunDisabled}>
+                  <div class="traRunHelpInline">
+                    Select at least one trigger to run analysis.
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <div
+              class="slds-col slds-size_1-of-1 slds-text-align_right"
+            >
+              <template if:true={runId}>
+                <!-- Share actions -->
+                <div class="slds-button-group" role="group">
                   <lightning-button
                     class="actionBtn"
-                    label="Refresh"
-                    title="Refresh run status and findings"
-                    onclick={refreshRun}
+                    label="Copy Summary"
+                    title="Copy a shareable summary for tickets, Slack, or email"
+                    onclick={copySummaryToClipboard}
+                    disabled={isLoading}
+                  >
+                  </lightning-button>
+
+                  <lightning-button
+                    class="actionBtn"
+                    label="Copy Release Decision"
+                    title="Copy the executive release decision (CAB / audit friendly)"
+                    onclick={copyReleaseDecisionToClipboard}
                     disabled={isLoading}
                   >
                   </lightning-button>
                 </div>
-              </template>
 
-              <template if:true={isPolling}>
-                <span class="slds-text-color_weak slds-m-left_medium">
-                  Auto-refreshing…
-                </span>
+                <!-- Export actions -->
+                <div class="slds-button-group slds-m-left_small" role="group">
+                  <lightning-button
+                    class="actionBtn"
+                    label="Export CSV"
+                    title="Export findings to CSV with Executive Signal and Release Gate details"
+                    onclick={exportCsv}
+                    disabled={disableExport}
+                  >
+                  </lightning-button>
+
+                  <lightning-button
+                    class="actionBtn"
+                    label="Export Release Decision"
+                    title="Export a release decision text file for CAB or audit evidence"
+                    onclick={exportReleaseDecision}
+                    disabled={isLoading}
+                  >
+                  </lightning-button>
+                </div>
+
+                <!-- Refresh (separate control action) -->
+                <template if:false={isPolling}>
+                  <div class="slds-button-group slds-m-left_medium" role="group">
+                    <lightning-button
+                      class="actionBtn"
+                      label="Refresh"
+                      title="Refresh run status and findings"
+                      onclick={refreshRun}
+                      disabled={isLoading}
+                    >
+                    </lightning-button>
+                  </div>
+                </template>
+
+                <template if:true={isPolling}>
+                  <span class="slds-text-color_weak slds-m-left_medium">
+                    Auto-refreshing…
+                  </span>
+                </template>
               </template>
-            </template>
+            </div>
           </div>
-        </div>
+        </template>
+
+        <template if:true={showRunWorkspace}>
+          <div class="traPanelHeader">
+            <h1 class="traPanelTitle">Analysis run</h1>
+          </div>
+
+          <div class="slds-box slds-theme_default">
+            <div class="slds-grid slds-grid_vertical-align-center slds-gutters">
+              <div class="slds-col">
+                <p class="slds-text-title_bold">{runStatusLabel}</p>
+                <p class="slds-text-color_weak">{runWorkspaceMessage}</p>
+              </div>
+
+              <div class="slds-col slds-no-flex">
+                <lightning-button
+                  label="New run"
+                  onclick={handleNewRun}
+                ></lightning-button>
+              </div>
+            </div>
+          </div>
+        </template>
 
         <template if:true={runId}>
           <!-- Section: Executive Signal -->
