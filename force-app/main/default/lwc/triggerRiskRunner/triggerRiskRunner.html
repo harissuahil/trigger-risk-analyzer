@@ -56,8 +56,8 @@
         <span class="traStatusDot"></span>
         <template if:true={isRunComplete}>Run complete</template>
         <template if:false={isRunComplete}>
-          <template if:true={runId}>Running</template>
-          <template if:false={runId}>Ready</template>
+          <template if:true={showRunWorkspace}>Running</template>
+          <template if:false={showRunWorkspace}>Ready</template>
         </template>
       </div>
     </div>
@@ -179,7 +179,7 @@
                 </div>
               </div>
 
-              <template if:true={runId}>
+              <template if:true={showRunWorkspace}>
                 <div class="slds-col slds-size_1-of-1 slds-large-size_6-of-12">
                   <div class="slds-grid slds-wrap slds-gutters_x-small">
                     <div
@@ -293,8 +293,27 @@
             </div>
           </div>
         </template>
+        <template if:true={showRunWorkspace}>
+          <template if:false={runId}>
+            <div class="slds-box slds-theme_default slds-m-top_medium">
+              <div
+                class="inlineSpinnerRow slds-grid slds-grid_vertical-align-center"
+              >
+                <div class="inlineSpinner">
+                  <lightning-spinner
+                    size="small"
+                    alternative-text="Starting analysis"
+                  ></lightning-spinner>
+                </div>
+                <div class="slds-m-left_small slds-text-color_weak">
+                  Starting analysis… Preparing the run workspace.
+                </div>
+              </div>
+            </div>
+          </template>
+        </template>
 
-        <template if:true={runId}>
+        <template if:true={showRunWorkspace}>
           <div class="slds-grid slds-wrap slds-gutters slds-m-top_medium">
             <aside class="slds-col slds-size_1-of-1 slds-large-size_1-of-4">
               <div class="slds-box slds-theme_default">
@@ -360,9 +379,11 @@
                     <span class="slds-text-color_weak">Updated</span>
                     <strong>{runUpdatedDisplay}</strong>
                   </div>
-                  <p class="slds-m-top_medium">
-                    <a href={runUrl} target="_blank">Open Run</a>
-                  </p>
+                  <template if:true={runId}>
+                    <p class="slds-m-top_medium">
+                      <a href={runUrl} target="_blank">Open Run</a>
+                    </p>
+                  </template>
                 </div>
 
                 <template if:true={impactChips}>
@@ -443,20 +464,30 @@
                     </div>
                   </div>
                   <div class="runSummaryWorkflowRow slds-m-top_small">
-                    <template if:true={isPolling}>
+                    <template if:true={isStartingRun}>
                       <div class="runSummaryWorkflowText slds-text-color_weak">
-                        Auto-refreshing…
+                        Starting run…
                       </div>
                     </template>
 
-                    <template if:false={isPolling}>
-                      <lightning-button
-                        label="Refresh"
-                        title="Refresh run status and findings"
-                        onclick={refreshRun}
-                        disabled={isLoading}
-                      >
-                      </lightning-button>
+                    <template if:false={isStartingRun}>
+                      <template if:true={isPolling}>
+                        <div
+                          class="runSummaryWorkflowText slds-text-color_weak"
+                        >
+                          Auto-refreshing…
+                        </div>
+                      </template>
+
+                      <template if:false={isPolling}>
+                        <lightning-button
+                          label="Refresh"
+                          title="Refresh run status and findings"
+                          onclick={refreshRun}
+                          disabled={isLoading}
+                        >
+                        </lightning-button>
+                      </template>
                     </template>
 
                     <lightning-button label="New run" onclick={handleNewRun}>
@@ -479,8 +510,7 @@
                       ></lightning-spinner>
                     </div>
                     <div class="slds-m-left_small slds-text-color_weak">
-                      Running analysis… Results will populate as processing
-                      completes.
+                      {runningPanelMessage}
                     </div>
                   </div>
                 </div>

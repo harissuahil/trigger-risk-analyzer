@@ -207,6 +207,18 @@ export default class TriggerRiskRunner extends LightningElement {
   get isPolling() {
     return this.pollTimer != null;
   }
+
+  get isStartingRun() {
+    return this.hasRunStarted && !this.runId;
+  }
+
+  get runningPanelMessage() {
+    if (this.isStartingRun) {
+      return "Starting analysis… Preparing the run workspace.";
+    }
+
+    return "Running analysis… Results will populate as processing completes.";
+  }
   // Run completion helper (used for enabling exports even when 0 findings)
   get isRunComplete() {
     return this.status === "Done" || this.status === "Failed";
@@ -463,6 +475,10 @@ export default class TriggerRiskRunner extends LightningElement {
       await this.refreshRun();
       this.startPolling();
     } catch (err) {
+      this.stopPolling();
+      this.runId = null;
+      this.hasRunStarted = false;
+      this.resetRunStatus();
       this.errorMsg = this.normalizeError(err);
     } finally {
       this.isLoading = false;
