@@ -183,7 +183,7 @@
                 <div class="slds-col slds-size_1-of-1 slds-large-size_6-of-12">
                   <div class="slds-grid slds-wrap slds-gutters_x-small">
                     <div
-                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6"
+                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4"
                     >
                       <div
                         class="slds-box slds-box_x-small slds-text-align_center"
@@ -202,38 +202,7 @@
                       </div>
                     </div>
                     <div
-                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6"
-                    >
-                      <div
-                        class="slds-box slds-box_x-small slds-text-align_center"
-                      >
-                        <div class="slds-text-title_caps slds-text-color_weak">
-                          Triggers
-                        </div>
-                        <div class="slds-text-heading_small">
-                          {selectedTriggersCount}
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6"
-                    >
-                      <div
-                        class="slds-box slds-box_x-small slds-text-align_center"
-                      >
-                        <div class="slds-text-title_caps slds-text-color_weak">
-                          Findings
-                        </div>
-                        <div class="slds-text-heading_small">
-                          <template if:true={isRunComplete}
-                            >{findingsCount}</template
-                          >
-                          <template if:false={isRunComplete}>—</template>
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6"
+                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4"
                     >
                       <div
                         class="slds-box slds-box_x-small slds-text-align_center"
@@ -252,7 +221,7 @@
                       </div>
                     </div>
                     <div
-                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6"
+                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4"
                     >
                       <div
                         class="slds-box slds-box_x-small slds-text-align_center"
@@ -269,7 +238,7 @@
                       </div>
                     </div>
                     <div
-                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6"
+                      class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4"
                     >
                       <div
                         class="slds-box slds-box_x-small slds-text-align_center"
@@ -293,25 +262,6 @@
             </div>
           </div>
         </template>
-        <template if:true={showRunWorkspace}>
-          <template if:false={runId}>
-            <div class="slds-box slds-theme_default slds-m-top_medium">
-              <div
-                class="inlineSpinnerRow slds-grid slds-grid_vertical-align-center"
-              >
-                <div class="inlineSpinner">
-                  <lightning-spinner
-                    size="small"
-                    alternative-text="Starting analysis"
-                  ></lightning-spinner>
-                </div>
-                <div class="slds-m-left_small slds-text-color_weak">
-                  Starting analysis… Preparing the run workspace.
-                </div>
-              </div>
-            </div>
-          </template>
-        </template>
 
         <template if:true={showRunWorkspace}>
           <div class="slds-grid slds-wrap slds-gutters slds-m-top_medium">
@@ -324,11 +274,7 @@
                     <div class="slds-text-title_caps slds-text-color_weak">
                       Run Summary
                     </div>
-                    <div class="slds-text-heading_small slds-m-top_xx-small">
-                      {releaseLabel}
-                    </div>
                   </div>
-
                   <template if:true={hasReleaseGate}>
                     <span class={releaseGateBadgeClass}
                       >{releaseGateDecisionLabel}</span
@@ -463,7 +409,9 @@
                       </lightning-button>
                     </div>
                   </div>
-                  <div class="runSummaryWorkflowRow slds-m-top_small">
+                  <div
+                    class="runSummaryWorkflowRow workflowControls slds-m-top_medium slds-p-top_small slds-border_top"
+                  >
                     <template if:true={isStartingRun}>
                       <div class="runSummaryWorkflowText slds-text-color_weak">
                         Starting run…
