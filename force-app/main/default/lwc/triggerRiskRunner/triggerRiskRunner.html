@@ -290,15 +290,6 @@
                   </div>
                 </div>
               </template>
-
-              <div
-                class="slds-col slds-size_1-of-1 slds-large-size_1-of-12 slds-text-align_right"
-              >
-                <lightning-button
-                  label="New run"
-                  onclick={handleNewRun}
-                ></lightning-button>
-              </div>
             </div>
           </div>
         </template>
@@ -369,6 +360,9 @@
                     <span class="slds-text-color_weak">Updated</span>
                     <strong>{runUpdatedDisplay}</strong>
                   </div>
+                  <p class="slds-m-top_medium">
+                    <a href={runUrl} target="_blank">Open Run</a>
+                  </p>
                 </div>
 
                 <template if:true={impactChips}>
@@ -404,6 +398,7 @@
                       <lightning-button
                         class="actionBtn"
                         label="Copy Summary"
+                        stretch
                         title="Copy a shareable summary for tickets, Slack, or email"
                         onclick={copySummaryToClipboard}
                         disabled={disableExport}
@@ -415,6 +410,7 @@
                       <lightning-button
                         class="actionBtn"
                         label="Copy Release Decision"
+                        stretch
                         title="Copy the executive release decision (CAB / audit friendly)"
                         onclick={copyReleaseDecisionToClipboard}
                         disabled={disableExport}
@@ -426,6 +422,7 @@
                       <lightning-button
                         class="actionBtn"
                         label="Export CSV"
+                        stretch
                         title="Export findings to CSV with Executive Signal and Release Gate details"
                         onclick={exportCsv}
                         disabled={disableExport}
@@ -437,36 +434,34 @@
                       <lightning-button
                         class="actionBtn"
                         label="Export Release Decision"
+                        stretch
                         title="Export a release decision text file for CAB or audit evidence"
                         onclick={exportReleaseDecision}
                         disabled={disableExport}
                       >
                       </lightning-button>
                     </div>
-
-                    <div class="slds-col slds-size_1-of-1 slds-m-top_small">
-                      <a href={runUrl} target="_blank">Open Run</a>
-                    </div>
-
-                    <template if:false={isPolling}>
-                      <div class="slds-col slds-size_1-of-1 slds-m-top_x-small">
-                        <lightning-button
-                          class="actionBtn"
-                          label="Refresh"
-                          title="Refresh run status and findings"
-                          onclick={refreshRun}
-                          disabled={isLoading}
-                        >
-                        </lightning-button>
+                  </div>
+                  <div class="runSummaryWorkflowRow slds-m-top_small">
+                    <template if:true={isPolling}>
+                      <div class="runSummaryWorkflowText slds-text-color_weak">
+                        Auto-refreshing…
                       </div>
                     </template>
-                  </div>
 
-                  <template if:true={isPolling}>
-                    <div class="slds-text-color_weak slds-m-top_x-small">
-                      Auto-refreshing…
-                    </div>
-                  </template>
+                    <template if:false={isPolling}>
+                      <lightning-button
+                        label="Refresh"
+                        title="Refresh run status and findings"
+                        onclick={refreshRun}
+                        disabled={isLoading}
+                      >
+                      </lightning-button>
+                    </template>
+
+                    <lightning-button label="New run" onclick={handleNewRun}>
+                    </lightning-button>
+                  </div>
                 </div>
               </div>
             </aside>

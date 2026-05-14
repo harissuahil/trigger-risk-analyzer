@@ -323,3 +323,32 @@ lightning-input[type="search"] {
     justify-self: auto;
   }
 }
+.runSummaryActions lightning-button {
+  display: block;
+  width: 100%;
+}
+
+.runSummaryActions lightning-button::part(button) {
+  width: 100%;
+  justify-content: center;
+}
+.runSummaryActions lightning-button {
+  display: block;
+}
+
+.runSummaryActions .actionBtn {
+  margin-left: 0;
+  width: 100%;
+}
+
+.runSummaryWorkflowRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.runSummaryWorkflowText {
+  white-space: nowrap;
+  font-size: 12px;
+}
