@@ -354,11 +354,6 @@ lightning-input[type="search"] {
 }
 
 .releaseSummaryStrip {
-  padding: 0;
-  overflow: hidden;
-}
-
-.releaseSummaryStrip {
   display: grid;
   grid-template-columns: 1.7fr 1.1fr 1fr 1fr 1fr;
   align-items: stretch;
