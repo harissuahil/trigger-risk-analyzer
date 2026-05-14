@@ -352,3 +352,68 @@ lightning-input[type="search"] {
   white-space: nowrap;
   font-size: 12px;
 }
+
+.releaseSummaryStrip {
+  padding: 0;
+  overflow: hidden;
+}
+
+.releaseSummaryStrip {
+  display: grid;
+  grid-template-columns: 1.7fr 1.1fr 1fr 1fr 1fr;
+  align-items: stretch;
+  background: var(--tra-surface);
+  border: 1px solid var(--tra-border-strong);
+  border-radius: var(--tra-radius-md);
+  overflow: hidden;
+}
+
+.releaseSummaryCell {
+  min-height: 86px;
+  padding: 16px 20px;
+  border-left: 1px solid var(--tra-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.releaseSummaryCell:first-child {
+  border-left: 0;
+}
+
+.releaseSummaryLabel {
+  color: var(--tra-fg-3);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.releaseSummaryValue {
+  color: var(--tra-brand-dark);
+  font-size: 16px;
+  line-height: 1.2;
+  margin-top: 4px;
+}
+
+.releaseSummaryTitle {
+  font-size: 24px;
+}
+
+.releaseSummarySubtext {
+  color: var(--tra-fg-4);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.releaseSummaryHigh {
+  color: #c23934;
+}
+
+.releaseSummaryMedium {
+  color: #8a4b00;
+}
+
+.releaseSummaryLow {
+  color: #056b2f;
+}
