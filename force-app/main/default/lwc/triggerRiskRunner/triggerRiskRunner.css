@@ -227,15 +227,6 @@
   margin-left: 8px;
 }
 
-.runSummaryActions .actionBtn {
-  display: block;
-  margin-left: 0;
-  width: 100%;
-}
-
-.runSummaryActions .slds-col {
-  width: 100%;
-}
 .selectedTriggers {
   border: 1px solid var(--tra-border);
   border-radius: var(--tra-radius-md);
