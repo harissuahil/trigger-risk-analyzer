@@ -361,23 +361,25 @@ lightning-input[type="search"] {
 }
 
 .releaseSummaryLabel {
-  color: var(--tra-fg-3);
+  color: var(--tra-fg-2);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.08em;
+  line-height: 1.1;
   text-transform: uppercase;
 }
 
 .releaseSummaryValue {
   color: var(--tra-brand-dark);
-  font-size: 15px;
+  font-size: 16px;
+  font-weight: 500;
   line-height: 1.15;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .releaseSummaryTitle {
-  font-size: 21px;
-  font-weight: 500;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .releaseSummarySubtext {
@@ -396,4 +398,11 @@ lightning-input[type="search"] {
 
 .releaseSummaryLow {
   color: #056b2f;
+}
+.releaseSummaryHigh,
+.releaseSummaryMedium,
+.releaseSummaryLow {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
 }
