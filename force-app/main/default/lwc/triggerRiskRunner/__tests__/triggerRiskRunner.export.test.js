@@ -427,7 +427,7 @@ describe("c-trigger-risk-runner — export buttons", () => {
       blockedFindingRow()
     ]);
 
-    const exportBtn = findButtonByLabel(element, "Export Release Decision");
+    const exportBtn = findButtonByLabel(element, "Export Decision (.txt)");
     expect(exportBtn).toBeTruthy();
     exportBtn.dispatchEvent(new CustomEvent("click", { bubbles: true }));
     await flushPromises();
@@ -516,7 +516,7 @@ describe("c-trigger-risk-runner — export buttons", () => {
 
     const element = await setupCompletedRun(approvedRunStatus, []);
 
-    const exportBtn = findButtonByLabel(element, "Export Release Decision");
+    const exportBtn = findButtonByLabel(element, "Export Decision (.txt)");
     expect(exportBtn).toBeTruthy();
     exportBtn.dispatchEvent(new CustomEvent("click", { bubbles: true }));
     await flushPromises();

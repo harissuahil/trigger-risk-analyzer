@@ -219,6 +219,13 @@
                     <div class="slds-text-title_caps slds-text-color_weak">
                       Run Summary
                     </div>
+                    <template if:true={runSummaryMetaLabel}>
+                      <div
+                        class="slds-text-color_weak slds-text-body_small slds-m-top_xx-small"
+                      >
+                        {runSummaryMetaLabel}
+                      </div>
+                    </template>
                   </div>
                   <template if:true={hasReleaseGate}>
                     <span class={releaseGateBadgeClass}
@@ -345,7 +352,7 @@
                     <div class="slds-col slds-size_1-of-1 slds-m-top_x-small">
                       <lightning-button
                         class="actionBtn"
-                        label="Export Release Decision"
+                        label="Export Decision (.txt)"
                         stretch
                         title="Export a release decision text file for CAB or audit evidence"
                         onclick={exportReleaseDecision}

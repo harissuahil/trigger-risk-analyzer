@@ -260,6 +260,22 @@ export default class TriggerRiskRunner extends LightningElement {
     return d || "N/A";
   }
 
+  get runSummaryMetaLabel() {
+    if (this.gatePolicyProfile && this.gateVersion) {
+      return `${this.gatePolicyProfile} · v${this.gateVersion}`;
+    }
+
+    if (this.gatePolicyProfile) {
+      return this.gatePolicyProfile;
+    }
+
+    if (this.gateVersion) {
+      return `v${this.gateVersion}`;
+    }
+
+    return "";
+  }
+
   get gateRationaleLines() {
     const raw = (this.gateRationaleRaw || "").trim();
     if (!raw) return [];
