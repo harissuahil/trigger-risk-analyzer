@@ -337,6 +337,13 @@ lightning-input[type="search"] {
   font-size: 12px;
 }
 
+.completedResultsPanel {
+  background: var(--tra-surface);
+  border: 1px solid var(--tra-border-strong);
+  border-radius: var(--tra-radius-md);
+  padding: 16px;
+}
+
 .releaseSummaryStrip {
   display: grid;
   grid-template-columns: 1.25fr 0.95fr 0.8fr 0.8fr 0.8fr;

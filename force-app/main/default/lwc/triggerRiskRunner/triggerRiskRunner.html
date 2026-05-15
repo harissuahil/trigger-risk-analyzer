@@ -424,127 +424,136 @@
                 </div>
               </template>
 
-              <template if:true={hasReleaseGate}>
-                <div class={releaseGateCardClass}>
-                  <div class="slds-text-title_bold">Release Gate</div>
-
-                  <div class="metaRow slds-m-top_x-small">
-                    <span class={releaseGateBadgeClass}
-                      >{releaseGateDecisionLabel}</span
-                    >
-
-                    <template if:true={gatePolicyProfile}>
-                      <span class="metaChip">Policy: {gatePolicyProfile}</span>
-                    </template>
-
-                    <template if:true={gateVersion}>
-                      <span class="metaChip">Version: {gateVersion}</span>
-                    </template>
-                  </div>
-
-                  <div class="slds-m-top_small">
-                    <p><b>Gate Outcome:</b> {releaseGateDecisionLabel}</p>
-                  </div>
-
-                  <template if:true={hasGateRationale}>
-                    <div class="slds-m-top_small">
-                      <p class="slds-text-title_bold">Rationale</p>
-                      <template for:each={gateRationaleLines} for:item="l">
-                        <div key={l} class="slds-m-top_xx-small">• {l}</div>
-                      </template>
-                    </div>
-                  </template>
-
-                  <template if:true={hasGateRequiredFixes}>
-                    <div class="slds-m-top_small">
-                      <p class="slds-text-title_bold">
-                        Required Fixes (to unblock)
-                      </p>
-                      <template for:each={gateRequiredFixLines} for:item="l">
-                        <div key={l} class="slds-m-top_xx-small">• {l}</div>
-                      </template>
-                    </div>
-                  </template>
-                </div>
-              </template>
-
               <template if:true={isRunComplete}>
-                <div class="sectionHeader slds-m-top_medium">
-                  <h2 class="slds-text-heading_small">Findings</h2>
-                  <p class="slds-text-color_weak slds-text-body_small">
-                    Filter and review individual findings
-                  </p>
-                </div>
+                <div class="completedResultsPanel">
+                  <template if:true={hasReleaseGate}>
+                    <div class={releaseGateCardClass}>
+                      <div class="slds-text-title_bold">Release Gate</div>
 
-                <div class="slds-m-top_medium slds-grid slds-wrap slds-gutters">
-                  <div
-                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
-                  >
-                    <lightning-combobox
-                      label="Severity"
-                      value={severityFilter}
-                      options={severityOptions}
-                      onchange={handleSeverityFilter}
-                    >
-                    </lightning-combobox>
+                      <div class="metaRow slds-m-top_x-small">
+                        <span class={releaseGateBadgeClass}>
+                          {releaseGateDecisionLabel}
+                        </span>
+
+                        <template if:true={gatePolicyProfile}>
+                          <span class="metaChip"
+                            >Policy: {gatePolicyProfile}</span
+                          >
+                        </template>
+
+                        <template if:true={gateVersion}>
+                          <span class="metaChip">Version: {gateVersion}</span>
+                        </template>
+                      </div>
+
+                      <div class="slds-m-top_small">
+                        <p><b>Gate Outcome:</b> {releaseGateDecisionLabel}</p>
+                      </div>
+
+                      <template if:true={hasGateRationale}>
+                        <div class="slds-m-top_small">
+                          <p class="slds-text-title_bold">Rationale</p>
+                          <template for:each={gateRationaleLines} for:item="l">
+                            <div key={l} class="slds-m-top_xx-small">• {l}</div>
+                          </template>
+                        </div>
+                      </template>
+
+                      <template if:true={hasGateRequiredFixes}>
+                        <div class="slds-m-top_small">
+                          <p class="slds-text-title_bold">
+                            Required Fixes (to unblock)
+                          </p>
+                          <template
+                            for:each={gateRequiredFixLines}
+                            for:item="l"
+                          >
+                            <div key={l} class="slds-m-top_xx-small">• {l}</div>
+                          </template>
+                        </div>
+                      </template>
+                    </div>
+                  </template>
+
+                  <div class="sectionHeader slds-m-top_medium">
+                    <h2 class="slds-text-heading_small">Findings</h2>
+                    <p class="slds-text-color_weak slds-text-body_small">
+                      Filter and review individual findings
+                    </p>
                   </div>
 
                   <div
-                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
+                    class="slds-m-top_medium slds-grid slds-wrap slds-gutters"
                   >
-                    <lightning-combobox
-                      label="Category"
-                      value={categoryFilter}
-                      options={categoryOptions}
-                      onchange={handleCategoryFilter}
+                    <div
+                      class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
                     >
-                    </lightning-combobox>
-                  </div>
+                      <lightning-combobox
+                        label="Severity"
+                        value={severityFilter}
+                        options={severityOptions}
+                        onchange={handleSeverityFilter}
+                      >
+                      </lightning-combobox>
+                    </div>
 
-                  <div
-                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
-                  >
-                    <lightning-input
-                      label="Search"
-                      value={searchText}
-                      onchange={handleSearchChange}
-                      placeholder="Search trigger, rule, message..."
+                    <div
+                      class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
                     >
-                    </lightning-input>
+                      <lightning-combobox
+                        label="Category"
+                        value={categoryFilter}
+                        options={categoryOptions}
+                        onchange={handleCategoryFilter}
+                      >
+                      </lightning-combobox>
+                    </div>
 
-                    <div class="slds-m-top_x-small">
-                      <lightning-button
-                        label="Clear"
-                        onclick={clearSearch}
-                      ></lightning-button>
+                    <div
+                      class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
+                    >
+                      <lightning-input
+                        label="Search"
+                        value={searchText}
+                        onchange={handleSearchChange}
+                        placeholder="Search trigger, rule, message..."
+                      >
+                      </lightning-input>
+
+                      <div class="slds-m-top_x-small">
+                        <lightning-button
+                          label="Clear"
+                          onclick={clearSearch}
+                        ></lightning-button>
+                      </div>
                     </div>
                   </div>
+
+                  <template if:true={showTable}>
+                    <div class="slds-m-top_medium">
+                      <lightning-datatable
+                        key-field="itemId"
+                        data={filteredItems}
+                        columns={columns}
+                        onrowaction={handleRowAction}
+                        hide-checkbox-column
+                      >
+                      </lightning-datatable>
+                    </div>
+                  </template>
+
+                  <template if:false={showTable}>
+                    <div class="slds-m-top_medium slds-text-color_weak">
+                      <template if:false={hasAnyFindings}>
+                        No findings detected. This trigger passed all active
+                        rules.
+                      </template>
+                      <template if:true={hasAnyFindings}>
+                        No findings match the current filters.
+                      </template>
+                    </div>
+                  </template>
                 </div>
-
-                <template if:true={showTable}>
-                  <div class="slds-m-top_medium">
-                    <lightning-datatable
-                      key-field="itemId"
-                      data={filteredItems}
-                      columns={columns}
-                      onrowaction={handleRowAction}
-                      hide-checkbox-column
-                    >
-                    </lightning-datatable>
-                  </div>
-                </template>
-
-                <template if:false={showTable}>
-                  <div class="slds-m-top_medium slds-text-color_weak">
-                    <template if:false={hasAnyFindings}>
-                      No findings detected. This trigger passed all active
-                      rules.
-                    </template>
-                    <template if:true={hasAnyFindings}>
-                      No findings match the current filters.
-                    </template>
-                  </div>
-                </template>
               </template>
             </main>
           </div>
