@@ -361,7 +361,7 @@ lightning-input[type="search"] {
 }
 
 .releaseSummaryLabel {
-  color: var(--tra-fg-2);
+  color: var(--tra-fg-3);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
