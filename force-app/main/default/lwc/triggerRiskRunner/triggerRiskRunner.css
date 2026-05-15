@@ -339,7 +339,7 @@ lightning-input[type="search"] {
 
 .releaseSummaryStrip {
   display: grid;
-  grid-template-columns: 1.35fr 1fr 0.95fr 0.95fr 0.95fr;
+  grid-template-columns: 1.25fr 0.95fr 0.8fr 0.8fr 0.8fr;
   align-items: stretch;
   background: var(--tra-surface);
   border: 1px solid var(--tra-border-strong);
@@ -348,12 +348,12 @@ lightning-input[type="search"] {
 }
 
 .releaseSummaryCell {
-  min-height: 72px;
-  padding: 14px 18px;
+  min-height: 66px;
+  padding: 12px 18px;
   border-left: 1px solid var(--tra-border);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .releaseSummaryCell:first-child {
@@ -371,19 +371,19 @@ lightning-input[type="search"] {
 .releaseSummaryValue {
   color: var(--tra-brand-dark);
   font-size: 15px;
-  line-height: 1.2;
-  margin-top: 4px;
+  line-height: 1.15;
+  margin-top: 2px;
 }
 
 .releaseSummaryTitle {
-  font-size: 22px;
+  font-size: 21px;
   font-weight: 500;
 }
 
 .releaseSummarySubtext {
   color: var(--tra-fg-4);
   font-size: 12px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .releaseSummaryHigh {
