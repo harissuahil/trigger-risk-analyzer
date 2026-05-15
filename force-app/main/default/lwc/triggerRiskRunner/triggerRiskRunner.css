@@ -420,3 +420,34 @@ lightning-input[type="search"] {
   justify-content: flex-end;
   align-items: center;
 }
+
+.completedResultsPanel [data-panel="release-gate"] {
+  margin-top: 0;
+  padding: 14px 16px;
+  border-radius: var(--tra-radius-md);
+  box-shadow: none;
+}
+
+.completedResultsPanel [data-panel="release-gate"] .slds-text-title_bold {
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.completedResultsPanel [data-panel="release-gate"] .metaRow {
+  align-items: center;
+  margin-top: 4px;
+}
+
+.completedResultsPanel [data-panel="release-gate"] .metaChip,
+.completedResultsPanel [data-panel="release-gate"] .badge {
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.completedResultsPanel [data-panel="release-gate"] p {
+  margin-bottom: 0;
+}
+
+.completedResultsPanel [data-panel="release-gate"] .slds-m-top_small {
+  margin-top: 10px;
+}
