@@ -327,7 +327,7 @@ lightning-input[type="search"] {
 
 .runSummaryWorkflowRow {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto 1fr;
   gap: 12px;
   align-items: center;
 }
@@ -406,4 +406,10 @@ lightning-input[type="search"] {
   font-size: 20px;
   font-weight: 700;
   line-height: 1;
+}
+
+.runSummaryWorkflowMeta {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }

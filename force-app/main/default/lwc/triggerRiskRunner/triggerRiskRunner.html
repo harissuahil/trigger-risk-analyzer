@@ -361,9 +361,19 @@
                       </lightning-button>
                     </div>
                   </div>
-                  <div
-                    class="runSummaryWorkflowRow workflowControls slds-m-top_medium slds-p-top_small slds-border_top"
+                </div>
+
+                <div
+                  class="runSummaryWorkflowRow workflowControls slds-m-top_medium slds-p-top_medium slds-border_top"
+                >
+                  <lightning-button
+                    label="New run"
+                    variant="brand"
+                    onclick={handleNewRun}
                   >
+                  </lightning-button>
+
+                  <div class="runSummaryWorkflowMeta">
                     <template if:true={isStartingRun}>
                       <div class="runSummaryWorkflowText slds-text-color_weak">
                         Starting run…
@@ -380,18 +390,16 @@
                       </template>
 
                       <template if:false={isPolling}>
-                        <lightning-button
-                          label="Refresh"
+                        <lightning-button-icon
+                          icon-name="utility:refresh"
+                          alternative-text="Refresh run status and findings"
                           title="Refresh run status and findings"
                           onclick={refreshRun}
                           disabled={isLoading}
                         >
-                        </lightning-button>
+                        </lightning-button-icon>
                       </template>
                     </template>
-
-                    <lightning-button label="New run" onclick={handleNewRun}>
-                    </lightning-button>
                   </div>
                 </div>
               </div>
