@@ -165,20 +165,20 @@
   font-size: 13px;
 }
 .sev-high {
-  background: var(--tra-sev-high-bg);
   color: var(--tra-sev-high-fg);
   font-weight: 700;
 }
+
 .sev-medium {
-  background: var(--tra-sev-medium-bg);
   color: var(--tra-sev-medium-fg);
   font-weight: 700;
 }
+
 .sev-low {
-  background: var(--tra-sev-low-bg);
   color: var(--tra-sev-low-fg);
   font-weight: 700;
 }
+
 .snippetBox {
   font-family:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
@@ -318,6 +318,26 @@ lightning-input[type="search"] {
 .runSummaryActions lightning-button::part(button) {
   width: 100%;
   justify-content: center;
+  border-color: var(--tra-border-strong);
+  border-radius: var(--tra-radius-md);
+  color: var(--tra-brand-dark);
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.runSummaryActions lightning-button::part(button):hover {
+  background: var(--tra-surface-alt);
+  border-color: #9ca3af;
+}
+
+.runSummaryActions .actionBtn {
+  margin-left: 0;
+  width: 100%;
+  --slds-c-button-radius-border: var(--tra-radius-md);
+  --slds-c-button-neutral-color-border: var(--tra-border);
+  --slds-c-button-neutral-color-border-hover: var(--tra-border-strong);
+  --slds-c-button-neutral-color-background: var(--tra-surface);
+  --slds-c-button-neutral-color-background-hover: var(--tra-surface-alt);
 }
 
 .runSummaryActions .actionBtn {
