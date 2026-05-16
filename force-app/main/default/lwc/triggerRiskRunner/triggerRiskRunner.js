@@ -260,6 +260,52 @@ export default class TriggerRiskRunner extends LightningElement {
     return d || "N/A";
   }
 
+  get releaseGateBannerTitle() {
+    const d = this.releaseDecision;
+
+    if (d === "APPROVED_WITH_CONDITIONS") {
+      return "Approved with conditions";
+    }
+
+    if (d === "BLOCKED") {
+      return "Blocked";
+    }
+
+    if (d === "APPROVED") {
+      return "Approved";
+    }
+
+    return this.releaseGateDecisionLabel;
+  }
+
+  get releaseGateBannerClass() {
+    const d = this.releaseDecision;
+
+    if (d === "BLOCKED") {
+      return "releaseGateBanner releaseGateBannerBlocked";
+    }
+
+    if (d === "APPROVED_WITH_CONDITIONS") {
+      return "releaseGateBanner releaseGateBannerConditional";
+    }
+
+    return "releaseGateBanner releaseGateBannerApproved";
+  }
+
+  get releaseGateBannerMeta() {
+    const policy = this.gatePolicyProfile || "Standard";
+    return `Policy ${policy} · ${this.highCount || 0} High · ${
+      this.mediumCount || 0
+    } Medium · ${this.lowCount || 0} Low`;
+  }
+
+  get meaningfulImpactChips() {
+    return (this.impactChips || []).filter((chip) => {
+      const value = (chip || "").trim().toLowerCase();
+      return value && value !== "n/a";
+    });
+  }
+
   get runSummaryMetaLabel() {
     if (this.gatePolicyProfile && this.gateVersion) {
       return `${this.gatePolicyProfile} · v${this.gateVersion}`;

@@ -451,3 +451,112 @@ lightning-input[type="search"] {
 .completedResultsPanel [data-panel="release-gate"] .slds-m-top_small {
   margin-top: 10px;
 }
+
+.releaseGateBanner {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  background: #fff8e6;
+  border-left: 4px solid #f4b400;
+  border-radius: var(--tra-radius-md);
+  padding: 14px 18px;
+  margin-bottom: 18px;
+}
+
+.releaseGateBannerMain {
+  flex: 1 1 auto;
+  min-width: 360px;
+}
+
+.releaseGateBannerTitle {
+  color: var(--tra-fg-1);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.25;
+  text-transform: none;
+}
+
+.releaseGateBannerMeta {
+  color: var(--tra-fg-2);
+  font-size: 13px;
+  margin-top: 4px;
+  white-space: nowrap;
+}
+
+.releaseGateBannerChips {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  max-width: 58%;
+}
+
+.releaseGateBannerChips .metaChip {
+  background: #f3f3f3;
+  color: var(--tra-fg-1);
+  font-size: 12px;
+  padding: 4px 12px;
+}
+
+.releaseGateEvidence {
+  margin-top: 12px;
+  padding: 0 2px;
+}
+
+.releaseGateBanner {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  border-radius: var(--tra-radius-md);
+  border-left: 4px solid;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+}
+
+.releaseGateBannerApproved {
+  background: #f0f9f4;
+  border-left-color: #2e844a;
+}
+
+.releaseGateBannerConditional {
+  background: #fff8e6;
+  border-left-color: #f4b400;
+}
+
+.releaseGateBannerBlocked {
+  background: #fde7e9;
+  border-left-color: #c23934;
+}
+
+.releaseGateBannerMain {
+  min-width: 0;
+}
+
+.releaseGateBannerTitle {
+  color: var(--tra-fg-1);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.releaseGateBannerMeta {
+  color: var(--tra-fg-2);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.releaseGateBannerChips {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.releaseGateBannerChips .metaChip {
+  background: #f3f3f3;
+  color: var(--tra-fg-1);
+  font-size: 12px;
+  padding: 4px 12px;
+}

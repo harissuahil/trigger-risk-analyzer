@@ -427,14 +427,30 @@
               <template if:true={isRunComplete}>
                 <div class="completedResultsPanel">
                   <template if:true={hasReleaseGate}>
-                    <div class={releaseGateCardClass} data-panel="release-gate">
-                      <div class="slds-text-title_bold">Release Gate</div>
+                    <div class={releaseGateBannerClass}>
+                      <div class="releaseGateBannerMain">
+                        <div class="releaseGateBannerTitle">
+                          {releaseGateBannerTitle}
+                        </div>
+                        <div class="releaseGateBannerMeta">
+                          {releaseGateBannerMeta}
+                        </div>
+                      </div>
 
+                      <template if:true={meaningfulImpactChips}>
+                        <div class="releaseGateBannerChips">
+                          <template
+                            for:each={meaningfulImpactChips}
+                            for:item="c"
+                          >
+                            <span key={c} class="metaChip">{c}</span>
+                          </template>
+                        </div>
+                      </template>
+                    </div>
+
+                    <div class="releaseGateEvidencePendingTabs slds-hide">
                       <div class="metaRow slds-m-top_x-small">
-                        <span class={releaseGateBadgeClass}>
-                          {releaseGateDecisionLabel}
-                        </span>
-
                         <template if:true={gatePolicyProfile}>
                           <span class="metaChip"
                             >Policy: {gatePolicyProfile}</span
@@ -444,10 +460,6 @@
                         <template if:true={gateVersion}>
                           <span class="metaChip">Version: {gateVersion}</span>
                         </template>
-                      </div>
-
-                      <div class="slds-m-top_small">
-                        <p><b>Gate Outcome:</b> {releaseGateDecisionLabel}</p>
                       </div>
 
                       <template if:true={hasGateRationale}>
