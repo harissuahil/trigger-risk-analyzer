@@ -366,7 +366,7 @@ export default class TriggerRiskRunner extends LightningElement {
 
   get releaseGateBannerMeta() {
     const policy = this.gatePolicyProfile || "Standard";
-    return `Policy ${policy} · ${this.highCount || 0} High · ${
+    return `Policy: ${policy} · ${this.highCount || 0} High · ${
       this.mediumCount || 0
     } Medium · ${this.lowCount || 0} Low`;
   }

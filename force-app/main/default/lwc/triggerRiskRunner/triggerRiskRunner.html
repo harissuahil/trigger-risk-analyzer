@@ -227,11 +227,6 @@
                       </div>
                     </template>
                   </div>
-                  <template if:true={hasReleaseGate}>
-                    <span class={releaseGateBadgeClass}
-                      >{releaseGateDecisionLabel}</span
-                    >
-                  </template>
                 </div>
 
                 <div class="slds-m-top_medium slds-border_top slds-p-top_small">
@@ -283,31 +278,6 @@
                     </p>
                   </template>
                 </div>
-
-                <template if:true={impactChips}>
-                  <div class="metaRow slds-m-top_small">
-                    <template for:each={impactChips} for:item="c">
-                      <span key={c} class="metaChip">{c}</span>
-                    </template>
-                  </div>
-                </template>
-
-                <template if:true={topRisks}>
-                  <template if:true={topRisks.length}>
-                    <div class="slds-m-top_medium">
-                      <p class="slds-text-title_bold">Top Risks</p>
-                      <ul class="slds-list_dotted slds-m-left_medium">
-                        <template
-                          for:each={topRisks}
-                          for:item="r"
-                          for:index="i"
-                        >
-                          <li key={r}>{r}</li>
-                        </template>
-                      </ul>
-                    </div>
-                  </template>
-                </template>
 
                 <div
                   class="runSummaryActions slds-m-top_medium slds-p-top_small slds-border_top"
@@ -450,6 +420,12 @@
                     </div>
 
                     <div class="releaseGateEvidencePendingTabs slds-hide">
+                      <template if:true={hasReleaseGate}>
+                        <span class={releaseGateBadgeClass}>
+                          {releaseGateDecisionLabel}
+                        </span>
+                      </template>
+
                       <div class="metaRow slds-m-top_x-small">
                         <template if:true={gatePolicyProfile}>
                           <span class="metaChip"
