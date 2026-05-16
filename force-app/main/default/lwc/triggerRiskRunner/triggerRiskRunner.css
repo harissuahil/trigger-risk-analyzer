@@ -335,11 +335,6 @@ lightning-input[type="search"] {
   --slds-c-button-neutral-color-background-hover: #f3f3f3;
 }
 
-.runSummaryActions .actionBtn {
-  margin-left: 0;
-  width: 100%;
-}
-
 .runSummaryWorkflowRow {
   display: grid;
   grid-template-columns: auto 1fr;
