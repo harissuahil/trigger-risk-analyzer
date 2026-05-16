@@ -421,89 +421,6 @@ lightning-input[type="search"] {
   align-items: center;
 }
 
-.completedResultsPanel [data-panel="release-gate"] {
-  margin-top: 0;
-  padding: 14px 16px;
-  border-radius: var(--tra-radius-md);
-  box-shadow: none;
-}
-
-.completedResultsPanel [data-panel="release-gate"] .slds-text-title_bold {
-  font-size: 13px;
-  font-weight: 800;
-  margin-bottom: 6px;
-}
-
-.completedResultsPanel [data-panel="release-gate"] .metaRow {
-  align-items: center;
-  margin-top: 4px;
-}
-
-.completedResultsPanel [data-panel="release-gate"] .metaChip,
-.completedResultsPanel [data-panel="release-gate"] .badge {
-  background: rgba(255, 255, 255, 0.72);
-}
-
-.completedResultsPanel [data-panel="release-gate"] p {
-  margin-bottom: 0;
-}
-
-.completedResultsPanel [data-panel="release-gate"] .slds-m-top_small {
-  margin-top: 10px;
-}
-
-.releaseGateBanner {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: center;
-  background: #fff8e6;
-  border-left: 4px solid #f4b400;
-  border-radius: var(--tra-radius-md);
-  padding: 14px 18px;
-  margin-bottom: 18px;
-}
-
-.releaseGateBannerMain {
-  flex: 1 1 auto;
-  min-width: 360px;
-}
-
-.releaseGateBannerTitle {
-  color: var(--tra-fg-1);
-  font-size: 15px;
-  font-weight: 800;
-  line-height: 1.25;
-  text-transform: none;
-}
-
-.releaseGateBannerMeta {
-  color: var(--tra-fg-2);
-  font-size: 13px;
-  margin-top: 4px;
-  white-space: nowrap;
-}
-
-.releaseGateBannerChips {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  flex-wrap: wrap;
-  max-width: 58%;
-}
-
-.releaseGateBannerChips .metaChip {
-  background: #f3f3f3;
-  color: var(--tra-fg-1);
-  font-size: 12px;
-  padding: 4px 12px;
-}
-
-.releaseGateEvidence {
-  margin-top: 12px;
-  padding: 0 2px;
-}
-
 .releaseGateBanner {
   display: flex;
   justify-content: space-between;
@@ -531,7 +448,8 @@ lightning-input[type="search"] {
 }
 
 .releaseGateBannerMain {
-  min-width: 0;
+  flex: 1 1 auto;
+  min-width: 360px;
 }
 
 .releaseGateBannerTitle {
@@ -545,6 +463,7 @@ lightning-input[type="search"] {
   color: var(--tra-fg-2);
   font-size: 13px;
   margin-top: 4px;
+  white-space: nowrap;
 }
 
 .releaseGateBannerChips {
@@ -552,6 +471,7 @@ lightning-input[type="search"] {
   justify-content: flex-end;
   gap: 8px;
   flex-wrap: wrap;
+  max-width: 58%;
 }
 
 .releaseGateBannerChips .metaChip {
