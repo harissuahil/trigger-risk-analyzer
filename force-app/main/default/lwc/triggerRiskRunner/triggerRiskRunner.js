@@ -759,9 +759,9 @@ export default class TriggerRiskRunner extends LightningElement {
   }
 
   severityToClass(sev) {
-    if (sev === "High") return "sev-high";
-    if (sev === "Medium") return "sev-medium";
-    return "sev-low";
+    if (sev === "High") return "slds-text-color_error";
+    if (sev === "Low") return "slds-text-color_success";
+    return "";
   }
 
   exportCsv() {
