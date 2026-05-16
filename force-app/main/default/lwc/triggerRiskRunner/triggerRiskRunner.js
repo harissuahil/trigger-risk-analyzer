@@ -110,7 +110,8 @@ export default class TriggerRiskRunner extends LightningElement {
     {
       label: "Message",
       fieldName: "messageShort",
-      type: "text"
+      type: "text",
+      wrapText: true
     },
     {
       label: "Details",
