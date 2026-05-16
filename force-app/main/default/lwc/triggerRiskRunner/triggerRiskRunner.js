@@ -239,6 +239,18 @@ export default class TriggerRiskRunner extends LightningElement {
     return (this.gateRequiredFixLines || []).length > 0;
   }
 
+  get gateRationaleCount() {
+    return (this.gateRationaleLines || []).length;
+  }
+
+  get gateRequiredFixCount() {
+    return (this.gateRequiredFixLines || []).length;
+  }
+
+  get topRisksCount() {
+    return (this.topRisks || []).length;
+  }
+
   get releaseGateBadgeClass() {
     const d = this.releaseDecision;
     if (d === "BLOCKED") return "badge badge-high";

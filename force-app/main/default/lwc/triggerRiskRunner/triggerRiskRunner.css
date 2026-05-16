@@ -480,3 +480,53 @@ lightning-input[type="search"] {
   font-size: 12px;
   padding: 4px 12px;
 }
+
+.completedTabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 1px solid var(--tra-border);
+  margin-top: 4px;
+  margin-bottom: 14px;
+}
+
+.completedTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--tra-fg-3);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 12px 14px 10px;
+}
+
+.completedTabActive {
+  color: var(--tra-brand-dark);
+  border-bottom-color: var(--tra-brand);
+}
+
+.completedTabCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--tra-radius-pill);
+  background: #eef3ff;
+  color: var(--tra-brand-dark);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.completedFilters {
+  margin-top: 0;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--tra-border);
+  border-radius: var(--tra-radius-md);
+  background: var(--tra-surface-alt);
+}

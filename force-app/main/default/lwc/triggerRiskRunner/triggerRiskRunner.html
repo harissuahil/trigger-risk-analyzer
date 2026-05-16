@@ -487,15 +487,37 @@
                     </div>
                   </template>
 
-                  <div class="sectionHeader slds-m-top_medium">
-                    <h2 class="slds-text-heading_small">Findings</h2>
-                    <p class="slds-text-color_weak slds-text-body_small">
-                      Filter and review individual findings
-                    </p>
+                  <div class="completedTabs">
+                    <button
+                      class="completedTab completedTabActive"
+                      type="button"
+                    >
+                      <span>Findings</span>
+                      <span class="completedTabCount">{findingsCount}</span>
+                    </button>
+
+                    <button class="completedTab" type="button">
+                      <span>Rationale</span>
+                      <span class="completedTabCount"
+                        >{gateRationaleCount}</span
+                      >
+                    </button>
+
+                    <button class="completedTab" type="button">
+                      <span>Required Fixes</span>
+                      <span class="completedTabCount"
+                        >{gateRequiredFixCount}</span
+                      >
+                    </button>
+
+                    <button class="completedTab" type="button">
+                      <span>Top Risks</span>
+                      <span class="completedTabCount">{topRisksCount}</span>
+                    </button>
                   </div>
 
                   <div
-                    class="slds-m-top_medium slds-grid slds-wrap slds-gutters"
+                    class="completedFilters slds-grid slds-wrap slds-gutters"
                   >
                     <div
                       class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
