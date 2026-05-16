@@ -325,19 +325,19 @@ lightning-input[type="search"] {
   box-shadow: none;
 }
 
-.runSummaryActions lightning-button::part(button):hover {
-  background: var(--tra-surface-alt);
-  border-color: #9ca3af;
+.runSummaryActions lightning-button::part(button) {
+  width: 100%;
+  justify-content: center;
 }
 
 .runSummaryActions .actionBtn {
   margin-left: 0;
   width: 100%;
   --slds-c-button-radius-border: var(--tra-radius-md);
-  --slds-c-button-neutral-color-border: var(--tra-border);
-  --slds-c-button-neutral-color-border-hover: var(--tra-border-strong);
-  --slds-c-button-neutral-color-background: var(--tra-surface);
-  --slds-c-button-neutral-color-background-hover: var(--tra-surface-alt);
+  --slds-c-button-neutral-color-border: #c9c9c9;
+  --slds-c-button-neutral-color-border-hover: #8c8c8c;
+  --slds-c-button-neutral-color-background: #ffffff;
+  --slds-c-button-neutral-color-background-hover: #f3f3f3;
 }
 
 .runSummaryActions .actionBtn {
