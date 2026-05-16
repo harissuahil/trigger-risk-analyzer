@@ -539,7 +539,7 @@ export default class TriggerRiskRunner extends LightningElement {
 
   get severityOptions() {
     return [
-      { label: "All", value: "All" },
+      { label: "All Severities", value: "All" },
       { label: "High", value: "High" },
       { label: "Medium", value: "Medium" },
       { label: "Low", value: "Low" }
@@ -553,7 +553,7 @@ export default class TriggerRiskRunner extends LightningElement {
     });
 
     return [
-      { label: "All", value: "All" },
+      { label: "All Categories", value: "All" },
       ...Array.from(cats)
         .sort()
         .map((c) => ({ label: c, value: c }))

@@ -537,10 +537,11 @@
                       class="completedFilters slds-grid slds-wrap slds-gutters"
                     >
                       <div
-                        class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
+                        class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12"
                       >
                         <lightning-combobox
                           label="Severity"
+                          variant="label-hidden"
                           value={severityFilter}
                           options={severityOptions}
                           onchange={handleSeverityFilter}
@@ -549,10 +550,11 @@
                       </div>
 
                       <div
-                        class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
+                        class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12"
                       >
                         <lightning-combobox
                           label="Category"
+                          variant="label-hidden"
                           value={categoryFilter}
                           options={categoryOptions}
                           onchange={handleCategoryFilter}
@@ -561,22 +563,16 @@
                       </div>
 
                       <div
-                        class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
+                        class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12"
                       >
                         <lightning-input
                           label="Search"
+                          variant="label-hidden"
                           value={searchText}
                           onchange={handleSearchChange}
-                          placeholder="Search trigger, rule, message..."
+                          placeholder="Search trigger, rule, or message"
                         >
                         </lightning-input>
-
-                        <div class="slds-m-top_x-small">
-                          <lightning-button
-                            label="Clear"
-                            onclick={clearSearch}
-                          ></lightning-button>
-                        </div>
                       </div>
                     </div>
 

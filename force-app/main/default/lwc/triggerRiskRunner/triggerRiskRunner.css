@@ -525,10 +525,11 @@ lightning-input[type="search"] {
 .completedFilters {
   margin-top: 0;
   margin-bottom: 12px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid var(--tra-border);
   border-radius: var(--tra-radius-md);
   background: var(--tra-surface-alt);
+  align-items: center;
 }
 
 .completedTableWrap {
