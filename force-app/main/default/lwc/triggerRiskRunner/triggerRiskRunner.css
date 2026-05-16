@@ -530,3 +530,18 @@ lightning-input[type="search"] {
   border-radius: var(--tra-radius-md);
   background: var(--tra-surface-alt);
 }
+
+.completedTabPanel {
+  border: 1px solid var(--tra-border);
+  border-radius: var(--tra-radius-md);
+  background: var(--tra-surface-alt);
+  padding: 14px 16px;
+  margin-top: 12px;
+}
+
+.completedTabBullet {
+  color: var(--tra-fg-2);
+  font-size: 13px;
+  line-height: 1.5;
+  margin-top: 4px;
+}

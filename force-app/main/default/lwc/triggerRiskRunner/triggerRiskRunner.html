@@ -489,101 +489,174 @@
 
                   <div class="completedTabs">
                     <button
-                      class="completedTab completedTabActive"
+                      class={findingsTabClass}
                       type="button"
+                      data-tab="findings"
+                      onclick={handleCompletedTabClick}
                     >
                       <span>Findings</span>
                       <span class="completedTabCount">{findingsCount}</span>
                     </button>
 
-                    <button class="completedTab" type="button">
+                    <button
+                      class={rationaleTabClass}
+                      type="button"
+                      data-tab="rationale"
+                      onclick={handleCompletedTabClick}
+                    >
                       <span>Rationale</span>
                       <span class="completedTabCount"
                         >{gateRationaleCount}</span
                       >
                     </button>
 
-                    <button class="completedTab" type="button">
+                    <button
+                      class={requiredFixesTabClass}
+                      type="button"
+                      data-tab="requiredFixes"
+                      onclick={handleCompletedTabClick}
+                    >
                       <span>Required Fixes</span>
                       <span class="completedTabCount"
                         >{gateRequiredFixCount}</span
                       >
                     </button>
 
-                    <button class="completedTab" type="button">
+                    <button
+                      class={topRisksTabClass}
+                      type="button"
+                      data-tab="topRisks"
+                      onclick={handleCompletedTabClick}
+                    >
                       <span>Top Risks</span>
                       <span class="completedTabCount">{topRisksCount}</span>
                     </button>
                   </div>
-
-                  <div
-                    class="completedFilters slds-grid slds-wrap slds-gutters"
-                  >
+                  <template if:true={isFindingsTabActive}>
                     <div
-                      class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
+                      class="completedFilters slds-grid slds-wrap slds-gutters"
                     >
-                      <lightning-combobox
-                        label="Severity"
-                        value={severityFilter}
-                        options={severityOptions}
-                        onchange={handleSeverityFilter}
+                      <div
+                        class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
                       >
-                      </lightning-combobox>
-                    </div>
+                        <lightning-combobox
+                          label="Severity"
+                          value={severityFilter}
+                          options={severityOptions}
+                          onchange={handleSeverityFilter}
+                        >
+                        </lightning-combobox>
+                      </div>
 
-                    <div
-                      class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
-                    >
-                      <lightning-combobox
-                        label="Category"
-                        value={categoryFilter}
-                        options={categoryOptions}
-                        onchange={handleCategoryFilter}
+                      <div
+                        class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
                       >
-                      </lightning-combobox>
-                    </div>
+                        <lightning-combobox
+                          label="Category"
+                          value={categoryFilter}
+                          options={categoryOptions}
+                          onchange={handleCategoryFilter}
+                        >
+                        </lightning-combobox>
+                      </div>
 
-                    <div
-                      class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
-                    >
-                      <lightning-input
-                        label="Search"
-                        value={searchText}
-                        onchange={handleSearchChange}
-                        placeholder="Search trigger, rule, message..."
+                      <div
+                        class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
                       >
-                      </lightning-input>
+                        <lightning-input
+                          label="Search"
+                          value={searchText}
+                          onchange={handleSearchChange}
+                          placeholder="Search trigger, rule, message..."
+                        >
+                        </lightning-input>
 
-                      <div class="slds-m-top_x-small">
-                        <lightning-button
-                          label="Clear"
-                          onclick={clearSearch}
-                        ></lightning-button>
+                        <div class="slds-m-top_x-small">
+                          <lightning-button
+                            label="Clear"
+                            onclick={clearSearch}
+                          ></lightning-button>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <template if:true={showTable}>
-                    <div class="slds-m-top_medium">
-                      <lightning-datatable
-                        key-field="itemId"
-                        data={filteredItems}
-                        columns={columns}
-                        onrowaction={handleRowAction}
-                        hide-checkbox-column
-                      >
-                      </lightning-datatable>
+                    <template if:true={showTable}>
+                      <div class="slds-m-top_medium">
+                        <lightning-datatable
+                          key-field="itemId"
+                          data={filteredItems}
+                          columns={columns}
+                          onrowaction={handleRowAction}
+                          hide-checkbox-column
+                        >
+                        </lightning-datatable>
+                      </div>
+                    </template>
+
+                    <template if:false={showTable}>
+                      <div class="slds-m-top_medium slds-text-color_weak">
+                        <template if:false={hasAnyFindings}>
+                          No findings detected. This trigger passed all active
+                          rules.
+                        </template>
+                        <template if:true={hasAnyFindings}>
+                          No findings match the current filters.
+                        </template>
+                      </div>
+                    </template>
+                  </template>
+                  <template if:true={isRationaleTabActive}>
+                    <div class="completedTabPanel">
+                      <template if:true={hasGateRationale}>
+                        <template for:each={gateRationaleLines} for:item="line">
+                          <div key={line} class="completedTabBullet">
+                            • {line}
+                          </div>
+                        </template>
+                      </template>
+                      <template if:false={hasGateRationale}>
+                        <div class="slds-text-color_weak">
+                          No rationale details available.
+                        </div>
+                      </template>
                     </div>
                   </template>
 
-                  <template if:false={showTable}>
-                    <div class="slds-m-top_medium slds-text-color_weak">
-                      <template if:false={hasAnyFindings}>
-                        No findings detected. This trigger passed all active
-                        rules.
+                  <template if:true={isRequiredFixesTabActive}>
+                    <div class="completedTabPanel">
+                      <template if:true={hasGateRequiredFixes}>
+                        <template
+                          for:each={gateRequiredFixLines}
+                          for:item="line"
+                        >
+                          <div key={line} class="completedTabBullet">
+                            • {line}
+                          </div>
+                        </template>
                       </template>
-                      <template if:true={hasAnyFindings}>
-                        No findings match the current filters.
+                      <template if:false={hasGateRequiredFixes}>
+                        <div class="slds-text-color_weak">
+                          No required fixes.
+                        </div>
+                      </template>
+                    </div>
+                  </template>
+
+                  <template if:true={isTopRisksTabActive}>
+                    <div class="completedTabPanel">
+                      <template if:true={topRisks}>
+                        <template if:true={topRisks.length}>
+                          <template for:each={topRisks} for:item="risk">
+                            <div key={risk} class="completedTabBullet">
+                              • {risk}
+                            </div>
+                          </template>
+                        </template>
+                      </template>
+                      <template if:false={topRisks.length}>
+                        <div class="slds-text-color_weak">
+                          No top risks available.
+                        </div>
                       </template>
                     </div>
                   </template>

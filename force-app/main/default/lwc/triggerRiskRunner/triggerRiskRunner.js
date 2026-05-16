@@ -122,6 +122,9 @@ export default class TriggerRiskRunner extends LightningElement {
   categoryFilter = "All";
   searchText = "";
 
+  // Tabs
+  activeCompletedTab = "findings";
+
   // Polling
   pollTimer;
   pollIntervalMs = 2000;
@@ -249,6 +252,53 @@ export default class TriggerRiskRunner extends LightningElement {
 
   get topRisksCount() {
     return (this.topRisks || []).length;
+  }
+
+  get isFindingsTabActive() {
+    return this.activeCompletedTab === "findings";
+  }
+
+  get isRationaleTabActive() {
+    return this.activeCompletedTab === "rationale";
+  }
+
+  get isRequiredFixesTabActive() {
+    return this.activeCompletedTab === "requiredFixes";
+  }
+
+  get isTopRisksTabActive() {
+    return this.activeCompletedTab === "topRisks";
+  }
+
+  get findingsTabClass() {
+    return this.isFindingsTabActive
+      ? "completedTab completedTabActive"
+      : "completedTab";
+  }
+
+  get rationaleTabClass() {
+    return this.isRationaleTabActive
+      ? "completedTab completedTabActive"
+      : "completedTab";
+  }
+
+  get requiredFixesTabClass() {
+    return this.isRequiredFixesTabActive
+      ? "completedTab completedTabActive"
+      : "completedTab";
+  }
+
+  get topRisksTabClass() {
+    return this.isTopRisksTabActive
+      ? "completedTab completedTabActive"
+      : "completedTab";
+  }
+
+  handleCompletedTabClick(event) {
+    const tab = event.currentTarget.dataset.tab;
+    if (tab) {
+      this.activeCompletedTab = tab;
+    }
   }
 
   get releaseGateBadgeClass() {
