@@ -608,11 +608,16 @@
                   <template if:true={isRationaleTabActive}>
                     <div class="completedTabPanel">
                       <template if:true={hasGateRationale}>
-                        <template for:each={gateRationaleLines} for:item="line">
-                          <div key={line} class="completedTabBullet">
-                            • {line}
-                          </div>
-                        </template>
+                        <ol class="completedTabList">
+                          <template
+                            for:each={gateRationaleLines}
+                            for:item="line"
+                          >
+                            <li key={line} class="completedTabListItem">
+                              {line}
+                            </li>
+                          </template>
+                        </ol>
                       </template>
                       <template if:false={hasGateRationale}>
                         <div class="slds-text-color_weak">
@@ -625,14 +630,16 @@
                   <template if:true={isRequiredFixesTabActive}>
                     <div class="completedTabPanel">
                       <template if:true={hasGateRequiredFixes}>
-                        <template
-                          for:each={gateRequiredFixLines}
-                          for:item="line"
-                        >
-                          <div key={line} class="completedTabBullet">
-                            • {line}
-                          </div>
-                        </template>
+                        <ol class="completedTabList">
+                          <template
+                            for:each={gateRequiredFixLines}
+                            for:item="line"
+                          >
+                            <li key={line} class="completedTabListItem">
+                              {line}
+                            </li>
+                          </template>
+                        </ol>
                       </template>
                       <template if:false={hasGateRequiredFixes}>
                         <div class="slds-text-color_weak">
@@ -646,11 +653,13 @@
                     <div class="completedTabPanel">
                       <template if:true={topRisks}>
                         <template if:true={topRisks.length}>
-                          <template for:each={topRisks} for:item="risk">
-                            <div key={risk} class="completedTabBullet">
-                              • {risk}
-                            </div>
-                          </template>
+                          <ol class="completedTabList">
+                            <template for:each={topRisks} for:item="risk">
+                              <li key={risk} class="completedTabListItem">
+                                {risk}
+                              </li>
+                            </template>
+                          </ol>
                         </template>
                       </template>
                       <template if:false={topRisks.length}>
