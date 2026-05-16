@@ -79,34 +79,43 @@ export default class TriggerRiskRunner extends LightningElement {
       label: "Severity",
       fieldName: "severity",
       type: "text",
-      initialWidth: 110,
+      initialWidth: 90,
       cellAttributes: { class: { fieldName: "severityClass" } }
     },
     {
       label: "Trigger",
       fieldName: "triggerName",
       type: "text",
-      initialWidth: 260
+      initialWidth: 220
     },
-    { label: "Rule", fieldName: "ruleLabel", type: "text", initialWidth: 200 },
+    {
+      label: "Rule",
+      fieldName: "ruleLabel",
+      type: "text",
+      initialWidth: 180
+    },
     {
       label: "Category",
       fieldName: "category",
       type: "text",
-      initialWidth: 180
+      initialWidth: 160
     },
     {
       label: "Line",
       fieldName: "lineNumber",
       type: "number",
-      initialWidth: 90,
+      initialWidth: 65,
       cellAttributes: { alignment: "left" }
     },
-    { label: "Message", fieldName: "messageShort", type: "text" },
+    {
+      label: "Message",
+      fieldName: "messageShort",
+      type: "text"
+    },
     {
       label: "Details",
       type: "button",
-      initialWidth: 110,
+      initialWidth: 75,
       typeAttributes: { label: "View", name: "view", variant: "base" }
     }
   ];
